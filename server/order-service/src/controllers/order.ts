@@ -8,7 +8,11 @@ interface IOrderRequest extends Request {
 }
 
 // Place a order by logged in customer
-const placeOrder = async (req: IOrderRequest, res: Response, next: NextFunction) => {
+const placeOrder = async (
+    req: IOrderRequest, 
+    res: Response, 
+    next: NextFunction
+) => {
     try {
         const { userId,restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
         const order = new Order({
@@ -28,7 +32,10 @@ const placeOrder = async (req: IOrderRequest, res: Response, next: NextFunction)
 };
 
 // Get all orders from the database
-const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+const getAllOrders = async (
+    req: Request, res: Response, 
+    next: NextFunction
+) => {
     try {
         const orders = await Order.find();
         res.status(200).json({ message: 'Orders fetched successfully', orders });
@@ -38,7 +45,11 @@ const getAllOrders = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 // Get order list to specific restraurant
-const getOrdersByRestaurantId = async (req: Request<{ restaurantId: string }>, res: Response, next: NextFunction) => {
+const getOrdersByRestaurantId = async (
+    req: Request<{ restaurantId: string }>, 
+    res: Response, 
+    next: NextFunction
+) => {
     try {
         const orders = await Order.find({ restaurantId: req.params.restaurantId });
         res.status(200).json({ message: 'Orders fetched successfully', orders });
@@ -48,7 +59,10 @@ const getOrdersByRestaurantId = async (req: Request<{ restaurantId: string }>, r
 }
 
 // Get order by id
-const getOrderById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+const getOrderById = async (
+    req: Request<{ id: string }>, 
+    res: Response, next: NextFunction
+): Promise<void> => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) {
@@ -62,7 +76,11 @@ const getOrderById = async (req: Request<{ id: string }>, res: Response, next: N
 };
 
 // Get orders for logged in customer
-const getOrdersByUserId = async (req: Request<{ userId: string }>, res: Response, next: NextFunction) => {
+const getOrdersByUserId = async (
+    req: Request<{ userId: string }>, 
+    res: Response, 
+    next: NextFunction
+) => {
     try {
         const orders = await Order.find({ userId: req.params.userId });
         res.status(200).json({ message: 'Orders fetched successfully', orders });
@@ -72,7 +90,12 @@ const getOrdersByUserId = async (req: Request<{ userId: string }>, res: Response
 }
 
 // Update order status by restraurant owner
-const updateOrderStatus = async (req: Request<{ id: string }, {}, { orderStatus: string }>, res: Response, next: NextFunction): Promise<void> => {
+const updateOrderStatus = async (
+    req: Request<{ id: string }, 
+    {}, 
+    { orderStatus: string }>, 
+    res: Response, next: NextFunction
+): Promise<void> => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) {
@@ -97,7 +120,10 @@ const updateOrderStatus = async (req: Request<{ id: string }, {}, { orderStatus:
 }
 
 // Remove order by restraurant owner
-const removeOrder = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+const removeOrder = async (
+    req: Request<{ id: string }>, 
+    res: Response, next: NextFunction
+): Promise<void> => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) {

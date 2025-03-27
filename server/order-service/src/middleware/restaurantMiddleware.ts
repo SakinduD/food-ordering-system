@@ -7,7 +7,10 @@ interface AuthenticatedRequest extends Request {
     };
   }
 
-const restaurantMiddleware: RequestHandler = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+const restaurantMiddleware: RequestHandler = (
+    req: AuthenticatedRequest, 
+    res: Response, next: NextFunction
+): void => {
     try {
         if (req.user && req.user.role === 'restaurant') {
             next();
@@ -20,4 +23,5 @@ const restaurantMiddleware: RequestHandler = (req: AuthenticatedRequest, res: Re
         return;
     }
 }
+
 export default restaurantMiddleware;

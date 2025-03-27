@@ -12,14 +12,17 @@ interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
 }
 
-const authMiddleware: RequestHandler = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+const authMiddleware: RequestHandler = (
+    req: AuthenticatedRequest, 
+    res: Response, 
+    next: NextFunction
+): void => {
   try {
     const JWT_SECRET = process.env.JWT_SECRET as string;
     if (!JWT_SECRET) {
         res.status(500).json({ message: "Internal Server Error: JWT_SECRET not set" });
         return;
     }
-    
 
     const authHeader = req.headers.authorization;
     if (!authHeader) {

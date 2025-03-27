@@ -7,7 +7,11 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-const costomerMiddleware:RequestHandler = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+const costomerMiddleware:RequestHandler = (
+    req: AuthenticatedRequest, 
+    res: Response, 
+    next: NextFunction
+): void => {
     try{
         if (req.user && req.user.role === 'customer') {
             next();

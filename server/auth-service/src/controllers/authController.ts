@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import User, { IUser } from '../models/User';
+import User, { IUser, UserRole } from '../models/User';
 import { hashPassword, comparePasswords } from '../utils/passwordUtils';
 import { generateToken } from '../utils/tokenUtils';
 import { sendOtpEmail, sendConfirmationEmail } from '../services/emailService';
@@ -11,12 +11,25 @@ interface TokenPayload {
   _id: string;
   email: string;
   isAdmin: boolean;
+  role: UserRole;
 }
 
 // Register User
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, isAdmin }: { name: string; email: string; password: string; isAdmin?: boolean } = req.body;
+    const { 
+      name, 
+      email, 
+      password, 
+      role, 
+      isAdmin 
+    }: { 
+      name: string; 
+      email: string; 
+      password: string; 
+      role: UserRole;
+      isAdmin?: boolean 
+    } = req.body;
 
     const hashedPassword = await hashPassword(password);
     const otp = crypto.randomInt(100000, 999999).toString();
@@ -25,6 +38,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       name,
       email,
       password: hashedPassword,
+      role, // Add role to user creation
       isAdmin: isAdmin || false,
       otp,
       otpExpires: new Date(Date.now() + 300000), // OTP valid for 5 minutes
@@ -33,6 +47,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     await sendOtpEmail(email, otp);
     res.status(201).json({ message: 'OTP sent to email', userId: user._id });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
 };
@@ -88,7 +103,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const tokenPayload: TokenPayload = {
       _id: userId,
       email: user.email,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      role: user.role
     };
 
     const token = generateToken(tokenPayload);
@@ -104,6 +120,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         _id: userId,
         name: user.name,
         email: user.email,
+        role: user.role,
         isAdmin: user.isAdmin,
       },
     });

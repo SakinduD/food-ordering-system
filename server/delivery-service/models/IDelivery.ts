@@ -7,11 +7,11 @@ export interface IDelivery extends mongoose.Document {
   status: 'Pending' | 'Accepted' | 'Picked Up' | 'On the Way' | 'Delivered' | 'Cancelled';
   restaurantLocation: {
     type: 'Point';
-    coordinates: [number, number]; // [longitude, latitude]
+    coordinates: [number, number]; 
   };
   customerLocation: {
     type: 'Point';
-    coordinates: [number, number]; // [longitude, latitude]
+    coordinates: [number, number]; 
   };
   currentLocation?: {
     type: 'Point';

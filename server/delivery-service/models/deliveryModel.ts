@@ -25,10 +25,10 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
       coordinates: { type: [Number] },
     },
   },
-  { timestamps: true } // Automatically adds createdAt & updatedAt
+  { timestamps: true } 
 );
 
-// Create 2dsphere indexes for geospatial queries
+
 DeliverySchema.index({ restaurantLocation: '2dsphere' });
 DeliverySchema.index({ customerLocation: '2dsphere' });
 

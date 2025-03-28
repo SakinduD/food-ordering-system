@@ -9,7 +9,7 @@ const router = Router();
 
 
 router.post('/placeOrder',authMiddleware, customerMiddleware, orderController.placeOrder); //only logged customer
-router.get('/getOrdersByUserId/:userId',authMiddleware, customerMiddleware, orderController.getOrdersByUserId); //only logged customer
+router.get('/getOrdersByUserId',authMiddleware, customerMiddleware, orderController.getOrdersByUserId); //only logged customer
 
 router.get('/getOrderById/:id',authMiddleware, orderController.getOrderById); //any logged user
 

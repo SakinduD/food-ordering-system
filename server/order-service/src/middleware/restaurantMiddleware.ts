@@ -1,12 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Response, NextFunction, RequestHandler } from "express";
+import { AuthenticatedRequest } from "./authMiddleware";
 
-interface AuthenticatedRequest extends Request {
-    user?: {
-      id: string;
-      role: string;
-    };
-  }
-
+//middleware for check logged user is a restraurant owner
 const restaurantMiddleware: RequestHandler = (
     req: AuthenticatedRequest, 
     res: Response, next: NextFunction
@@ -15,7 +10,7 @@ const restaurantMiddleware: RequestHandler = (
         if (req.user && req.user.role === 'restaurant') {
             next();
         } else {
-            res.status(403).json({ message: 'You need to be a logged restaurant to access this route' });
+            res.status(403).json({ message: 'You must be logged in as a restaurant owner to access this route.' });
             return;
         }
     } catch (err) {

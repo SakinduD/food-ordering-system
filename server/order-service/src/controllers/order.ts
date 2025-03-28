@@ -1,20 +1,27 @@
 import { Request, Response, NextFunction } from "express";
 import Order from '../models/orderDetail';
 import { OrderDetail } from '../types/order';
+import axios from 'axios';
 
 // Define the interface for the request body
 interface IOrderRequest extends Request {
+    user: {
+        userId: string;
+        role: string;
+    };
     body: OrderDetail;
 }
 
 // Place a order by logged in customer
 const placeOrder = async (
-    req: IOrderRequest, 
+    req: Request, 
     res: Response, 
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
-        const { userId,restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
+        const { restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
+        const { userId } = (req as IOrderRequest).user;
+
         const order = new Order({
             userId,
             restaurantId,
@@ -35,7 +42,7 @@ const placeOrder = async (
 const getAllOrders = async (
     req: Request, res: Response, 
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const orders = await Order.find();
         res.status(200).json({ message: 'Orders fetched successfully', orders });
@@ -46,17 +53,27 @@ const getAllOrders = async (
 
 // Get order list to specific restraurant
 const getOrdersByRestaurantId = async (
-    req: Request<{ restaurantId: string }>, 
+    req: Request, 
     res: Response, 
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
-        const orders = await Order.find({ restaurantId: req.params.restaurantId });
-        res.status(200).json({ message: 'Orders fetched successfully', orders });
+        /*const { userId } = (req as IOrderRequest).user;
+        const {data : restaurants} = await axios.get('http://localhost:3001/api/v1/restaurants/');
+        const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
+
+        if (!restaurant) {
+            res.status(404).json({ message: 'Restaurant not found' });
+            return;
+        }
+        
+        const orders = await Order.find({ restaurantId : restaurant.restaurantId });
+        
+        res.status(200).json({ message: 'Orders fetched successfully', orders });*/
     } catch (error) {
         next(error);
     }
-}
+};
 
 // Get order by id
 const getOrderById = async (
@@ -77,17 +94,19 @@ const getOrderById = async (
 
 // Get orders for logged in customer
 const getOrdersByUserId = async (
-    req: Request<{ userId: string }>, 
+    req: Request, 
     res: Response, 
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
-        const orders = await Order.find({ userId: req.params.userId });
+        const { userId } = (req as IOrderRequest).user;
+
+        const orders = await Order.find({ userId });
         res.status(200).json({ message: 'Orders fetched successfully', orders });
     } catch (error) {
         next(error);
     }
-}
+};
 
 // Update order status by restraurant owner
 const updateOrderStatus = async (
@@ -111,13 +130,13 @@ const updateOrderStatus = async (
             return;
         }
 
-        order.orderStatus = req.body.orderStatus;
+        order.orderStatus = reqOrderStatus;
         await order.save();
         res.status(200).json({ message: 'Order updated successfully' });
     } catch (error) {
         next(error);
     }
-}
+};
 
 // Remove order by restraurant owner
 const removeOrder = async (
@@ -134,7 +153,7 @@ const removeOrder = async (
         const status = order.orderStatus.toLowerCase();
 
         if(status != 'cancelled') {
-            res.status(400).json({ message: 'The order cannot be removed unless its status is canceled.' });
+            res.status(400).json({ message: 'The order cannot be removed unless its status is cancelled.' });
             return;
         }
             
@@ -143,7 +162,7 @@ const removeOrder = async (
     } catch (error) {
         next(error);
     }
-}
+};
 
 export default {
     placeOrder,

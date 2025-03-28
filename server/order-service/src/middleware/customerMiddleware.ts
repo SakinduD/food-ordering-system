@@ -1,12 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Response, NextFunction, RequestHandler } from "express";
+import { AuthenticatedRequest } from "./authMiddleware";
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
-
+//middleware for check logged user is a customer
 const costomerMiddleware:RequestHandler = (
     req: AuthenticatedRequest, 
     res: Response, 
@@ -15,9 +10,8 @@ const costomerMiddleware:RequestHandler = (
     try{
         if (req.user && req.user.role === 'customer') {
             next();
-        }
-        else {
-            res.status(403).json({message: 'You need to be a logged customer to access this route'});
+        } else {
+            res.status(403).json({message: 'You must be logged in as a customer to access this page.'});
             return;
         }
     } catch(err) {

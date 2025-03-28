@@ -1,12 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Response, NextFunction, RequestHandler } from "express";
+import { AuthenticatedRequest } from "./authMiddleware";
 
-interface AuthenticatedRequest extends Request {
-    user?: {
-      id: string;
-      role: string;
-    };
-  }
-
+//middleware for check logged user is a admin
 const adminMiddleware: RequestHandler = (
     req: AuthenticatedRequest, 
     res: Response, 
@@ -16,7 +11,7 @@ const adminMiddleware: RequestHandler = (
         if (req.user && req.user.role === 'admin') {
             next();
         } else {
-            res.status(403).json({ message: 'You need to be a logged admin to access this route' });
+            res.status(403).json({ message: 'You must be logged in as a head admin to access this route.' });
             return;
         }
     } catch (err) {

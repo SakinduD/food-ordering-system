@@ -12,5 +12,11 @@ export interface OrderDetail {
         itemName: string;
         itemQuantity: number;
     }[];
+    orderLocation: {
+        latitude: number;
+        longitude: number;
+    };
+    roadDistance: number;
+    deliveryFee: number;
     totalAmount: number;
 }

@@ -16,7 +16,7 @@ router.get('/getOrderById/:id',authMiddleware, orderController.getOrderById); //
 router.get('/getAllOrders',authMiddleware, adminMiddleware, orderController.getAllOrders); //main admin
 
 router.get('/getOrdersByRestaurantId/:restaurantId',authMiddleware, restaurantMiddleware, orderController.getOrdersByRestaurantId); //restrarant owner
-router.put('/updateOrderStatus/:id',authMiddleware, restaurantMiddleware, orderController.updateOrderStatus); //restrarant owner
+router.put('/updateOrderStatus/:id',authMiddleware, orderController.updateOrderStatus); //restrarant owner
 router.delete('/deleteOrder/:id',authMiddleware, restaurantMiddleware,orderController.removeOrder); //restrarantowner
 
 export default router;

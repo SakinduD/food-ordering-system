@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import Order from '../models/orderDetail';
 import { OrderDetail } from '../types/order';
+import deliveyDistance from '../utils/deliveryDistance';
 import axios from 'axios';
+import deliveryFee from '../utils/deliveryFee';
 
 // Define the interface for the request body
 interface IOrderRequest extends Request {
@@ -19,10 +21,19 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
+        const { customerLat, customerLon, restaurantId, userName, userEmail, orderItems, foodTotalProce } = req.body;
         const { userId } = (req as IOrderRequest).user;
 
+        //generate a uniqe invoice id for the order
         const invoiceId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        //call the delivery distance API to get the road distance
+        const roadDistance: number = await deliveyDistance(customerLat, customerLon, restaurantId);
+        
+        //calculate the delivery fee based on the road distance
+        const deliveryFeeAmount = deliveryFee(roadDistance);
+
+        const totalAmount: number = deliveryFeeAmount + foodTotalProce;
 
         const order:OrderDetail = await Order.create({
             invoiceId,
@@ -31,6 +42,12 @@ const placeOrder = async (
             userName,
             userEmail,
             orderItems,
+            orderLocation: {
+                latitude: customerLat,
+                longitude: customerLon
+            },
+            roadDistance,
+            deliveryFee: deliveryFeeAmount,
             totalAmount
         });
 
@@ -59,7 +76,7 @@ const getOrdersByRestaurantId = async (
     res: Response, 
     next: NextFunction
 ): Promise<void> => {
-    /*try {
+    try {
         const { userId } = (req as IOrderRequest).user;
         const {data : restaurants} = await axios.get('http://localhost:5000/api/restaurant/');
         const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
@@ -74,7 +91,7 @@ const getOrdersByRestaurantId = async (
         res.status(200).json({ message: 'Orders fetched successfully', orders });
     } catch (error) {
         next(error);
-    }*/
+    }
 };
 
 // Get order by id

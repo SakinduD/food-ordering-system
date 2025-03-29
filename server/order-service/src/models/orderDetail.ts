@@ -4,6 +4,11 @@ import { OrderDetail } from "../types/order";
 interface OrderDetailDocument extends OrderDetail, Document {}
 
 const OrderDetailSchema = new Schema({
+    invoiceId: {
+        type: String,
+        required: true,
+        unique: true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User'

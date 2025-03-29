@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface OrderDetail {
+    invoiceId: string;
     userId: Types.ObjectId;
     restaurantId: Types.ObjectId;
     userName: string;

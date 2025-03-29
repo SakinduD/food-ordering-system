@@ -37,7 +37,7 @@ const generateToken = (userId: string, role: string) => {
     return token;
 };
 // Example Usage
-const token = generateToken('67e5ab7ba2faacd3c42aa556', 'restaurant');
+const token = generateToken('67e5ab7ba2faacd3c42aa556', 'admin');
 console.log('Generated Token:', token);
 
 const PORT = process.env.PORT || 5001;

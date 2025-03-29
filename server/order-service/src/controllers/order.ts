@@ -22,7 +22,10 @@ const placeOrder = async (
         const { restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
         const { userId } = (req as IOrderRequest).user;
 
-        const order = new Order({
+        const invoiceId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        const order:OrderDetail = await Order.create({
+            invoiceId,
             userId,
             restaurantId,
             userName,
@@ -31,8 +34,7 @@ const placeOrder = async (
             totalAmount
         });
 
-        await order.save();
-        res.status(201).json({ message: 'Order placed successfully' });
+        res.status(201).json({ message: order.invoiceId+' Order placed successfully!' });
     } catch (error) {
         next(error);
     }
@@ -57,9 +59,9 @@ const getOrdersByRestaurantId = async (
     res: Response, 
     next: NextFunction
 ): Promise<void> => {
-    try {
-        /*const { userId } = (req as IOrderRequest).user;
-        const {data : restaurants} = await axios.get('http://localhost:3001/api/v1/restaurants/');
+    /*try {
+        const { userId } = (req as IOrderRequest).user;
+        const {data : restaurants} = await axios.get('http://localhost:5000/api/restaurant/');
         const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
 
         if (!restaurant) {
@@ -67,12 +69,12 @@ const getOrdersByRestaurantId = async (
             return;
         }
         
-        const orders = await Order.find({ restaurantId : restaurant.restaurantId });
+        const orders = await Order.find({ restaurantId : restaurant._id });
         
-        res.status(200).json({ message: 'Orders fetched successfully', orders });*/
+        res.status(200).json({ message: 'Orders fetched successfully', orders });
     } catch (error) {
         next(error);
-    }
+    }*/
 };
 
 // Get order by id

@@ -17,10 +17,10 @@ const menuItemSchema = new Schema<IMenuItem>(
     price: { type: Number, required: true },
     available: { type: Boolean, default: true },
     restaurantId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Restaurant',
       required: true,
-    },
+    },    
   },
   {
     timestamps: true,

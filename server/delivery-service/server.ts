@@ -1,7 +1,7 @@
 require('dotenv').config();
 import express from 'express';
 import mongoose from 'mongoose';
-import deliveryRoutes from './routes/deliveryRoutes';
+import deliveryRoutes from './src/routes/deliveryRoutes';
 
 const app = express();
 app.use(express.json());

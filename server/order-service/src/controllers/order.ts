@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import Order from '../models/orderDetail';
 import { OrderDetail } from '../types/order';
+import deliveyDistance from '../utils/deliveryDistance';
 import axios from 'axios';
+import deliveryFee from '../utils/deliveryFee';
 
 // Define the interface for the request body
 interface IOrderRequest extends Request {
@@ -19,20 +21,37 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { restaurantId, userName, userEmail, orderItems, totalAmount } = req.body;
+        const { customerLat, customerLon, restaurantId, userName, userEmail, orderItems, foodTotalProce } = req.body;
         const { userId } = (req as IOrderRequest).user;
 
-        const order = new Order({
+        //generate a uniqe invoice id for the order
+        const invoiceId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        //call the delivery distance API to get the road distance
+        const roadDistance: number = await deliveyDistance(customerLat, customerLon, restaurantId);
+        
+        //calculate the delivery fee based on the road distance
+        const deliveryFeeAmount = deliveryFee(roadDistance);
+
+        const totalAmount: number = deliveryFeeAmount + foodTotalProce;
+
+        const order:OrderDetail = await Order.create({
+            invoiceId,
             userId,
             restaurantId,
             userName,
             userEmail,
             orderItems,
+            orderLocation: {
+                latitude: customerLat,
+                longitude: customerLon
+            },
+            roadDistance,
+            deliveryFee: deliveryFeeAmount,
             totalAmount
         });
 
-        await order.save();
-        res.status(201).json({ message: 'Order placed successfully' });
+        res.status(201).json({ message: order.invoiceId+' Order placed successfully!' });
     } catch (error) {
         next(error);
     }
@@ -58,8 +77,8 @@ const getOrdersByRestaurantId = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        /*const { userId } = (req as IOrderRequest).user;
-        const {data : restaurants} = await axios.get('http://localhost:3001/api/v1/restaurants/');
+        const { userId } = (req as IOrderRequest).user;
+        const {data : restaurants} = await axios.get('http://localhost:5000/api/restaurant/');
         const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
 
         if (!restaurant) {
@@ -67,9 +86,9 @@ const getOrdersByRestaurantId = async (
             return;
         }
         
-        const orders = await Order.find({ restaurantId : restaurant.restaurantId });
+        const orders = await Order.find({ restaurantId : restaurant._id });
         
-        res.status(200).json({ message: 'Orders fetched successfully', orders });*/
+        res.status(200).json({ message: 'Orders fetched successfully', orders });
     } catch (error) {
         next(error);
     }

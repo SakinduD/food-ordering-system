@@ -1,10 +1,22 @@
 import express from 'express';
-import { setAvailability, getRestaurants } from '../controllers/restaurantController';
+import {
+  createRestaurant,
+  getRestaurants,
+  getRestaurantById,
+  updateRestaurant,
+  deleteRestaurant,
+  setAvailability
+} from '../controllers/restaurantController';
+
 import authMiddleware from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.put('/:id/availability', authMiddleware, setAvailability);
+router.post('/', authMiddleware, createRestaurant);
 router.get('/', getRestaurants);
+router.get('/:id', getRestaurantById);
+router.put('/:id', authMiddleware, updateRestaurant);
+router.delete('/:id', authMiddleware, deleteRestaurant);
+router.put('/:id/availability', authMiddleware, setAvailability);
 
 export default router;

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
-    "serve": "node dist/server.js"
+    "server": "node dist/server.js"
   },
   "keywords": [],
   "author": "",

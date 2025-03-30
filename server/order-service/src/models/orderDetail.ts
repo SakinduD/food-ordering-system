@@ -4,6 +4,11 @@ import { OrderDetail } from "../types/order";
 interface OrderDetailDocument extends OrderDetail, Document {}
 
 const OrderDetailSchema = new Schema({
+    invoiceId: {
+        type: String,
+        required: true,
+        unique: true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User'
@@ -40,6 +45,24 @@ const OrderDetailSchema = new Schema({
             required: true
         }
     }],
+    orderLocation: {
+        latitude: {
+            type: Number,
+            required: true
+        },
+        longitude: {
+            type: Number,
+            required: true
+        }
+    },
+    roadDistance: {
+        type: Number,
+        required: true
+    },
+    deliveryFee: {
+        type: Number,
+        required: true
+    },
     totalAmount: {
         type: Number,
         required: true

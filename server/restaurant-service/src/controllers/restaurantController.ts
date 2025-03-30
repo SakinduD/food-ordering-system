@@ -1,6 +1,69 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/Restaurant';
 
+// ✅ Create a new restaurant
+export const createRestaurant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const restaurant = await Restaurant.create(req.body);
+    res.status(201).json({ message: 'Restaurant created successfully!', data: restaurant });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// ✅ Get all restaurants
+export const getRestaurants = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const restaurants = await Restaurant.find();
+    res.json({ message: 'Restaurants fetched!', data: restaurants });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ✅ Get a single restaurant
+export const getRestaurantById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+    if (restaurant) {
+      res.status(200).json({ data: restaurant });
+    } else {
+      res.status(404).json({ message: 'Restaurant not found' });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ✅ Update a restaurant (name, address, etc.)
+export const updateRestaurant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const updated = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (updated) {
+      res.status(200).json({ message: 'Restaurant updated!', data: updated });
+    } else {
+      res.status(404).json({ message: 'Restaurant not found' });
+    }
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// ✅ Delete a restaurant
+export const deleteRestaurant = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const deleted = await Restaurant.findByIdAndDelete(req.params.id);
+    if (deleted) {
+      res.status(200).json({ message: 'Restaurant deleted successfully!' });
+    } else {
+      res.status(404).json({ message: 'Restaurant not found' });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ✅ Set availability
 export const setAvailability = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurant = await Restaurant.findByIdAndUpdate(
@@ -17,14 +80,5 @@ export const setAvailability = async (req: Request, res: Response): Promise<void
     res.json({ message: 'Availability updated!', data: restaurant });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
-  }
-};
-
-export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const restaurants = await Restaurant.find();
-    res.json({ message: 'Restaurants fetched!', data: restaurants });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
   }
 };

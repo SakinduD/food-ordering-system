@@ -1,10 +1,16 @@
-require('dotenv').config();
 import express from 'express';
 import mongoose from 'mongoose';
-import deliveryRoutes from './src/routes/deliveryRoutes';
+import http from 'http';
+import dotenv from 'dotenv';
+import { initializeSocket } from './src/utils/socket';  
+import deliveryRoutes from './src/routes/deliveryRoutes';  
 
+dotenv.config();
 const app = express();
 app.use(express.json());
+
+const server = http.createServer(app);  
+initializeSocket(server);
 
 mongoose.connect(process.env.MONGO_URI || '')
   .then(() => console.log('MongoDB Connected'))
@@ -13,4 +19,4 @@ mongoose.connect(process.env.MONGO_URI || '')
 app.use('/api/deliveries', deliveryRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Delivery service running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

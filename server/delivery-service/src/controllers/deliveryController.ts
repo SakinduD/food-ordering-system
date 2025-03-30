@@ -2,6 +2,7 @@ import  { Request, Response } from 'express';
 import Delivery from '../models/deliveryModel';
 import apiCaller from '../utils/apiCaller';
 import mongoose from 'mongoose';
+import { getIo } from '../utils/socket';
 
 const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL || '';
 const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL || '';
@@ -54,7 +55,7 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
 // ✅ Update delivery status
 export const updateDeliveryStatus = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { status, currentLocation } = req.body;
+    const { status } = req.body;
     const { deliveryId } = req.params;
 
     const delivery = await Delivery.findById(deliveryId);
@@ -64,12 +65,29 @@ export const updateDeliveryStatus = async (req: Request, res: Response): Promise
     }
 
     delivery.status = status;
-    if (currentLocation) {
-      delivery.currentLocation = currentLocation;
+    await delivery.save();
+
+    // Notify customers
+    getIo().to(deliveryId).emit('statusUpdate', { deliveryId, status });
+
+    res.json(delivery);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getDeliveryLocation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
     }
 
-    await delivery.save();
-    res.json(delivery);
+    res.json({ deliveryId, currentLocation: delivery.currentLocation });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: (error as Error).message });
@@ -86,3 +104,5 @@ export const getAllDeliveries = async (req: Request, res: Response): Promise<voi
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+

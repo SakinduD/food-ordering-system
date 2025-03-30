@@ -21,16 +21,14 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
       coordinates: { type: [Number], required: true },
     },
     currentLocation: {
-      type: { type: String, enum: ['Point'] },
-      coordinates: { type: [Number] },
+      type: { type: String, enum: ['Point'], required: false },
+      coordinates: { type: [Number], required: false },
     },
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
-
 
 DeliverySchema.index({ restaurantLocation: '2dsphere' });
 DeliverySchema.index({ customerLocation: '2dsphere' });
 
-// Export Mongoose Model
 export default mongoose.model<IDelivery>('Delivery', DeliverySchema);

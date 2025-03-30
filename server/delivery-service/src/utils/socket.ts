@@ -22,19 +22,21 @@ export const initializeSocket = (server: HttpServer) => {
 
     
     socket.on('updateLocation', async (data) => {
-      console.log(`Driver location updated: ${JSON.stringify(data)}`);
-
+      console.log(`Driver location update received: ${JSON.stringify(data)}`);
+    
       const { deliveryId, currentLocation } = data;
       const delivery = await Delivery.findById(deliveryId);
-
+    
       if (delivery) {
+        console.log(`Before update: ${JSON.stringify(delivery.currentLocation)}`);
         delivery.currentLocation = currentLocation;
         await delivery.save();
-
-        
+        console.log(`After update: ${JSON.stringify(delivery.currentLocation)}`);
+    
         io.to(deliveryId).emit('locationUpdate', { deliveryId, currentLocation });
       }
     });
+    
 
     socket.on('disconnect', () => {
       console.log(`Client disconnected: ${socket.id}`);

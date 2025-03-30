@@ -81,18 +81,19 @@ export const getDeliveryLocation = async (req: Request, res: Response): Promise<
   try {
     const { deliveryId } = req.params;
 
-    const delivery = await Delivery.findById(deliveryId);
+    const delivery = await Delivery.findById(deliveryId).select('currentLocation');
     if (!delivery) {
       res.status(404).json({ message: 'Delivery not found' });
       return;
     }
 
-    res.json({ deliveryId, currentLocation: delivery.currentLocation });
+    res.json({ deliveryId, currentLocation: delivery.currentLocation || { coordinates: [0, 0] } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
 
 // ✅ Get all deliveries
 export const getAllDeliveries = async (req: Request, res: Response): Promise<void> => {

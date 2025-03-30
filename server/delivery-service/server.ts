@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 import http from 'http';
 import dotenv from 'dotenv';
 import { initializeSocket } from './src/utils/socket';  
-import deliveryRoutes from './src/routes/deliveryRoutes';  
-import jwt from 'jsonwebtoken'; 
+import deliveryRoutes from './src/routes/deliveryRoutes';   
 
 dotenv.config();
 const app = express();
@@ -16,16 +15,6 @@ initializeSocket(server);
 mongoose.connect(process.env.MONGO_URI || '')
   .then(() => console.log('MongoDB Connected'))
   .catch((err: unknown) => console.error('MongoDB Connection Error:', err));
-
-  const mockUser = {
-    id: 'mockUserId',
-    role: 'Admin', // Change role to test different access levels
-  };
-  
-  const MOCK_SECRET = process.env.JWT_SECRET || 'mocksecretkey'; // Use env secret or default
-  const mockToken = jwt.sign(mockUser, MOCK_SECRET, { expiresIn: '1h' });
-  
-  console.log(`🔑 Mock JWT Token: ${mockToken}`);
   
 
 app.use('/api/deliveries', deliveryRoutes);

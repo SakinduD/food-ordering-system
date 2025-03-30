@@ -3,6 +3,7 @@ import {
   createRestaurant,
   getRestaurants,
   getRestaurantById,
+  getRestaurantByUserId,
   updateRestaurant,
   deleteRestaurant,
   setAvailability
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.post('/', authMiddleware, createRestaurant);
 router.get('/', getRestaurants);
+router.get('/user/:userId', getRestaurantByUserId); 
 router.get('/:id', getRestaurantById);
 router.put('/:id', authMiddleware, updateRestaurant);
 router.delete('/:id', authMiddleware, deleteRestaurant);

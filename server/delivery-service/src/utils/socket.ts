@@ -8,38 +8,50 @@ export const initializeSocket = (server: HttpServer) => {
   io = new SocketIOServer(server, {
     cors: {
       origin: '*',
+      methods: ['GET', 'POST'],
     },
   });
 
+  server.on('upgrade', (request, socket, head) => {
+    console.log('🔄 WebSocket Upgrade Request Received');
+  });
+
   io.on('connection', (socket) => {
-    console.log(`Client connected: ${socket.id}`);
+    console.log(`✅ Client connected: ${socket.id}`);
 
-    
     socket.on('joinDeliveryRoom', (deliveryId) => {
-      socket.join(deliveryId);
-      console.log(`Driver joined delivery room: ${deliveryId}`);
-    });
-
-    
-    socket.on('updateLocation', async (data) => {
-      console.log(`Driver location update received: ${JSON.stringify(data)}`);
-    
-      const { deliveryId, currentLocation } = data;
-      const delivery = await Delivery.findById(deliveryId);
-    
-      if (delivery) {
-        console.log(`Before update: ${JSON.stringify(delivery.currentLocation)}`);
-        delivery.currentLocation = currentLocation;
-        await delivery.save();
-        console.log(`After update: ${JSON.stringify(delivery.currentLocation)}`);
-    
-        io.to(deliveryId).emit('locationUpdate', { deliveryId, currentLocation });
+      if (deliveryId) {
+        socket.join(deliveryId);
+        console.log(`🚛 Driver joined delivery room: ${deliveryId}`);
+      } else {
+        console.error('❌ Invalid deliveryId received');
       }
     });
-    
+
+    socket.on('updateLocation', async (data) => {
+      try {
+        const { deliveryId, currentLocation } = data;
+        if (!deliveryId || !currentLocation) {
+          console.error('❌ Missing deliveryId or currentLocation');
+          return;
+        }
+
+        const delivery = await Delivery.findById(deliveryId);
+        if (delivery) {
+          delivery.currentLocation = currentLocation;
+          await delivery.save();
+
+          io.to(deliveryId).emit('locationUpdate', { deliveryId, currentLocation });
+        } else {
+          console.error('❌ Delivery not found');
+        }
+      } catch (error) {
+        console.error('❌ Error updating location:', error);
+      }
+    });
 
     socket.on('disconnect', () => {
-      console.log(`Client disconnected: ${socket.id}`);
+      console.log(`❌ Client disconnected: ${socket.id}`);
     });
   });
 };

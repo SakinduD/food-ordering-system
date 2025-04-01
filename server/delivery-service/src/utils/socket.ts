@@ -19,12 +19,13 @@ export const initializeSocket = (server: HttpServer) => {
   io.on('connection', (socket) => {
     console.log(`✅ Client connected: ${socket.id}`);
 
-    socket.on('joinDeliveryRoom', (deliveryId) => {
-      if (deliveryId) {
+    socket.on('joinDeliveryRoom', (data) => {
+      const { deliveryId, driverId } = data;
+      if (deliveryId && driverId) {
         socket.join(deliveryId);
-        console.log(`🚛 Driver joined delivery room: ${deliveryId}`);
+        console.log(`🚛 Driver ${driverId} joined delivery room: ${deliveryId}`);
       } else {
-        console.error('❌ Invalid deliveryId received');
+        console.error('❌ Invalid deliveryId or driverId received');
       }
     });
 

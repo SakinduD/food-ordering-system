@@ -3,6 +3,7 @@ import Delivery from '../models/deliveryModel';
 import apiCaller from '../utils/apiCaller';
 import mongoose from 'mongoose';
 import { getIo } from '../utils/socket';
+import OrderDetail from '../../../order-service/src/models/orderDetail';
 
 const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL || '';
 const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL || '';

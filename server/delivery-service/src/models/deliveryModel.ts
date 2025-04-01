@@ -21,8 +21,8 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
       coordinates: { type: [Number], required: true },
     },
     currentLocation: {
-      type: { type: String, enum: ['Point'], required: false },
-      coordinates: { type: [Number], required: false },
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], default: [0, 0] },
     },
   },
   { timestamps: true }
@@ -30,5 +30,6 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
 
 DeliverySchema.index({ restaurantLocation: '2dsphere' });
 DeliverySchema.index({ customerLocation: '2dsphere' });
+
 
 export default mongoose.model<IDelivery>('Delivery', DeliverySchema);

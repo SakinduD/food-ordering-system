@@ -6,10 +6,10 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
   {
     orderId: { type: Schema.Types.ObjectId, ref: 'Order', required: true },
     restaurantId: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
-    driverId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    driverId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     status: {
       type: String,
-      enum: ['Pending', 'Accepted', 'Picked Up', 'On the Way', 'Delivered', 'Cancelled'],
+      enum: ['Pending', 'Driver_Assigned', 'Picked_Up', 'On_the_Way', 'Delivered', 'Cancelled'],
       default: 'Pending',
     },
     restaurantLocation: {
@@ -24,6 +24,7 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number], default: [0, 0] },
     },
+    isDriverAssigned: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

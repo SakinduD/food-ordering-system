@@ -13,6 +13,11 @@ export interface IUser extends Document {
   isVerified: boolean;
   otp: string | null;
   otpExpires: Date | null;
+  currentLocation?: {
+    type: string;
+    coordinates: [number, number]; // [longitude, latitude]
+  };
+  isAvailable?: boolean; // For delivery agents to mark themselves as available
 }
 
 // Define the schema for the User model
@@ -29,10 +34,18 @@ const userSchema: Schema = new Schema(
     isAdmin: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     otp: { type: String, default: null },
-    otpExpires: { type: Date, default: null }
+    otpExpires: { type: Date, default: null },
+    currentLocation: {
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], default: [0, 0] }
+    },
+    isAvailable: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
+
+// Add geospatial index for location queries
+userSchema.index({ currentLocation: '2dsphere' });
 
 // Create the User model and export it
 const User = mongoose.model<IUser>('User', userSchema);

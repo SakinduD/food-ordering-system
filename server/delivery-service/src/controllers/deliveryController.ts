@@ -1,52 +1,104 @@
-import  { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import Delivery from '../models/deliveryModel';
-import apiCaller from '../utils/apiCaller';
 import mongoose from 'mongoose';
 import { getIo } from '../utils/socket';
 import OrderDetail from '../../../order-service/src/models/orderDetail';
+import Restaurant from '../../../restaurant-service/src/models/Restaurant';
+import User from '../../../auth-service/src/models/User';
 
-const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL || '';
-const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL || '';
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || '';
-
-// ✅ Create a new delivery
+// Create initial delivery without driver
 export const createDelivery = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { orderId, driverId } = req.body;
+    const { orderId } = req.body;
 
-    // Fetch order details from the Order service
-    // const order = await apiCaller(`${ORDER_SERVICE_URL}/${orderId}`);
-    // if (!order) {
-    //   res.status(404).json({ message: 'Order not found' });
-    //   return;
-    // }
+    // Fetch order details
+    const order = await OrderDetail.findById(orderId);
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
 
-    // Fetch restaurant details from the Restaurant service
-    // const restaurant = await apiCaller(`${RESTAURANT_SERVICE_URL}/${order.restaurantId}`);
-    // if (!restaurant) {
-    //   res.status(404).json({ message: 'Restaurant not found' });
-    //   return;
-    // }
+    // Fetch restaurant details
+    const restaurant = await Restaurant.findById(order.restaurantId);
+    if (!restaurant) {
+      res.status(404).json({ message: 'Restaurant not found' });
+      return;
+    }
 
-    // Fetch driver details from the Auth service
-    // const driver = await apiCaller(`${AUTH_SERVICE_URL}/users/${driverId}`);
-    // if (!driver || driver.role !== 'Driver') {
-    //   res.status(403).json({ message: 'Invalid driver' });
-    //   return;
-    // }
-
-    // Create a new delivery
     const delivery = new Delivery({
-      orderId,
-      restaurantId: new mongoose.Types.ObjectId(), // Use a valid ObjectId
-      driverId,
+      orderId: new mongoose.Types.ObjectId(orderId),
+      restaurantId: order.restaurantId,
       status: 'Pending',
-      restaurantLocation: { type: 'Point', coordinates: [-73.935242, 40.73061] }, // Mock location
-      customerLocation: { type: 'Point', coordinates: [-73.935242, 40.73061] }, // Mock location
+      restaurantLocation: {
+        type: 'Point',
+        coordinates: [restaurant.location?.longitude || 0, restaurant.location?.latitude || 0]
+      },
+      customerLocation: {
+        type: 'Point',
+        coordinates: [order.orderLocation.longitude, order.orderLocation.latitude]
+      },
+      isDriverAssigned: false
     });
 
     await delivery.save();
-    res.status(201).json(delivery);
+
+    // Emit new delivery event for available drivers
+    getIo().emit('newDeliveryAvailable', {
+      deliveryId: delivery._id,
+      pickupLocation: delivery.restaurantLocation,
+      dropLocation: delivery.customerLocation
+    });
+
+    res.status(201).json({
+      message: 'Delivery created and waiting for driver assignment',
+      delivery
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// Assign driver to delivery
+export const assignDriver = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+    const { driverId } = req.body;
+
+    // Validate driver
+    const driver = await User.findById(driverId);
+    if (!driver || driver.role !== 'deliveryAgent') {
+      res.status(400).json({ message: 'Invalid driver or not a delivery agent' });
+      return;
+    }
+
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
+    }
+
+    if (delivery.isDriverAssigned) {
+      res.status(400).json({ message: 'Delivery already assigned to a driver' });
+      return;
+    }
+
+    delivery.driverId = new mongoose.Types.ObjectId(driverId);
+    delivery.isDriverAssigned = true;
+    delivery.status = 'Driver_Assigned';
+    await delivery.save();
+
+    // Notify relevant parties about driver assignment
+    getIo().emit('driverAssigned', {
+      deliveryId: delivery._id,
+      driverId,
+      status: delivery.status
+    });
+
+    res.status(200).json({
+      message: 'Driver assigned successfully',
+      delivery
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: (error as Error).message });
@@ -101,6 +153,28 @@ export const getAllDeliveries = async (req: Request, res: Response): Promise<voi
   try {
     const deliveries = await Delivery.find().populate('orderId restaurantId driverId');
     res.json(deliveries);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getActiveDriversLocations = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const drivers = await User.find({
+      role: 'deliveryAgent',
+      isAvailable: true,
+      currentLocation: { $exists: true }
+    }).select('_id name currentLocation');
+
+    res.json({
+      success: true,
+      drivers: drivers.map(driver => ({
+        driverId: driver._id,
+        name: driver.name,
+        location: driver.currentLocation
+      }))
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: (error as Error).message });

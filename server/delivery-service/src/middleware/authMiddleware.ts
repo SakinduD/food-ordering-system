@@ -1,59 +1,54 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import { AuthServiceAdapter, ServiceError } from '../adapters/serviceAdapters';
+import { IAuthUser } from '../interfaces/services';
 
-dotenv.config();
+const authService = new AuthServiceAdapter();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'mocksecretkey';
-const USE_MOCK_AUTH = process.env.USE_MOCK_AUTH === 'true';
-
-// 🟢 Generate mock token once
-const mockUser = { id: 'mockUserId', role: 'Driver' };
-const mockToken = jwt.sign(mockUser, JWT_SECRET, { expiresIn: '1h' });
-
-console.log(`🔑 Mock JWT Token: ${mockToken}`); // Show mock token in terminal
-
-export interface AuthRequest extends Request {
-  user?: { id: string; role: string };
+export interface AuthenticatedRequest extends Request {
+  user?: IAuthUser;
 }
 
-// ✅ Authentication Middleware (Handles Mock Token)
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  let token = req.headers.authorization?.split(' ')[1];
-
-  if (USE_MOCK_AUTH) {
-    console.log('🟢 Using mock authentication');
-    token = mockToken; // Inject mock token when testing
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Unauthorized: No token provided' });
-    return;
-  }
-
+export const authenticate = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    // ✅ Verify JWT token
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; role: string };
-    req.user = decoded;
+    // Get token from cookie (auth service uses httpOnly cookies)
+    const token = req.cookies?.token;
+
+    if (!token) {
+      res.status(401).json({ message: 'Authentication required' });
+      return;
+    }
+
+    const userData = await authService.verifyToken(token);
+    req.user = userData;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
 
-// ✅ Authorization Middleware (Role-Based Access Control)
 export const authorize = (roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({ message: 'Unauthorized: No user data' });
+      res.status(401).json({ message: 'Authentication required' });
       return;
     }
 
-    if (!roles.includes(req.user.role)) {
-      res.status(403).json({ message: 'Access forbidden: Insufficient permissions' });
+    // Allow if user is admin or has required role
+    if (req.user.isAdmin || roles.includes(req.user.role)) {
+      next();
       return;
     }
 
-    next();
+    res.status(403).json({ 
+      message: 'You do not have permission to perform this action' 
+    });
   };
 };

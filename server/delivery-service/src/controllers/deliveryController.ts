@@ -1,37 +1,33 @@
 import { Request, Response } from 'express';
-import Delivery from '../models/deliveryModel';
 import mongoose from 'mongoose';
+import Delivery from '../models/deliveryModel';
 import { getIo } from '../utils/socket';
-import OrderDetail from '../../../order-service/src/models/orderDetail';
-import Restaurant from '../../../restaurant-service/src/models/Restaurant';
+import { OrderServiceAdapter, RestaurantServiceAdapter, ServiceError } from '../adapters/serviceAdapters';
 import User from '../../../auth-service/src/models/User';
+
+const orderService = new OrderServiceAdapter();
+const restaurantService = new RestaurantServiceAdapter();
 
 // Create initial delivery without driver
 export const createDelivery = async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderId } = req.body;
 
-    // Fetch order details
-    const order = await OrderDetail.findById(orderId);
-    if (!order) {
-      res.status(404).json({ message: 'Order not found' });
-      return;
-    }
+    // Fetch order details through adapter
+    const orderResponse = await orderService.getOrderById(orderId);
+    const { order } = orderResponse;
 
-    // Fetch restaurant details
-    const restaurant = await Restaurant.findById(order.restaurantId);
-    if (!restaurant) {
-      res.status(404).json({ message: 'Restaurant not found' });
-      return;
-    }
+    // Fetch restaurant details through adapter
+    const restaurantResponse = await restaurantService.getRestaurantById(order.restaurantId);
+    const { restaurant } = restaurantResponse;
 
     const delivery = new Delivery({
       orderId: new mongoose.Types.ObjectId(orderId),
-      restaurantId: order.restaurantId,
+      restaurantId: new mongoose.Types.ObjectId(order.restaurantId),
       status: 'Pending',
       restaurantLocation: {
         type: 'Point',
-        coordinates: [restaurant.location?.longitude || 0, restaurant.location?.latitude || 0]
+        coordinates: [restaurant.location.longitude, restaurant.location.latitude]
       },
       customerLocation: {
         type: 'Point',
@@ -55,6 +51,10 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
     });
   } catch (error) {
     console.error(error);
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: (error as Error).message });
   }
 };

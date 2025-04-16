@@ -2,11 +2,17 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Delivery from '../models/deliveryModel';
 import { getIo } from '../utils/socket';
-import { OrderServiceAdapter, RestaurantServiceAdapter, ServiceError } from '../adapters/serviceAdapters';
-import User from '../../../auth-service/src/models/User';
+import { 
+  OrderServiceAdapter, 
+  RestaurantServiceAdapter, 
+  UserServiceAdapter,
+  ServiceError 
+} from '../adapters/serviceAdapters';
+
 
 const orderService = new OrderServiceAdapter();
 const restaurantService = new RestaurantServiceAdapter();
+const userService = new UserServiceAdapter();
 
 // Create initial delivery without driver
 export const createDelivery = async (req: Request, res: Response): Promise<void> => {
@@ -21,13 +27,18 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
     const restaurantResponse = await restaurantService.getRestaurantById(order.restaurantId);
     const { restaurant } = restaurantResponse;
 
+    // Validate restaurant location
+    if (!restaurant.location || !restaurant.location.coordinates) {
+      throw new ServiceError('DeliveryService', 'Restaurant location not found', 400);
+    }
+
     const delivery = new Delivery({
       orderId: new mongoose.Types.ObjectId(orderId),
       restaurantId: new mongoose.Types.ObjectId(order.restaurantId),
       status: 'Pending',
       restaurantLocation: {
         type: 'Point',
-        coordinates: [restaurant.location.longitude, restaurant.location.latitude]
+        coordinates: restaurant.location.coordinates // Restaurant model already stores as [longitude, latitude]
       },
       customerLocation: {
         type: 'Point',
@@ -41,8 +52,14 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
     // Emit new delivery event for available drivers
     getIo().emit('newDeliveryAvailable', {
       deliveryId: delivery._id,
-      pickupLocation: delivery.restaurantLocation,
-      dropLocation: delivery.customerLocation
+      pickupLocation: {
+        longitude: restaurant.location.coordinates[0],
+        latitude: restaurant.location.coordinates[1]
+      },
+      dropLocation: {
+        longitude: order.orderLocation.longitude,
+        latitude: order.orderLocation.latitude
+      }
     });
 
     res.status(201).json({
@@ -65,8 +82,10 @@ export const assignDriver = async (req: Request, res: Response): Promise<void> =
     const { deliveryId } = req.params;
     const { driverId } = req.body;
 
-    // Validate driver
-    const driver = await User.findById(driverId);
+    // Validate driver through user service
+    const driverResponse = await userService.getUserById(driverId);
+    const driver = driverResponse.user;
+    
     if (!driver || driver.role !== 'deliveryAgent') {
       res.status(400).json({ message: 'Invalid driver or not a delivery agent' });
       return;
@@ -101,6 +120,10 @@ export const assignDriver = async (req: Request, res: Response): Promise<void> =
     });
   } catch (error) {
     console.error(error);
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: (error as Error).message });
   }
 };
@@ -161,22 +184,22 @@ export const getAllDeliveries = async (req: Request, res: Response): Promise<voi
 
 export const getActiveDriversLocations = async (req: Request, res: Response): Promise<void> => {
   try {
-    const drivers = await User.find({
-      role: 'deliveryAgent',
-      isAvailable: true,
-      currentLocation: { $exists: true }
-    }).select('_id name currentLocation');
-
+    const activeDrivers = await userService.getActiveDrivers();
+    
     res.json({
       success: true,
-      drivers: drivers.map(driver => ({
-        driverId: driver._id,
-        name: driver.name,
-        location: driver.currentLocation
+      drivers: activeDrivers.map(({ user }) => ({
+        driverId: user._id,
+        name: user.name,
+        location: user.currentLocation
       }))
     });
   } catch (error) {
     console.error(error);
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: (error as Error).message });
   }
 };

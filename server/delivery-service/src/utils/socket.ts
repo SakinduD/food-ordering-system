@@ -1,12 +1,12 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { AuthServiceAdapter } from '../adapters/serviceAdapters';
+import { AuthServiceAdapter, UserServiceAdapter } from '../adapters/serviceAdapters';
 import Delivery from '../models/deliveryModel';
-import User from '../../../auth-service/src/models/User';
 
 let io: SocketIOServer;
 const activeDrivers = new Map();
 const authService = new AuthServiceAdapter();
+const userService = new UserServiceAdapter();
 
 export const initializeSocket = (server: HttpServer) => {
   io = new SocketIOServer(server, {
@@ -45,6 +45,7 @@ export const initializeSocket = (server: HttpServer) => {
 
       const { isAvailable, location } = data;
       try {
+        // Update driver availability through user service
         if (isAvailable) {
           activeDrivers.set(user._id, { 
             socketId: socket.id, 
@@ -76,6 +77,7 @@ export const initializeSocket = (server: HttpServer) => {
 
       const { deliveryId, location } = data;
       try {
+        // Validate delivery assignment
         if (deliveryId) {
           const delivery = await Delivery.findById(deliveryId);
           if (delivery && delivery.driverId?.toString() === user._id) {
@@ -112,7 +114,6 @@ export const initializeSocket = (server: HttpServer) => {
       }
     });
 
-    // Allow authenticated users to join delivery tracking rooms
     socket.on('joinDeliveryRoom', async (data) => {
       const { deliveryId } = data;
       try {
@@ -122,7 +123,7 @@ export const initializeSocket = (server: HttpServer) => {
           return;
         }
 
-        // Allow admin, restaurant owner of this delivery, or assigned delivery agent
+        // Verify user permissions
         if (user.isAdmin || 
             delivery.restaurantId.toString() === user.restaurantId ||
             (user.role === 'deliveryAgent' && delivery.driverId?.toString() === user._id)) {
@@ -138,7 +139,6 @@ export const initializeSocket = (server: HttpServer) => {
     });
 
     socket.on('disconnect', async () => {
-      console.log(`Client disconnected: ${socket.id}`);
       if (user.role === 'deliveryAgent') {
         activeDrivers.delete(user._id);
         io.emit('driverStatusUpdate', {
@@ -146,6 +146,7 @@ export const initializeSocket = (server: HttpServer) => {
           isAvailable: false
         });
       }
+      console.log(`Client disconnected: ${socket.id}`);
     });
   });
 };

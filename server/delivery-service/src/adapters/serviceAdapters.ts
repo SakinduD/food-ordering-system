@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IOrderResponse, IRestaurantResponse, IAuthUser } from '../interfaces/services';
+import { IOrderResponse, IRestaurantResponse, IUserResponse, IAuthUser } from '../interfaces/services';
 import jwt from 'jsonwebtoken';
 
 export class ServiceError extends Error {
@@ -10,6 +10,40 @@ export class ServiceError extends Error {
   ) {
     super(message);
     this.name = 'ServiceError';
+  }
+}
+
+export class UserServiceAdapter {
+  private readonly baseUrl: string;
+
+  constructor() {
+    this.baseUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5000/api';
+  }
+
+  async getUserById(userId: string): Promise<IUserResponse> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/users/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new ServiceError('UserService',
+        error.response?.data?.message || 'Failed to fetch user details',
+        error.response?.status || 500
+      );
+    }
+  }
+
+  async getActiveDrivers(): Promise<IUserResponse[]> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/users`, {
+        params: { role: 'deliveryAgent', isAvailable: true }
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new ServiceError('UserService',
+        error.response?.data?.message || 'Failed to fetch active drivers',
+        error.response?.status || 500
+      );
+    }
   }
 }
 

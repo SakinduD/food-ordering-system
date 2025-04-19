@@ -14,3 +14,13 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
+
+  menu-service:
+    build: ./menu-service
+    ports:
+      - "5001:5001"
+    environment:
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
+    depends_on:
+      - restaurant-service
+      

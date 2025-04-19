@@ -9,7 +9,7 @@ import { getRestaurantById } from "../services/restrauntService";
 // Define the interface for the request body
 interface IOrderRequest extends Request {
     user: {
-        userId: string;
+        _id: string;
         role: string;
     };
     body: OrderDetail;
@@ -22,8 +22,8 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { customerLat, customerLon, userName, userEmail, orderItems, foodTotalProce } = req.body;
-        const { userId } = (req as IOrderRequest).user;
+        const { customerLat, customerLon, userName, userPhone, orderItems, foodTotalProce } = req.body;
+        const userId = (req as IOrderRequest).user._id;
         const restaurantId = orderItems[0].restaurantId;
 
         const restaurant = await getRestaurantById(restaurantId);
@@ -51,7 +51,7 @@ const placeOrder = async (
             restaurantId,
             restaurantName,
             userName,
-            userEmail,
+            userPhone,
             orderItems,
             orderLocation: [customerLon, customerLat],
             roadDistance,
@@ -85,7 +85,7 @@ const getOrdersByRestaurantId = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { userId } = (req as IOrderRequest).user;
+        const userId = (req as IOrderRequest).user._id;
 
         const restaurants = await getAllRestaurants();
         if (!restaurants || restaurants.length === 0) {
@@ -132,7 +132,7 @@ const getOrdersByUserId = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { userId } = (req as IOrderRequest).user;
+        const userId = (req as IOrderRequest).user._id;
 
         const orders = await Order.find({ userId });
         res.status(200).json({ message: 'Orders fetched successfully', orders });

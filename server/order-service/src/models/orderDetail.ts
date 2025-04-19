@@ -25,7 +25,7 @@ const OrderDetailSchema = new Schema({
         type: String,
         required: true
     },
-    userEmail: {
+    userPhone: {
         type: String,
         required: true
     },

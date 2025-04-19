@@ -40,7 +40,7 @@ const generateToken = (userId: string, role: string) => {
 const token = generateToken('67e5ab7ba2faacd3c42aa556', 'customer');
 console.log('Generated Token:', token);
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5007;
 
 app.listen(PORT, () => {
     console.log(`Order Server is running on port ${PORT}`);

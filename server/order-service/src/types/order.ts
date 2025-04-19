@@ -4,6 +4,7 @@ export interface OrderDetail {
     invoiceId: string;
     userId: Types.ObjectId;
     restaurantId: Types.ObjectId;
+    restaurantName: string;
     userName: string;
     userEmail: string;
     orderDate: Date;

@@ -42,10 +42,7 @@ const placeOrder = async (
             userName,
             userEmail,
             orderItems,
-            orderLocation: {
-                latitude: customerLat,
-                longitude: customerLon
-            },
+            orderLocation: [customerLon, customerLat],
             roadDistance,
             deliveryFee: deliveryFeeAmount,
             totalAmount

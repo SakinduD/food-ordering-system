@@ -14,8 +14,8 @@ const deliveryDistance = async (
         }
 
         // Get restaurant location
-        const shopLat: number = restaurant.location.latitude;
-        const shopLon: number = restaurant.location.longitude;
+        const shopLon: number = restaurant.location.coordinates[0];
+        const shopLat: number = restaurant.location.coordinates[1];
         
         // Google Distance Matrix API URL
         const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;

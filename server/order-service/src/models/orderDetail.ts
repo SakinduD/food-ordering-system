@@ -46,14 +46,8 @@ const OrderDetailSchema = new Schema({
         }
     }],
     orderLocation: {
-        latitude: {
-            type: Number,
-            required: true
-        },
-        longitude: {
-            type: Number,
-            required: true
-        }
+        type: [Number], // [longitude, latitude]
+        required: true
     },
     roadDistance: {
         type: Number,
@@ -67,6 +61,7 @@ const OrderDetailSchema = new Schema({
         type: Number,
         required: true
     }
-});
+}, { timestamps: true });
 
+OrderDetailSchema.index({ orderLocation: '2dsphere' });
 export default mongoose.model<OrderDetailDocument>("OrderDetail", OrderDetailSchema);

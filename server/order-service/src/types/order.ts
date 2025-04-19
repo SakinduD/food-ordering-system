@@ -6,7 +6,7 @@ export interface OrderDetail {
     restaurantId: Types.ObjectId;
     restaurantName: string;
     userName: string;
-    userEmail: string;
+    userPhone: string;
     orderDate: Date;
     orderStatus: string;
     orderItems: {

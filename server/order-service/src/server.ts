@@ -27,9 +27,9 @@ app.use('/order', orderRoutes);
 
 import jwt from 'jsonwebtoken';
 const SECRET_KEY = process.env.JWT_SECRET as string;
-const generateToken = (userId: string, role: string) => {
+const generateToken = (_id: string, role: string) => {
     const payload = {
-        userId,
+        _id, // Adding user ID in token payload
         role, // Adding role in token payload
     };
 

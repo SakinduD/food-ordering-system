@@ -14,10 +14,16 @@ const UserContextProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
                 const { data } = await axios.get('http://localhost:5010/api/users/profile', {
                     withCredentials: true,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
-                console.log("Fetched User Data:", data);
+                console.log("User Data:", data);
                 setUser(data);
             } catch (error) {
                 console.error("Failed to fetch user:", error);

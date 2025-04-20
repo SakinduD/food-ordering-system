@@ -7,30 +7,36 @@ const UserOrderList = () => {
     const { user } = useContext(UserContext);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    console.log("user", user);
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5001/api/orders/getOrdersByUserId', {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                const { data } = await axios.get('http://localhost:5001/api/order/getOrdersByUserId', {
                     withCredentials: true,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
-                setOrders(data);
+                setOrders(data.orders);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
-                setError(error.message);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchOrders();
-    }, [user.userId]);
+    }, [user?.userId]);
 
     if (loading) return <div>Loading...</div>;
 
     return (
         <div className="user-order-list">
             <h2>Your Orders</h2>
+            <h2></h2>
             {orders.length === 0 ? (
                 <p>No orders found.</p>
             ) : (

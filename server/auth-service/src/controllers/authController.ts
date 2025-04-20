@@ -7,7 +7,7 @@ import { sendOtpEmail, sendConfirmationEmail } from '../services/emailService';
 import crypto from 'crypto';
 
 // Define a type for token generation that matches the expected input
-interface TokenPayload {
+export interface TokenPayload {
   _id: string;
   email: string;
   isAdmin: boolean;
@@ -120,6 +120,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         isAdmin: user.isAdmin,
       },
+      token
     });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });

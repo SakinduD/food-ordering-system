@@ -102,7 +102,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
   try {
     const reqUser = (req as any).user;
 
-    const user = await User.findById(reqUser.id);
+    const user = await User.findById(reqUser._id);
 
     if (!user) {
       res.status(404).json({ message: 'User not found' });
@@ -115,7 +115,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
       email: user.email,
       role: user.role,
     };
-    console.log("✅ /api/users/profile endpoint hit");
+
     res.status(200).json(userProfile);
   } catch (err) {
     console.error(err);

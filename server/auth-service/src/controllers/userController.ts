@@ -115,7 +115,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
       email: user.email,
       role: user.role,
     };
-
+    console.log("✅ /api/users/profile endpoint hit");
     res.status(200).json(userProfile);
   } catch (err) {
     console.error(err);

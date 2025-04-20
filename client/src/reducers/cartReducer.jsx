@@ -10,7 +10,6 @@ const CartReducer = (state, action) => {
 
     switch (action.type) {
         case "Add":
-
             if (!action.userId) {
                 console.error("User ID is missing. Cannot add to cart.");
                 return state;
@@ -35,14 +34,13 @@ const CartReducer = (state, action) => {
                 )
                 : [...state, { ...action.item, cartUsage: action.item.cartUsage || 1 }];
 
-            sessionStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedState));
+            localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedState));
 
             return updatedState;
 
-
         case "Remove":
             const updatedStateR = state.filter(item => item._id !== action.payload);
-            sessionStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateR));
+            localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateR));
             return updatedStateR;
 
         case "Increase":
@@ -51,7 +49,7 @@ const CartReducer = (state, action) => {
                 ? { ...item, cartUsage: Math.min(item.cartUsage + 1, item.itemStock) }
                 : item
             );
-            sessionStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateI));
+            localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateI));
             return updatedStateI;
 
         case "Decrease":
@@ -60,25 +58,24 @@ const CartReducer = (state, action) => {
                 ? { ...item, cartUsage: item.cartUsage - 1 }
                 : item
             );
-            sessionStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateD));
+            localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateD));
             return updatedStateD;
 
         case "Init":
             return action.payload;
 
         case "Clear":
-            sessionStorage.removeItem(`cart_${action.userId}`);
+            localStorage.removeItem(`cart_${action.userId}`);
             return [];
 
         default:
             return state;
     }
-
 }
 
-export const loadCartFromSessionStorage = (userId) => {
+export const loadCartFromLocalStorage = (userId) => {
     if (!userId) return [];
-    const savedCart = JSON.parse(sessionStorage.getItem(`cart_${userId}`));
+    const savedCart = JSON.parse(localStorage.getItem(`cart_${userId}`));
     return savedCart || [];
 };
 

@@ -9,11 +9,17 @@ interface AuthRequest extends Request {
 
 // Protect route middleware
 export const protect = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  const token = req.cookies?.token;
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+      res.status(401).json({ message: "Authentication failed: No token provided" });
+      return;
+  }
+
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
+      res.status(401).json({ message: "Authentication failed [No Token]" });
+      return;
   }
 
   try {

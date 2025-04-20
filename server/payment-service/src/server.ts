@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 import paymentRoutes from './routes/paymentRoutes';
-app.use('/payment', paymentRoutes);
+app.use('/api/payment', paymentRoutes);
 
 
 import jwt from 'jsonwebtoken';

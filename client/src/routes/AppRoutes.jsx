@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import MenuItemList from '../pages/restaurant-service/MenuItemList';
 import AddMenuItem from '../pages/restaurant-service/AddMenuItem';
 import EditMenuItem from '../pages/restaurant-service/EditMenuItem';
 import RegisterRestaurant from '../pages/restaurant-service/RegisterRestaurant';

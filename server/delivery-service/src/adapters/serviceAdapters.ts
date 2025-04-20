@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { IOrderResponse, IRestaurantResponse, IUserResponse, IAuthUser } from '../interfaces/services';
 import jwt from 'jsonwebtoken';
+import { IOrderResponse, IRestaurantResponse, IUserResponse, IJwtPayload } from '../interfaces/services';
 
 export class ServiceError extends Error {
   constructor(
@@ -48,25 +48,27 @@ export class UserServiceAdapter {
 }
 
 export class AuthServiceAdapter {
-  private readonly baseUrl: string;
   private readonly jwtSecret: string;
 
   constructor() {
-    this.baseUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5000/api';
     this.jwtSecret = process.env.JWT_SECRET || '';
+    if (!this.jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is not set');
+    }
   }
 
-  async verifyToken(token: string): Promise<IAuthUser> {
+  verifyToken(token: string): IJwtPayload {
     try {
-      // Since we're using the same JWT_SECRET as auth service, we can verify locally
-      const decoded = jwt.verify(token, this.jwtSecret) as IAuthUser;
+      const decoded = jwt.verify(token, this.jwtSecret) as IJwtPayload;
       return decoded;
     } catch (error) {
-      throw new ServiceError(
-        'AuthService',
-        'Invalid or expired token',
-        401
-      );
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new ServiceError('AuthService', 'Token has expired', 401);
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new ServiceError('AuthService', 'Invalid token', 401);
+      }
+      throw new ServiceError('AuthService', 'Token verification failed', 401);
     }
   }
 }
@@ -81,12 +83,21 @@ export class OrderServiceAdapter {
   async getOrderById(orderId: string): Promise<IOrderResponse> {
     try {
       const response = await axios.get(`${this.baseUrl}/orders/${orderId}`);
+      
+      if (!response.data || !response.data.order) {
+        throw new ServiceError('OrderService', 'Invalid order response', 404);
+      }
+
       return response.data;
     } catch (error: any) {
-      throw new ServiceError('OrderService', 
-        error.response?.data?.message || 'Failed to fetch order details',
-        error.response?.status || 500
-      );
+      if (axios.isAxiosError(error)) {
+        throw new ServiceError(
+          'OrderService',
+          error.response?.data?.message || 'Failed to fetch order details',
+          error.response?.status || 500
+        );
+      }
+      throw error;
     }
   }
 }
@@ -101,12 +112,21 @@ export class RestaurantServiceAdapter {
   async getRestaurantById(restaurantId: string): Promise<IRestaurantResponse> {
     try {
       const response = await axios.get(`${this.baseUrl}/restaurants/${restaurantId}`);
+      
+      if (!response.data || !response.data.restaurant) {
+        throw new ServiceError('RestaurantService', 'Invalid restaurant response', 404);
+      }
+
       return response.data;
     } catch (error: any) {
-      throw new ServiceError('RestaurantService',
-        error.response?.data?.message || 'Failed to fetch restaurant details',
-        error.response?.status || 500
-      );
+      if (axios.isAxiosError(error)) {
+        throw new ServiceError(
+          'RestaurantService',
+          error.response?.data?.message || 'Failed to fetch restaurant details',
+          error.response?.status || 500
+        );
+      }
+      throw error;
     }
   }
 }

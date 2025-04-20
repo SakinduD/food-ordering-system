@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthServiceAdapter, ServiceError } from '../adapters/serviceAdapters';
-import { IAuthUser } from '../interfaces/services';
-
-const authService = new AuthServiceAdapter();
+import jwt from 'jsonwebtoken';
+import { IJwtPayload } from '../interfaces/services';
 
 export interface AuthenticatedRequest extends Request {
-  user?: IAuthUser;
+  user?: IJwtPayload;
 }
 
 export const authenticate = async (
@@ -14,23 +12,34 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get token from cookie (auth service uses httpOnly cookies)
-    const token = req.cookies?.token;
-
-    if (!token) {
-      res.status(401).json({ message: 'Authentication required' });
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      res.status(401).json({ message: 'Authorization header must start with Bearer' });
       return;
     }
 
-    const userData = await authService.verifyToken(token);
-    req.user = userData;
+    const token = authHeader.split(' ')[1];
+    const jwtSecret = process.env.JWT_SECRET;
+
+    if (!jwtSecret) {
+      res.status(500).json({ message: 'JWT_SECRET is not configured' });
+      return;
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as IJwtPayload;
+    req.user = decoded;
     next();
   } catch (error) {
-    if (error instanceof ServiceError) {
-      res.status(error.statusCode).json({ message: error.message });
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ message: 'Token has expired' });
       return;
     }
-    res.status(401).json({ message: 'Invalid or expired token' });
+    if (error instanceof jwt.JsonWebTokenError) {
+      res.status(401).json({ message: 'Invalid token' });
+      return;
+    }
+    res.status(401).json({ message: 'Authentication failed' });
   }
 };
 
@@ -41,7 +50,6 @@ export const authorize = (roles: string[]) => {
       return;
     }
 
-    // Allow if user is admin or has required role
     if (req.user.isAdmin || roles.includes(req.user.role)) {
       next();
       return;

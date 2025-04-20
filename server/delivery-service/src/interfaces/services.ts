@@ -23,6 +23,15 @@ export interface IRestaurantResponse {
   };
 }
 
+export interface IJwtPayload {
+  id: string;
+  email: string;
+  role: 'customer' | 'restaurantOwner' | 'deliveryAgent' | 'admin';
+  isAdmin: boolean;
+  iat?: number;
+  exp?: number;
+}
+
 export interface IUserResponse {
   user: {
     _id: string;
@@ -33,12 +42,4 @@ export interface IUserResponse {
     currentLocation?: ILocation;
     isAvailable?: boolean;
   };
-}
-
-export interface IAuthUser {
-  _id: string;
-  email: string;
-  name: string;
-  role: 'customer' | 'restaurantOwner' | 'deliveryAgent';
-  isAdmin: boolean;
 }

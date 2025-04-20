@@ -1,12 +1,11 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { AuthServiceAdapter, UserServiceAdapter } from '../adapters/serviceAdapters';
+import jwt from 'jsonwebtoken';
+import { IJwtPayload } from '../interfaces/services';
 import Delivery from '../models/deliveryModel';
 
 let io: SocketIOServer;
 const activeDrivers = new Map();
-const authService = new AuthServiceAdapter();
-const userService = new UserServiceAdapter();
 
 export const initializeSocket = (server: HttpServer) => {
   io = new SocketIOServer(server, {
@@ -24,11 +23,22 @@ export const initializeSocket = (server: HttpServer) => {
         return next(new Error('Authentication token is required'));
       }
 
-      const userData = await authService.verifyToken(token);
-      socket.data.user = userData;
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        return next(new Error('JWT_SECRET is not configured'));
+      }
+
+      const decoded = jwt.verify(token, jwtSecret) as IJwtPayload;
+      socket.data.user = decoded;
       next();
     } catch (error) {
-      next(new Error('Authentication failed'));
+      if (error instanceof jwt.TokenExpiredError) {
+        next(new Error('Token has expired'));
+      } else if (error instanceof jwt.JsonWebTokenError) {
+        next(new Error('Invalid token'));
+      } else {
+        next(new Error('Authentication failed'));
+      }
     }
   });
 

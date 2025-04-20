@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import http from 'http';
 import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
 import { initializeSocket } from './src/utils/socket';
 import deliveryRoutes from './src/routes/deliveryRoutes';
 
@@ -12,7 +11,6 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cookieParser());
 
 const server = http.createServer(app);
 

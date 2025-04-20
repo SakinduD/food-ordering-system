@@ -4,6 +4,7 @@ import mongoose, { Schema, model, Document } from 'mongoose';
 export interface IMenuItem extends Document {
   name: string;
   description?: string;
+  imageUrl?: String,
   price: number;
   available: boolean;
   restaurantId: mongoose.Types.ObjectId;
@@ -14,6 +15,7 @@ const menuItemSchema = new Schema<IMenuItem>(
   {
     name: { type: String, required: true },
     description: { type: String },
+    imageUrl: { type: String },
     price: { type: Number, required: true },
     available: { type: Boolean, default: true },
     restaurantId: {

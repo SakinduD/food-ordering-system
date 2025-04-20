@@ -2,20 +2,34 @@ import { Request, Response } from 'express';
 import MenuItem from '../models/MenuItem';
 import { getRestaurantById } from '../services/restaurantService';
 
-// ✅ Create a new menu item
-export const addMenuItem = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { restaurantId } = req.body;
-    const restaurant = await getRestaurantById(restaurantId);
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
 
+// ✅ Create a new menu item
+export const addMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
+  try {
+    const { name, description, price, available, restaurantId } = req.body;
+
+    const restaurant = await getRestaurantById(restaurantId);
     if (!restaurant) {
       res.status(404).json({ message: 'Restaurant not found for given ID' });
       return;
     }
 
-    const menuItem = await MenuItem.create(req.body);
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    const menuItem = await MenuItem.create({
+      name,
+      description,
+      price,
+      available,
+      restaurantId,
+      imageUrl,
+    });
+
     const fullItem = await MenuItem.findById(menuItem._id).populate('restaurantId', 'name');
-    res.status(201).json({ message: 'Menu item added!', data: menuItem });
+    res.status(201).json({ message: 'Menu item added!', data: fullItem });
   } catch (err: any) {
     res.status(400).json({ error: err.message || 'Failed to add menu item' });
   }
@@ -45,9 +59,23 @@ export const getMenuItems = async (req: Request, res: Response): Promise<void> =
 };
 
 // ✅ Update menu item by ID
-export const updateMenuItem = async (req: Request, res: Response): Promise<void> => {
+export const updateMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const item = await MenuItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { name, description, price, available, restaurantId } = req.body;
+
+    const updateData: any = {
+      name,
+      description,
+      price,
+      available,
+      restaurantId,
+    };
+
+    if (req.file) {
+      updateData.imageUrl = `/uploads/${req.file.filename}`; 
+    }
+
+    const item = await MenuItem.findByIdAndUpdate(req.params.id, updateData, { new: true });
 
     if (item) {
       res.json({ message: 'Menu Item Updated successfully', data: item });

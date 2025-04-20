@@ -97,3 +97,29 @@ export const getUsersByRole = asyncHandler(async (req: Request, res: Response): 
     res.status(500).json({ error: 'Failed to fetch users by role' });
   }
 });
+
+export const getUserProfile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  try {
+    const reqUser = (req as any).user;
+
+    const user = await User.findById(reqUser.id);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    const userProfile = {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    console.log("✅ /api/users/profile endpoint hit");
+    res.status(200).json(userProfile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+    return;
+  }
+});

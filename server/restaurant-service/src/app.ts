@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 
 import menuRoutes from './routes/menuRoutes';
 import orderRoutes from './routes/orderRoutes';
@@ -15,6 +16,6 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api', testAuthRoute);
-
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 export default app;

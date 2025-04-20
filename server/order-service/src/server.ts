@@ -13,7 +13,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: 'http://localhost:3000',
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 import orderRoutes from './routes/orderRoutes';
-app.use('/order', orderRoutes);
+app.use('/api/order', orderRoutes);
 
 
 

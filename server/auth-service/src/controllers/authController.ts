@@ -108,11 +108,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     };
 
     const token = generateToken(tokenPayload);
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    console.log('Generated token:', token);
+    res.setHeader('Authorization', `Bearer ${token}`);
 
     res.status(200).json({
       message: 'Login successful',

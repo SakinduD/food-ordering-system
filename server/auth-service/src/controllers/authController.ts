@@ -108,6 +108,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     };
 
     const token = generateToken(tokenPayload);
+    console.log('Generated token:', token);
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'strict',

@@ -143,9 +143,7 @@ const getOrdersByUserId = async (
 
 // Update order status by restraurant owner
 const updateOrderStatus = async (
-    req: Request<{ id: string }, 
-    {}, 
-    { orderStatus: string }>, 
+    req: Request, 
     res: Response, next: NextFunction
 ): Promise<void> => {
     try {
@@ -156,7 +154,7 @@ const updateOrderStatus = async (
         }
 
         const reqOrderStatus = req.body.orderStatus.toLowerCase();
-        const validStatuses = new Set(["delivered", "cancelled", "pending", "completed"]);
+        const validStatuses = new Set(["delivered", "cancelled", "pending", "completed", "accepted"]);
 
         if (!validStatuses.has(reqOrderStatus)) {
             res.status(400).json({ message: 'Invalid Order Status' });

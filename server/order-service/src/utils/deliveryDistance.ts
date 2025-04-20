@@ -21,9 +21,10 @@ const deliveryDistance = async (
         const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
         const googleUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=
                         ${customerLat},${customerLon}&destinations=${shopLat},${shopLon}&key=${googleApiKey}`;
-
+        
         // Get road distance from Google API
         const googleResponse = await axios.get(googleUrl);
+
         const roadDistanceString: string = googleResponse.data.rows[0].elements[0].distance.text;
         const roadDistance: number = parseFloat(roadDistanceString.replace(/[^0-9.]/g, ''));
 

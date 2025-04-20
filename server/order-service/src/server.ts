@@ -27,9 +27,9 @@ app.use('/order', orderRoutes);
 
 import jwt from 'jsonwebtoken';
 const SECRET_KEY = process.env.JWT_SECRET as string;
-const generateToken = (userId: string, role: string) => {
+const generateToken = (_id: string, role: string) => {
     const payload = {
-        userId,
+        _id, // Adding user ID in token payload
         role, // Adding role in token payload
     };
 
@@ -40,7 +40,7 @@ const generateToken = (userId: string, role: string) => {
 const token = generateToken('67e5ab7ba2faacd3c42aa556', 'customer');
 console.log('Generated Token:', token);
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5007;
 
 app.listen(PORT, () => {
     console.log(`Order Server is running on port ${PORT}`);

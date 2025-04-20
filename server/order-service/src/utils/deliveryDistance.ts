@@ -1,21 +1,21 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
+import { getRestaurantById } from "../services/restrauntService";
 
 const deliveryDistance = async (
-    customerLat: number, customerLon: number, restaurantId: number
+    customerLat: number, customerLon: number, restaurantId: String
 ): Promise<number> => {
     try{
         //find the restaurant
-        const {data : restaurants} = await axios.get('http://localhost:5000/api/restaurant/');
-        const restaurant = restaurants.find((restaurant: any) => restaurant._id === restaurantId);
+        const restaurant = await getRestaurantById(restaurantId);
         if (!restaurant) {
             throw new Error('Restaurant not found');
         }
 
         // Get restaurant location
-        const shopLat: number = restaurant.location.latitude;
-        const shopLon: number = restaurant.location.longitude;
+        const shopLon: number = restaurant.location.coordinates[0];
+        const shopLat: number = restaurant.location.coordinates[1];
         
         // Google Distance Matrix API URL
         const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;

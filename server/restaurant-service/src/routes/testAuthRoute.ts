@@ -9,8 +9,8 @@ const router = express.Router();
 // Temporary login to generate a JWT token
 router.post('/test-login', (req: Request, res: Response) => {
   const fakeUser = {
-    id: 'test-user',
-    name: 'Test User',
+    id: '200001',
+    name: 'Sunil Srimal',
     role: 'admin'
   };
 

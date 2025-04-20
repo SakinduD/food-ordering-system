@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import Order from '../models/orderDetail';
 import { OrderDetail } from '../types/order';
 import deliveyDistance from '../utils/deliveryDistance';
-import axios from 'axios';
 import deliveryFee from '../utils/deliveryFee';
+import { getAllRestaurants } from '../services/restrauntService';
+import { getRestaurantById } from "../services/restrauntService";
 
 // Define the interface for the request body
 interface IOrderRequest extends Request {
     user: {
-        userId: string;
+        _id: string;
         role: string;
     };
     body: OrderDetail;
@@ -21,8 +22,17 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { customerLat, customerLon, restaurantId, userName, userEmail, orderItems, foodTotalProce } = req.body;
-        const { userId } = (req as IOrderRequest).user;
+        const { customerLat, customerLon, userName, userPhone, orderItems, foodTotalProce } = req.body;
+        const userId = (req as IOrderRequest).user._id;
+        const restaurantId = orderItems[0].restaurantId;
+
+        const restaurant = await getRestaurantById(restaurantId);
+        if (!restaurant) {
+            res.status(404).json({ message: 'Restaurant not found' });
+            return;
+        }
+
+        const restaurantName = restaurant.name;
 
         //generate a uniqe invoice id for the order
         const invoiceId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -39,13 +49,11 @@ const placeOrder = async (
             invoiceId,
             userId,
             restaurantId,
+            restaurantName,
             userName,
-            userEmail,
+            userPhone,
             orderItems,
-            orderLocation: {
-                latitude: customerLat,
-                longitude: customerLon
-            },
+            orderLocation: [customerLon, customerLat],
             roadDistance,
             deliveryFee: deliveryFeeAmount,
             totalAmount
@@ -77,8 +85,14 @@ const getOrdersByRestaurantId = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { userId } = (req as IOrderRequest).user;
-        const {data : restaurants} = await axios.get('http://localhost:5000/api/restaurant/');
+        const userId = (req as IOrderRequest).user._id;
+
+        const restaurants = await getAllRestaurants();
+        if (!restaurants || restaurants.length === 0) {
+            res.status(404).json({ message: 'No restaurants found' });
+            return;
+        }
+
         const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
 
         if (!restaurant) {
@@ -118,7 +132,7 @@ const getOrdersByUserId = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { userId } = (req as IOrderRequest).user;
+        const userId = (req as IOrderRequest).user._id;
 
         const orders = await Order.find({ userId });
         res.status(200).json({ message: 'Orders fetched successfully', orders });

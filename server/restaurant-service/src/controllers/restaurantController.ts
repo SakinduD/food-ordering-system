@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/Restaurant';
+import { getOrdersByRestaurantId, updateOrderStatus, deleteOrder } from '../services/orderService';
 
 // Create a new restaurant for the logged-in user
 export const createRestaurant = async (req: Request, res: Response): Promise<void> => {
@@ -106,5 +107,74 @@ export const setAvailability = async (req: Request, res: Response): Promise<void
     res.json({ message: 'Availability updated!', data: restaurant });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+// View incoming orders
+export const fetchRestaurantOrders = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const restaurantId = req.params.id;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    const orders = await getOrdersByRestaurantId(restaurantId, token);
+    if (!orders) {
+      res.status(404).json({ message: 'Orders not found' });
+      return;
+    }
+
+    res.json({ message: 'Orders fetched successfully', data: orders });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update order status
+export const handleUpdateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const { orderStatus } = req.body;
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!orderStatus || !token) {
+      res.status(400).json({ message: 'Missing orderStatus or token' });
+      return;
+    }
+
+    const success = await updateOrderStatus(orderId, orderStatus, token);
+
+    if (!success) {
+      res.status(500).json({ message: 'Failed to update order status' });
+      return;
+    }
+
+    res.json({ message: 'Order status updated successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Delete order
+export const handleDeleteOrder = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    const success = await deleteOrder(orderId, token);
+    if (!success) {
+      res.status(400).json({ message: 'Failed to delete order' });
+      return;
+    }
+
+    res.json({ message: 'Order deleted successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 };

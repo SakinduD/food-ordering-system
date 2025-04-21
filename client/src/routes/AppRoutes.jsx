@@ -6,6 +6,8 @@ import AdminMenuList from '../pages/restaurant-service/AdminMenuList';
 import CustomerMenuList from '../pages/restaurant-service/CustomerMenuList';
 import UserOrderList from '../components/Orders/userOrderList';
 import Login from '../pages/login/login';
+import RestaurantProfile from '../pages/restaurant-service/RestaurantProfile';
+import EditRestaurant from '../pages/restaurant-service/EditRestaurant';
 
 function AppRoutes() {
     return (
@@ -19,6 +21,8 @@ function AppRoutes() {
                 <Route path="/menu" element={<CustomerMenuList />} />
                 <Route path="/orders" element={<UserOrderList />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/restaurant-profile" element={<RestaurantProfile />} />
+                <Route path="/edit-restaurant" element={<EditRestaurant />} />
             </Routes>
         </Router>
     );

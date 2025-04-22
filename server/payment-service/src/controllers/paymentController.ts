@@ -1,4 +1,5 @@
 import md5 from "crypto-js/md5";
+import { v4 as uuIdv4 } from 'uuid';
 require('dotenv').config();
 import { Request, Response } from 'express';
 
@@ -51,16 +52,17 @@ const createPayment = (req: Request, res: Response) => {
         address,
         city,
         currency = 'LKR',
-        orderId
     } = req.body;
 
     const { userId } = (req as IOrderRequest).user;
 
+    const orderId = uuIdv4();
+
     paymentData = {
         merchantId: process.env.MERCHANT_ID as string || '',
-        return_url: 'http://localhost:5173/',
-        cancel_url: 'http://localhost:5173/',
-        notify_url: 'http://localhost:5173/',
+        return_url: 'http://localhost:3000/',
+        cancel_url: 'http://localhost:3000/',
+        notify_url: 'http://localhost:3000/',
         merchantSecret: process.env.MERCHANT_SECRET as string || '',
         first_name,
         last_name,

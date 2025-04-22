@@ -10,6 +10,7 @@ import RestaurantProfile from '../pages/restaurant-service/RestaurantProfile';
 import EditRestaurant from '../pages/restaurant-service/EditRestaurant';
 import DeliveryDriverAssignment from '../components/Delivery/DeliveryDriverAssignment';
 import CreateDelivery from  '../components/Delivery/CreateDelivery';
+import Cart from '../components/Orders/cart';
 
 function AppRoutes() {
     return (
@@ -21,12 +22,18 @@ function AppRoutes() {
                 <Route path="/register-restaurant" element={<RegisterRestaurant />} />
                 <Route path="/admin/menu" element={<AdminMenuList />} />
                 <Route path="/menu" element={<CustomerMenuList />} />
-                <Route path="/orders" element={<UserOrderList />} />
+                
                 <Route path="/login" element={<Login />} />
                 <Route path="/restaurant-profile" element={<RestaurantProfile />} />
                 <Route path="/edit-restaurant" element={<EditRestaurant />} />
                 <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
                 <Route path="/create-delivery" element={<CreateDelivery />} />
+
+
+
+
+                <Route path="/orders" element={<UserOrderList />} />
+                <Route path="/cart" element={<Cart />} />
             </Routes>
         </Router>
     );

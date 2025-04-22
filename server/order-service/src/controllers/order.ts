@@ -22,7 +22,7 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { customerLat, customerLon, userName, userPhone, orderItems, foodTotalProce } = req.body;
+        const { customerLat, customerLon, userName, userPhone, orderItems, comments, foodTotalPrice, address } = req.body;
         const userId = (req as IOrderRequest).user._id;
         const restaurantId = orderItems[0].restaurantId;
 
@@ -43,7 +43,7 @@ const placeOrder = async (
         //calculate the delivery fee based on the road distance
         const deliveryFeeAmount = deliveryFee(roadDistance);
 
-        const totalAmount: number = deliveryFeeAmount + foodTotalProce;
+        const totalAmount: number = deliveryFeeAmount + foodTotalPrice;
 
         const order:OrderDetail = await Order.create({
             invoiceId,
@@ -53,6 +53,8 @@ const placeOrder = async (
             userName,
             userPhone,
             orderItems,
+            comments,
+            address,
             orderLocation: [customerLon, customerLat],
             roadDistance,
             deliveryFee: deliveryFeeAmount,

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 // Define interface for decoded token
 interface JwtPayload {
-    userId: string;
+    _id: string;
     role: string;
 }
 

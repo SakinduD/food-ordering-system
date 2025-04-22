@@ -49,6 +49,13 @@ const OrderDetailSchema = new Schema({
             required: true
         }
     }],
+    comments: {
+        type: String,
+    },
+    address: {
+        type: String,
+        required: true
+    },
     orderLocation: {
         type: [Number], // [longitude, latitude]
         required: true

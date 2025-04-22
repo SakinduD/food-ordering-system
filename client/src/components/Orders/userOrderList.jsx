@@ -11,6 +11,8 @@ const UserOrderList = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
+                if (!user?.userId) return;
+                
                 const token = localStorage.getItem("token");
                 if (!token) return;
 
@@ -45,8 +47,7 @@ const UserOrderList = () => {
                     {orders.map(order => (
                         <li key={order._id}>
                             <h3>Invoice ID: {order.invoiceId}</h3>
-                            <p>Total Amount: ${order.totalAmount}</p>
-                            <p>Status: {order.status}</p>
+                            <p>Status: {order.orderStatus}</p>
                             <p>Items:</p>
                             <ul>
                                 {order.orderItems.map(item => (
@@ -55,6 +56,7 @@ const UserOrderList = () => {
                                     </li>
                                 ))}
                             </ul>
+                            <p>Total Amount: ${order.totalAmount}</p>
                         </li>
                     ))}
                 </ul>

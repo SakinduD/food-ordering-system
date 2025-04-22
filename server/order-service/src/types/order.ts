@@ -13,6 +13,7 @@ export interface OrderDetail {
         itemName: string;
         itemQuantity: number;
     }[];
+    comments?: string;
     orderLocation: {
         latitude: number;
         longitude: number;

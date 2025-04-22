@@ -129,6 +129,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 // Logout User
 export const logout = (req: Request, res: Response): void => {
-  res.clearCookie('token');
+  res.setHeader('Authorization', '');
   res.json({ message: 'Logged out successfully' });
 };

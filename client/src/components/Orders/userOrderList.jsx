@@ -20,6 +20,7 @@ const UserOrderList = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                console.log(user);
                 setOrders(data.orders);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);

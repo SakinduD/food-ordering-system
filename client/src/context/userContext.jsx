@@ -23,7 +23,6 @@ const UserContextProvider = ({ children }) => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                console.log("User Data:", data);
                 setUser(data);
             } catch (error) {
                 console.error("Failed to fetch user:", error);

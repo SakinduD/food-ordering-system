@@ -1,8 +1,14 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import jwt from 'jsonwebtoken';
-import { IJwtPayload } from '../interfaces/services';
 import Delivery from '../models/deliveryModel';
+
+interface JwtPayload {
+  _id: string;
+  email: string;
+  role: string;
+  isAdmin: boolean;
+}
 
 let io: SocketIOServer;
 const activeDrivers = new Map();
@@ -28,7 +34,7 @@ export const initializeSocket = (server: HttpServer) => {
         return next(new Error('JWT_SECRET is not configured'));
       }
 
-      const decoded = jwt.verify(token, jwtSecret) as IJwtPayload;
+      const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
       socket.data.user = decoded;
       next();
     } catch (error) {
@@ -55,7 +61,6 @@ export const initializeSocket = (server: HttpServer) => {
 
       const { isAvailable, location } = data;
       try {
-        // Update driver availability through user service
         if (isAvailable) {
           activeDrivers.set(user._id, { 
             socketId: socket.id, 
@@ -87,7 +92,6 @@ export const initializeSocket = (server: HttpServer) => {
 
       const { deliveryId, location } = data;
       try {
-        // Validate delivery assignment
         if (deliveryId) {
           const delivery = await Delivery.findById(deliveryId);
           if (delivery && delivery.driverId?.toString() === user._id) {
@@ -135,7 +139,7 @@ export const initializeSocket = (server: HttpServer) => {
 
         // Verify user permissions
         if (user.isAdmin || 
-            delivery.restaurantId.toString() === user.restaurantId ||
+            delivery.restaurantId.toString() === user._id || // for restaurant owner
             (user.role === 'deliveryAgent' && delivery.driverId?.toString() === user._id)) {
           socket.join(`delivery:${deliveryId}`);
           console.log(`Client joined delivery room: ${deliveryId}`);
@@ -156,10 +160,14 @@ export const initializeSocket = (server: HttpServer) => {
           isAvailable: false
         });
       }
-      console.log(`Client disconnected: ${socket.id}`);
+      console.log(`❌ Client disconnected: ${socket.id}`);
     });
   });
 };
 
-export const getIo = () => io;
-export const getActiveDrivers = () => Array.from(activeDrivers.entries());
+export const getIo = (): SocketIOServer => {
+  if (!io) {
+    throw new Error('Socket.io not initialized');
+  }
+  return io;
+};

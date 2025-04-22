@@ -25,7 +25,7 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
 
     // Fetch restaurant details through adapter
     const restaurantResponse = await restaurantService.getRestaurantById(order.restaurantId);
-    const { restaurant } = restaurantResponse;
+    const restaurant = restaurantResponse.data;
 
     // Validate restaurant location
     if (!restaurant.location || !restaurant.location.coordinates) {
@@ -42,7 +42,7 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
       },
       customerLocation: {
         type: 'Point',
-        coordinates: [order.orderLocation.longitude, order.orderLocation.latitude]
+        coordinates: [order.orderLocation[0], order.orderLocation[1]]
       },
       isDriverAssigned: false
     });
@@ -57,8 +57,8 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
         latitude: restaurant.location.coordinates[1]
       },
       dropLocation: {
-        longitude: order.orderLocation.longitude,
-        latitude: order.orderLocation.latitude
+        longitude: order.orderLocation[0],
+        latitude: order.orderLocation[1]
       }
     });
 
@@ -174,7 +174,7 @@ export const getDeliveryLocation = async (req: Request, res: Response): Promise<
 // ✅ Get all deliveries
 export const getAllDeliveries = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deliveries = await Delivery.find().populate('orderId restaurantId driverId');
+    const deliveries = await Delivery.find();
     res.json(deliveries);
   } catch (error) {
     console.error(error);
@@ -203,5 +203,70 @@ export const getActiveDriversLocations = async (req: Request, res: Response): Pr
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+export const getNearbyDrivers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+    
+    // Verify the delivery exists and belongs to the requesting restaurant
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
+    }
+
+    // Get active drivers through user service
+    const activeDrivers = await userService.getActiveDrivers();
+    
+    // Calculate distance and sort drivers by proximity to restaurant
+    const availableDrivers = activeDrivers.map(({ user }) => {
+      if (!user.currentLocation?.coordinates) return null;
+      
+      // Calculate distance between driver and restaurant
+      const [driverLong, driverLat] = user.currentLocation.coordinates;
+      const [restaurantLong, restaurantLat] = delivery.restaurantLocation.coordinates;
+      
+      const distance = calculateDistance(
+        driverLat, driverLong,
+        restaurantLat, restaurantLong
+      );
+
+      return {
+        driverId: user._id,
+        name: user.name,
+        distance: Math.round(distance * 10) / 10, // Round to 1 decimal place
+        location: user.currentLocation
+      };
+    })
+    .filter(driver => driver !== null)
+    .sort((a, b) => a!.distance - b!.distance);
+
+    res.json({
+      success: true,
+      deliveryId,
+      availableDrivers
+    });
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// Helper function to calculate distance between two points
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c; // Distance in km
+}
 
 

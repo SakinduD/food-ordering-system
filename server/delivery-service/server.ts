@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import http from 'http';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { initializeSocket } from './src/utils/socket';
 import deliveryRoutes from './src/routes/deliveryRoutes';
 
@@ -10,6 +11,12 @@ dotenv.config();
 const app = express();
 
 // Middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const server = http.createServer(app);

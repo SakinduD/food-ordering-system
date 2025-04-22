@@ -1,9 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { IJwtPayload } from '../interfaces/services';
+
+interface JwtPayload {
+  _id: string;
+  email: string;
+  role: string;
+  isAdmin: boolean;
+}
 
 export interface AuthenticatedRequest extends Request {
-  user?: IJwtPayload;
+  user?: JwtPayload;
 }
 
 export const authenticate = async (
@@ -27,19 +33,17 @@ export const authenticate = async (
       return;
     }
 
-    const decoded = jwt.verify(token, jwtSecret) as IJwtPayload;
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
     req.user = decoded;
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       res.status(401).json({ message: 'Token has expired' });
-      return;
-    }
-    if (error instanceof jwt.JsonWebTokenError) {
+    } else if (error instanceof jwt.JsonWebTokenError) {
       res.status(401).json({ message: 'Invalid token' });
-      return;
+    } else {
+      res.status(401).json({ message: 'Authentication failed' });
     }
-    res.status(401).json({ message: 'Authentication failed' });
   }
 };
 

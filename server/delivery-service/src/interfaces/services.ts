@@ -5,41 +5,37 @@ export interface ILocation {
 }
 
 export interface IOrderResponse {
+  message: string;
   order: {
     _id: string;
     restaurantId: string;
-    orderLocation: {
-      longitude: number;
-      latitude: number;
-    };
+    orderLocation: [number, number]; // [longitude, latitude]
     orderStatus: string;
   };
 }
 
 export interface IRestaurantResponse {
-  restaurant: {
+  data: {
     _id: string;
     location: ILocation;
+    name: string;
+    address: string;
+    phone: string;
+    available: boolean;
+    userId: string;
   };
 }
 
-export interface IJwtPayload {
-  id: string;
+export interface IUser {
+  _id: string;
+  name: string;
   email: string;
-  role: 'customer' | 'restaurantOwner' | 'deliveryAgent' | 'admin';
+  role: string;
   isAdmin: boolean;
-  iat?: number;
-  exp?: number;
+  currentLocation?: ILocation;
+  isAvailable?: boolean;
 }
 
 export interface IUserResponse {
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    role: string;
-    isAdmin: boolean;
-    currentLocation?: ILocation;
-    isAvailable?: boolean;
-  };
+  user: IUser;
 }

@@ -8,6 +8,8 @@ import UserOrderList from '../components/Orders/userOrderList';
 import Login from '../pages/login/login';
 import RestaurantProfile from '../pages/restaurant-service/RestaurantProfile';
 import EditRestaurant from '../pages/restaurant-service/EditRestaurant';
+import DeliveryDriverAssignment from '../components/Delivery/DeliveryDriverAssignment';
+import CreateDelivery from  '../components/Delivery/CreateDelivery';
 
 function AppRoutes() {
     return (
@@ -23,6 +25,8 @@ function AppRoutes() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/restaurant-profile" element={<RestaurantProfile />} />
                 <Route path="/edit-restaurant" element={<EditRestaurant />} />
+                <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
+                <Route path="/create-delivery" element={<CreateDelivery />} />
             </Routes>
         </Router>
     );

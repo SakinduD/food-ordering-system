@@ -11,8 +11,8 @@ const router = Router();
 router.post('/placeOrder',authMiddleware, customerMiddleware, orderController.placeOrder); //only logged customer
 router.get('/getOrdersByUserId',authMiddleware, customerMiddleware, orderController.getOrdersByUserId); //only logged customer
 
-router.get('/getOrderById/:id',authMiddleware, orderController.getOrderById); //any logged user
-
+//router.get('/getOrderById/:id',authMiddleware, orderController.getOrderById); //any logged user
+router.get('/getOrderById/:id', orderController.getOrderById);
 router.get('/getAllOrders',authMiddleware, adminMiddleware, orderController.getAllOrders); //main admin
 
 router.get('/getOrdersByRestaurantId',authMiddleware, restaurantMiddleware, orderController.getOrdersByRestaurantId); //restrarant owner

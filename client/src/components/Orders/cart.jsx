@@ -148,7 +148,6 @@ const Cart = () => {
                 }
               );
               
-            console.log("del res",response.data);
             return response.data.deliveryFee;
         } catch (error) {
             console.error("Error fetching delivery fee", error);

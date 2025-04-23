@@ -23,6 +23,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 import orderRoutes from './routes/orderRoutes';
 app.use('/api/order', orderRoutes);
 
+import deliveryFeeRoutes from './routes/deliveryFeeRoute';
+app.use('/api/deliveryFee', deliveryFeeRoutes);
+
 const PORT = process.env.PORT || 5007;
 
 app.listen(PORT, () => {

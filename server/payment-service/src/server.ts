@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log('Order service is running');
+console.log('Payment service is running');
 
 const app = express();
 

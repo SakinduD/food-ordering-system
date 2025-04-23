@@ -4,20 +4,20 @@ import { useContext } from 'react';
 import { totalItems } from '../../reducers/cartReducer';
 import { totalPrice } from '../../reducers/cartReducer';
 import { loadCartFromLocalStorage } from '../../reducers/cartReducer';
-import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import LocationPicker from './LocationPicker';
+import handleCheckout from '../../handlers/checkOutHandler';
 
 const Cart = () => {
-    const { cart, dispatch, user } = useContext(UserContext);
+    const { cart, dispatch, user, loading } = useContext(UserContext);
+    const [deliveryFee, setDeliveryFee] = useState(null);
     const userId = user?.userId;
     const [location, setLocation] = useState({
         latitude: null,
         longitude: null,
     });
-
     const [showMap, setShowMap] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -49,6 +49,16 @@ const Cart = () => {
     };
 
     useEffect(() => {
+        if (user && user.userId) {
+            setFormData(prev => ({
+                ...prev,
+                userId: user.userId,
+                email: user.email || "",
+            }));
+        }
+    }, [user]);
+
+    useEffect(() => {
         if (userId && cart.length === 0) {
             const savedCart = loadCartFromLocalStorage(userId);
             if (savedCart.length > 0) {
@@ -66,14 +76,13 @@ const Cart = () => {
     const Increase = (id) => {
         const index = cart.findIndex((item) => item._id === id);
         if (index === -1) return;
-        if(cart[index].cartUsage < cart[index].itemStock) {
-            dispatch({
-                type: 'Increase',
-                payload: id,
-                userId,
-            });
-        }
-
+        
+        dispatch({
+            type: 'Increase',
+            payload: id,
+            userId,
+        });
+        
     };
 
     const Decrease = (id) => {
@@ -88,143 +97,20 @@ const Cart = () => {
         }
     };
 
-    const handleCheckout = async () => {
-        try {
-            console.log('Form Data:', formData);
-            Swal.fire({
-                title: "Are you sure you want to place the order?",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, place it!"
-              }).then(async (result) => {
-                if(result.isConfirmed) {
-                    const token = localStorage.getItem("token");
-
-                    const response = await axios.get('http://localhost:5008/payment', {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        },
-                    });
-                    
-                    const responseData = response.data;
-
-                    if (response.status === 200) {
-                        const payment = {
-                            sandbox: true,
-                            merchant_id: responseData.merchantId,
-                            return_url: responseData.return_url,
-                            cancel_url: responseData.cancel_url,
-                            notify_url: responseData.notify_url,
-                            first_name: responseData.first_name,
-                            last_name: responseData.last_name,
-                            email: responseData.email,
-                            phone: responseData.phone,
-                            address: responseData.address,
-                            city: responseData.city,
-                            country: responseData.country,
-                            order_id: responseData.orderId,
-                            items: responseData.items,
-                            amount: formData.amount,
-                            currency: responseData.currency,
-                            hash: responseData.hash,
-                        };
-            
-                        window.payhere.onCompleted = async function (OrderID) {
-
-                            try {
-                                const token = localStorage.getItem("token");
-
-                                const response = await fetch('http://localhost:5001/api/order/placeOrder', {
-                                    method: 'POST',
-                                    headers: {
-                                        Authorization: `Bearer ${token}`,
-                                    },
-                                    body: JSON.stringify({
-                                        customerLat: location.latitude,
-                                        customerLon: location.longitude,
-                                        address: formData.address,
-                                        userName: user?.name,
-                                        email: user?.email,
-                                        userPhone : formData.phone,
-                                        comments: formData.comments,
-                                        orderItems: cart.map((item) => ({
-                                            itemName: item.itemName,
-                                            itemQuantity: item.cartUsage,
-                                        })),
-                                        foodTotalPrice: totalPrice(cart),
-                                    }),
-                                });
-                        
-                                if (response.ok) {
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "success",
-                                        title: "Order Placed Successfully!!",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                        
-                                    dispatch({
-                                        type: 'Clear',
-                                        userId,
-                                    });
-                        
-                                } else {
-                                    toast.error('Failed to place order');
-                                }
-
-                            } catch (err) {
-                                toast.error("Failed to place the order." + err.message);
-                            }
-
-                        };
-            
-                        window.payhere.onDismissed = function () {
-                            console.log("Payment dismissed");
-
-                        };
-            
-                        window.payhere.onError = function (error) {
-                            toast.error("Error occurred. " + error);
-                            console.log("Error: " + error);
-
-                            setTimeout(() => {
-                                window.location.href = '/cart';
-                            }, 2000);
-                        };
-            
-                        window.payhere.startPayment(payment);
-                        
-                        
-                    } else {
-                        console.error("Failed to generate hash for payment.");
-                    }
-                    
-                }
-                    
-            });
-        } catch (error) {
-            console.error('Error:', error);
-            toast.error('Failed to place order');
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
             const token = localStorage.getItem("token");
 
-            const response = await axios.post("http://localhost:5008/api/payment/createPayment", {
-                formData,
+            const response = await axios.post("http://localhost:5008/api/payment/createPayment", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             
             if (response.status === 200) {
-                handleCheckout();
+                handleCheckout(formData, location, cart, dispatch, userId);
             } else {
                 console.error("Payment gateway is not available.");
             }
@@ -232,6 +118,42 @@ const Cart = () => {
         } catch (err) {
             console.error("Failed to create payment:", err);
         } 
+    };
+
+    if (loading) {
+        return <div>Loading user data...</div>;
+    }
+
+    const handleLocationSelect = async (location) => {
+        setLocation({ latitude: location.lat, longitude: location.lng });
+        const fee = await fetchDeliveryFee(location.lat, location.lng);
+        setDeliveryFee(fee);
+    };
+
+    const fetchDeliveryFee = async (latitude, longitude) => {
+        try {
+            const token = localStorage.getItem("token");
+            console.log(token);
+
+            const response = await axios.post("http://localhost:5001/api/deliveryFee",
+                {
+                  customerLat: latitude,
+                  customerLon: longitude,
+                  restaurantId: cart[0].restaurantId,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              
+            console.log("del res",response.data);
+            return response.data.deliveryFee;
+        } catch (error) {
+            console.error("Error fetching delivery fee", error);
+            return 0;
+        }
     };
 
     return (
@@ -247,12 +169,12 @@ const Cart = () => {
                             key={item._id}
                         >
                             <img 
-                                src={`http://localhost:3000/PCItemImages/${item.itemImage}`} 
+                                src={`http://localhost:5000${item.imageUrl}`}
                                 alt={item.itemName || "Item Image"} 
                                 className="w-24 h-24 object-cover mb-4 rounded-md"
                             />
-                            <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.itemName}</h4>
-                            <h4 className="text-gray-600 text-sm mb-4">${item.itemPrice}</h4>
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.name}</h4>
+                            <h4 className="text-gray-600 text-sm mb-4">${item.price}</h4>
                             <div className="flex items-center gap-2 mb-4">
                                 <button className="bg-red-500 text-white rounded px-3 py-1 hover:bg-red-600"
                                     onClick={() => {Decrease(item._id)}}
@@ -334,9 +256,7 @@ const Cart = () => {
                                 <LocationPicker
                                     isOpen={showMap}
                                     onClose={() => setShowMap(false)}
-                                    onLocationSelect={(loc) =>
-                                        setLocation({ latitude: loc.lat, longitude: loc.lng })
-                                    }
+                                    onLocationSelect={handleLocationSelect}
                                 />
 
                             </div>
@@ -351,7 +271,9 @@ const Cart = () => {
                             </div>
 
                             <h5>Total Items:{totalItems(cart)}</h5>
-                            <h5>Total Price:{totalPrice(cart)}</h5>
+                            <h5>Delivery Fee: {deliveryFee ? deliveryFee : 0}</h5>
+                            <h5>Total Price (including delivery): {totalPrice(cart) + (deliveryFee || 0)}</h5>
+
                             <button 
                                 type='submit' 
                                 disabled={cart.length === 0}

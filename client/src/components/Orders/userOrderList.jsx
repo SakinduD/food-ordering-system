@@ -4,9 +4,9 @@ import { useContext } from "react";
 import axios from "axios";
 
 const UserOrderList = () => {
-    const { user } = useContext(UserContext);
+    const { user, loading } = useContext(UserContext);
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [itemLoading, setItemLoading] = useState(true);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -27,14 +27,14 @@ const UserOrderList = () => {
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
             } finally {
-                setLoading(false);
+                setItemLoading(false);
             }
         };
 
         fetchOrders();
     }, [user?.userId]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading || itemLoading) return <div>Loading...</div>;
 
     return (
         <div className="user-order-list">
@@ -56,7 +56,8 @@ const UserOrderList = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <p>Total Amount: ${order.totalAmount}</p>
+                            <p>Delivery Fee : ${order.deliveryFee}</p>
+                            <p>Total Amount (With Delivery Fee): ${order.totalAmount}</p>
                         </li>
                     ))}
                 </ul>

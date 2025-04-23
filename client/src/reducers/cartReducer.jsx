@@ -3,7 +3,7 @@ export const totalItems = (cart) => {
 }
 
 export const totalPrice = (cart) => {
-    return cart.reduce((total, item) => total + item.cartUsage * item.itemPrice, 0);
+    return cart.reduce((total, item) => total + item.cartUsage * item.price, 0);
 }
 
 const CartReducer = (state, action) => {
@@ -46,7 +46,7 @@ const CartReducer = (state, action) => {
         case "Increase":
             const updatedStateI = state.map(item => 
                 item._id === action.payload
-                ? { ...item, cartUsage: Math.min(item.cartUsage + 1, item.itemStock) }
+                ? { ...item, cartUsage: item.cartUsage + 1 }
                 : item
             );
             localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedStateI));

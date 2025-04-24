@@ -84,31 +84,37 @@ export const initializeSocket = (server: HttpServer) => {
       }
     });
 
-    socket.on('updateDriverLocation', async (data) => {
+    socket.on('updateDriverLocation', async (data, callback) => {
       if (user.role !== 'deliveryAgent') {
-        socket.emit('error', { message: 'Unauthorized' });
+        const error = { message: 'Unauthorized: Only delivery agents can update location' };
+        if (callback) callback(error);
+        socket.emit('error', error);
         return;
       }
 
       const { deliveryId, location } = data;
       try {
-        if (deliveryId) {
-          const delivery = await Delivery.findById(deliveryId);
-          if (delivery && delivery.driverId?.toString() === user._id) {
-            delivery.currentLocation = {
-              type: 'Point',
-              coordinates: [location.longitude, location.latitude]
-            };
-            await delivery.save();
-
-            io.to(`delivery:${deliveryId}`).emit('deliveryLocationUpdate', {
-              deliveryId,
-              location,
-              driverId: user._id
-            });
-          }
+        if (!deliveryId || !location) {
+          throw new Error('Missing required data: deliveryId or location');
         }
 
+        // Update delivery location in database
+        const delivery = await Delivery.findById(deliveryId);
+        if (!delivery) {
+          throw new Error('Delivery not found');
+        }
+
+        if (delivery.driverId?.toString() !== user._id) {
+          throw new Error('Unauthorized: Driver not assigned to this delivery');
+        }
+
+        delivery.currentLocation = {
+          type: 'Point',
+          coordinates: [location.longitude, location.latitude]
+        };
+        await delivery.save();
+
+        // Update active drivers map
         if (activeDrivers.has(user._id)) {
           activeDrivers.set(user._id, {
             ...activeDrivers.get(user._id),
@@ -117,14 +123,25 @@ export const initializeSocket = (server: HttpServer) => {
           });
         }
 
+        // Emit updates
+        io.to(`delivery:${deliveryId}`).emit('deliveryLocationUpdate', {
+          deliveryId,
+          location,
+          driverId: user._id
+        });
+
         io.emit('driverLocationUpdate', {
           driverId: user._id,
           location,
           deliveryId
         });
+
+        if (callback) callback(null); // Acknowledge success
       } catch (error) {
         console.error('Error updating location:', error);
-        socket.emit('error', { message: 'Failed to update location' });
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update location';
+        if (callback) callback({ message: errorMessage });
+        socket.emit('error', { message: errorMessage });
       }
     });
 

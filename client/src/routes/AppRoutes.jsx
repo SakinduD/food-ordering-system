@@ -10,6 +10,8 @@ import RestaurantProfile from '../pages/restaurant-service/RestaurantProfile';
 import EditRestaurant from '../pages/restaurant-service/EditRestaurant';
 import DeliveryDriverAssignment from '../components/Delivery/DeliveryDriverAssignment';
 import CreateDelivery from  '../components/Delivery/CreateDelivery';
+import SocketMonitor from '../components/Delivery/SocketMonitor';
+import DriverLocationTracker from '../components/Delivery/DriverLocationTracker';   
 
 function AppRoutes() {
     return (
@@ -27,6 +29,8 @@ function AppRoutes() {
                 <Route path="/edit-restaurant" element={<EditRestaurant />} />
                 <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
                 <Route path="/create-delivery" element={<CreateDelivery />} />
+                <Route path="/socket-monitor" element={<SocketMonitor />} />
+                <Route path="/location-tracker/:deliveryId" element={<DriverLocationTracker />} />
             </Routes>
         </Router>
     );

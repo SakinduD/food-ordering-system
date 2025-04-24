@@ -84,12 +84,8 @@ export const assignDriver = async (req: Request, res: Response): Promise<void> =
 
     // Validate driver through user service
     const driverResponse = await userService.getUserById(driverId);
-    const driver = driverResponse.user;
     
-    if (!driver || driver.role !== 'deliveryAgent') {
-      res.status(400).json({ message: 'Invalid driver or not a delivery agent' });
-      return;
-    }
+  
 
     const delivery = await Delivery.findById(deliveryId);
     if (!delivery) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const DeliveryDriverAssignment = ({ deliveryId, onAssignSuccess }) => {
   const [availableDrivers, setAvailableDrivers] = useState([]);
@@ -80,17 +81,25 @@ const DeliveryDriverAssignment = ({ deliveryId, onAssignSuccess }) => {
                   <p>Distance: {driver.distance} km away</p>
                 </div>
               </div>
-              <button
-                onClick={() => handleAssignDriver(driver.driverId)}
-                disabled={loading}
-                className={`px-4 py-2 rounded-lg ${
-                  loading 
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                }`}
-              >
-                {loading ? 'Assigning...' : 'Assign Driver'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleAssignDriver(driver.driverId)}
+                  disabled={loading}
+                  className={`px-4 py-2 rounded-lg ${
+                    loading 
+                      ? 'bg-gray-300 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  }`}
+                >
+                  {loading ? 'Assigning...' : 'Assign Driver'}
+                </button>
+                <Link
+                  to={`/location-tracker/${deliveryId}`}
+                  className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"
+                >
+                  Track Location
+                </Link>
+              </div>
             </div>
           ))}
         </div>

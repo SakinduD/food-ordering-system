@@ -101,15 +101,22 @@ export const getUsersByRole = asyncHandler(async (req: Request, res: Response): 
 
 export const getUserProfile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   try {
-    const reqUser = (req as any).user;
+    // Log the full request user object
+    console.log('Token user data:', {
+      user: (req as any).user,
+      timestamp: new Date().toISOString()
+    });
 
+    const reqUser = (req as any).user;
     const user = await User.findById(reqUser._id);
 
     if (!user) {
+      console.log('User not found for ID:', reqUser._id);
       res.status(404).json({ message: 'User not found' });
       return;
     }
 
+    // Log the full user profile being sent
     const userProfile = {
       userId: user._id,
       isAdmin: user.isAdmin,
@@ -118,9 +125,14 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
       role: user.role,
     };
 
+    console.log('User profile data:', {
+      profile: userProfile,
+      timestamp: new Date().toISOString()
+    });
+
     res.status(200).json(userProfile);
   } catch (err) {
-    console.error(err);
+    console.error('Error in getUserProfile:', err);
     res.status(500).json({ message: 'Internal server error' });
     return;
   }

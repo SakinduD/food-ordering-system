@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-import deliveryBikeIcon from '../../assets/delivery-bike.svg';
+import deliveryBikeIcon from '../../assets/delivery-bike.png';
 import 'leaflet/dist/leaflet.css';
 
 // Create custom icon

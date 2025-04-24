@@ -50,7 +50,7 @@ function HeroSection() {
           <div className="flex-1 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl blur-2xl"></div>
             <img
-              src="https://i.imgur.com/ZYNpBbo.png"
+              src="https://i.imgur.com/w1e5Wl0.png"
               alt="Food delivery illustration"
               className="relative rounded-2xl shadow-2xl w-full max-w-[500px] mx-auto 
               transform hover:scale-[1.02] transition-transform duration-300

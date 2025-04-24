@@ -20,6 +20,7 @@ import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 //Methush imports
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import UserProfile from '../pages/UserProfile';
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -79,6 +80,14 @@ function AppRoutes() {
       <Route path="/detailed-order/:orderId" element={<DetailedOrderPage />} />
 
       {/* Protected Routes */}
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } 
+      />
     </Routes>
   );
 }

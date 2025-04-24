@@ -73,6 +73,12 @@ const handleCheckout = async (formData, location, cart, dispatch, userId) => {
                                     foodTotalPrice: totalPrice(cart),
                                 }),
                             });
+
+                            if(!response.ok) {
+                                const errorData = await response.json();
+                                toast.error("Order Failed "+errorData.message || 'Failed to place order');
+                                return;
+                            }
                     
                             if (response.ok) {
                                 Swal.fire({

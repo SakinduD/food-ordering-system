@@ -26,6 +26,16 @@ const placeOrder = async (
         const userId = (req as IOrderRequest).user._id;
         const restaurantId = orderItems[0].restaurantId;
 
+        const invalidItem = orderItems.find(
+            (item: OrderDetail) => item.restaurantId.toString() !== restaurantId.toString()
+        );
+
+        if (invalidItem) {
+            res.status(400)
+                .json({ message: 'All items in an order must come from the same restaurant.' });
+                return
+        }
+
         const restaurant = await getRestaurantById(restaurantId);
         if (!restaurant) {
             res.status(404).json({ message: 'Restaurant not found' });
@@ -171,7 +181,7 @@ const updateOrderStatus = async (
     }
 };
 
-// Remove order by restraurant owner
+// Remove order
 const removeOrder = async (
     req: Request<{ id: string }>, 
     res: Response, next: NextFunction

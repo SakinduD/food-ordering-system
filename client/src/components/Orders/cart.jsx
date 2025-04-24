@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import LocationPicker from './LocationPicker';
 import handleCheckout from '../../handlers/checkOutHandler';
+import { MapPin } from 'lucide-react';
 
 const Cart = () => {
     const { cart, dispatch, user, loading } = useContext(UserContext);
@@ -156,133 +157,193 @@ const Cart = () => {
     };
 
     return (
-        <div>
+        <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
             <Toaster />
+            <div className="container mx-auto px-4 max-w-7xl">
+                <h2 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
+                    Your Cart
+                </h2>
 
-            <div>
-                
-                <div className="flex flex-wrap gap-6 p-4">
-                    {cart.map((item) => (
-                        <div 
-                            className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 w-64" 
-                            key={item._id}
-                        >
-                            <img 
-                                src={`http://localhost:5000${item.imageUrl}`}
-                                alt={item.itemName || "Item Image"} 
-                                className="w-24 h-24 object-cover mb-4 rounded-md"
-                            />
-                            <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.name}</h4>
-                            <h4 className="text-gray-600 text-sm mb-4">${item.price}</h4>
-                            <div className="flex items-center gap-2 mb-4">
-                                <button className="bg-red-500 text-white rounded px-3 py-1 hover:bg-red-600"
-                                    onClick={() => {Decrease(item._id)}}
-                                >
-                                    -
-                                </button>
-                                <h4 className="text-lg font-semibold">{item.cartUsage}</h4>
-                                <button className="bg-blue-500 text-white rounded px-3 py-1 hover:bg-blue-600"
-                                    onClick={() => {Increase(item._id)}
-                                }>
-                                    +
-                                </button>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    dispatch({
-                                        type: 'Remove',
-                                        payload: item._id,
-                                        userId,
-                                    });
-                                }}
-                                className="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    ))}
-                    <div>
-                        <form onSubmit={handleSubmit}> 
-                            <div>
-                                <label>First Name :</label>
-                                <input type="text" 
-                                    name='firstName'
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                required/>
-                            </div>
-
-                            <div>
-                                <label>Last Name :</label>
-                                <input type="text" 
-                                    name='lastName'
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                required/>
-                            </div>
-
-                            <div>
-                                <label>email : {user?.email} </label>
-                            </div>
-
-                            <div>
-                                <label>Phone Number : </label>
-                                <input type="text" 
-                                    name='phone'
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                required/>
-                            </div>
-
-                            <div>
-                                <label>Delivery Address : </label>
-                                <input type="text" 
-                                    name='address'
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                required/>
-                            </div>
-
-                            <div>
-                                <button
-                                    type="button"
-                                    className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-4"
-                                    onClick={() => setShowMap(true)}
-                                    >
-                                    Select Delivery Location
-                                </button>
-
-                                <LocationPicker
-                                    isOpen={showMap}
-                                    onClose={() => setShowMap(false)}
-                                    onLocationSelect={handleLocationSelect}
-                                />
-
-                            </div>
-
-                            <div>
-                                <label>comments : </label>
-                                <textarea 
-                                    name='comments'
-                                    value={formData.comments}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <h5>Total Items:{totalItems(cart)}</h5>
-                            <h5>Delivery Fee: {deliveryFee ? deliveryFee : 0}</h5>
-                            <h5>Total Price (including delivery): {totalPrice(cart) + (deliveryFee || 0)}</h5>
-
-                            <button 
-                                type='submit' 
-                                disabled={cart.length === 0}
-                                className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">
-                                    Checkout
-                            </button>
-                            
-                        </form>
+                {cart.length === 0 ? (
+                    <div className="text-center py-16">
+                        <h3 className="text-2xl font-semibold text-gray-600 mb-4">Your cart is empty</h3>
+                        <p className="text-gray-500 mb-8">Add some delicious items to get started!</p>
                     </div>
-                </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Cart Items Section */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {cart.map((item) => (
+                                    <div 
+                                        key={item._id}
+                                        className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                                    >
+                                        <img 
+                                            src={`http://localhost:5000${item.imageUrl}`}
+                                            alt={item.itemName || "Item Image"} 
+                                            className="w-full h-48 object-cover"
+                                        />
+                                        <div className="p-6 space-y-4">
+                                            <h4 className="text-xl font-semibold text-gray-800">{item.name}</h4>
+                                            <p className="text-orange-500 font-semibold">${item.price}</p>
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <button 
+                                                        onClick={() => Decrease(item._id)}
+                                                        className="h-8 w-8 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center hover:bg-orange-200 transition-colors"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="text-lg font-semibold text-gray-700">{item.cartUsage}</span>
+                                                    <button 
+                                                        onClick={() => Increase(item._id)}
+                                                        className="h-8 w-8 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center hover:bg-orange-200 transition-colors"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        dispatch({
+                                                            type: 'Remove',
+                                                            payload: item._id,
+                                                            userId,
+                                                        });
+                                                    }}
+                                                    className="text-red-500 hover:text-red-600 font-medium"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Checkout Form Section */}
+                        <div className="lg:col-span-1">
+                            <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6 sticky top-24">
+                                <h3 className="text-xl font-semibold mb-6 text-gray-800 text-center">Place the order</h3>
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">First Name</label>
+                                            <input
+                                                type="text"
+                                                name="firstName"
+                                                value={formData.firstName}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">Last Name</label>
+                                            <input
+                                                type="text"
+                                                name="lastName"
+                                                value={formData.lastName}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Email</label>
+                                        <input
+                                            type="text"
+                                            value={user?.email || ""}
+                                            disabled
+                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 bg-gray-50 text-gray-500"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            required
+                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Delivery Address</label>
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            required
+                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMap(true)}
+                                        className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-orange-100 text-orange-600 font-semibold hover:bg-orange-200 transition-colors"
+                                    >
+                                        <MapPin className="h-5 w-5" />
+                                        Select Delivery Location
+                                    </button>
+
+                                    <LocationPicker
+                                        isOpen={showMap}
+                                        onClose={() => setShowMap(false)}
+                                        onLocationSelect={handleLocationSelect}
+                                    />
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-gray-700">Special Instructions</label>
+                                        <textarea
+                                            name="comments"
+                                            value={formData.comments}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="w-full px-4 py-3 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
+                                            placeholder="Any special requests?"
+                                        />
+                                    </div>
+
+                                    <div className="border-t border-orange-100 pt-4 space-y-3">
+                                        <div className="flex justify-between text-gray-600">
+                                            <span>Total Items:</span>
+                                            <span>{totalItems(cart)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-600">
+                                            <span>Delivery Fee:</span>
+                                            <span>${deliveryFee ? deliveryFee.toFixed(2) : '0.00'}</span>
+                                        </div>
+                                        <div className="flex justify-between text-lg font-semibold text-gray-800">
+                                            <span>Total:</span>
+                                            <span>${(totalPrice(cart) + (deliveryFee || 0)).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={cart.length === 0}
+                                        className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 
+                                            text-white font-semibold shadow-lg transition-all duration-200 
+                                            hover:shadow-orange-500/30 hover:scale-[1.02] disabled:opacity-50 
+                                            disabled:cursor-not-allowed disabled:hover:scale-100"
+                                    >
+                                        Proceed to Checkout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

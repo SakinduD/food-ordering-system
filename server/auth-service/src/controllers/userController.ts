@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import User, { IUser, UserRole } from '../models/User';
+import { isAdmin } from '../middlewares/authMiddleware';
 
 // Get User by ID
 export const getUserById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -111,6 +112,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
 
     const userProfile = {
       userId: user._id,
+      isAdmin: user.isAdmin,
       name: user.name,
       email: user.email,
       role: user.role,

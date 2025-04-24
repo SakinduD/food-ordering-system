@@ -15,6 +15,7 @@ import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssig
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 import Cart from "../components/Orders/cart";
 import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
+import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";

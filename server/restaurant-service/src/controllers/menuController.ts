@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import MenuItem from '../models/MenuItem';
 import { getRestaurantById } from '../services/restaurantService';
+import Restaurant from '../models/Restaurant';
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -9,11 +10,18 @@ interface MulterRequest extends Request {
 // ✅ Create a new menu item
 export const addMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, price, available, restaurantId } = req.body;
+    const { name, description, price, available } = req.body;
+    const userId = (req as any).user._id;
 
-    const restaurant = await getRestaurantById(restaurantId);
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized: No user ID found in token' });
+      return;
+    }
+
+    // 🔍 Match restaurant by userId, not restaurantId from form
+    const restaurant = await Restaurant.findOne({ userId });
     if (!restaurant) {
-      res.status(404).json({ message: 'Restaurant not found for given ID' });
+      res.status(404).json({ message: 'Restaurant not found for this user' });
       return;
     }
 
@@ -24,13 +32,14 @@ export const addMenuItem = async (req: MulterRequest, res: Response): Promise<vo
       description,
       price,
       available,
-      restaurantId,
+      restaurantId: restaurant._id,
       imageUrl,
     });
 
     const fullItem = await MenuItem.findById(menuItem._id).populate('restaurantId', 'name');
     res.status(201).json({ message: 'Menu item added!', data: fullItem });
   } catch (err: any) {
+    console.error('Add Menu Error:', err.message);
     res.status(400).json({ error: err.message || 'Failed to add menu item' });
   }
 };

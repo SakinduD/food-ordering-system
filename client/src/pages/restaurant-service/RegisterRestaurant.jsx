@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { UserContext } from '../../context/userContext';
 
 const RegisterRestaurant = () => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
     address: '',
@@ -10,36 +13,28 @@ const RegisterRestaurant = () => {
     available: true,
     location: {
       type: 'Point',
-      coordinates: ['', ''], // [longitude, latitude]
+      coordinates: ['', ''],
     },
   });
-
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleCoordinateChange = (index, value) => {
-    const updatedCoordinates = [...form.location.coordinates];
-    updatedCoordinates[index] = value;
-    setForm({
-      ...form,
-      location: {
-        ...form.location,
-        coordinates: updatedCoordinates,
-      },
-    });
+    const updated = [...form.location.coordinates];
+    updated[index] = value;
+    setForm({ ...form, location: { ...form.location, coordinates: updated } });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-
-    if (!token) {
+    console.log('token', token);
+    if (!token || !user) {
       setError('You must be logged in to register a restaurant.');
       return;
     }
 
     try {
-      const formattedCoordinates = form.location.coordinates.map((c) => Number(c));
+      const formattedCoordinates = form.location.coordinates.map(Number);
       const payload = {
         ...form,
         location: {
@@ -57,9 +52,9 @@ const RegisterRestaurant = () => {
       alert('✅ Restaurant registered successfully!');
       navigate('/');
     } catch (err) {
-      console.error(err);
       const msg = err.response?.data?.message || 'Failed to register';
       setError(msg);
+      console.error('Register error:', err);
     }
   };
 
@@ -67,9 +62,7 @@ const RegisterRestaurant = () => {
     <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Register Restaurant</h2>
 
-      {error && (
-        <div className="mb-4 text-red-600 bg-red-100 p-2 rounded">{error}</div>
-      )}
+      {error && <div className="mb-4 text-red-600 bg-red-100 p-2 rounded">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -80,7 +73,6 @@ const RegisterRestaurant = () => {
           className="w-full p-2 border rounded"
           required
         />
-
         <input
           type="text"
           placeholder="Address"
@@ -88,7 +80,6 @@ const RegisterRestaurant = () => {
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           className="w-full p-2 border rounded"
         />
-
         <input
           type="text"
           placeholder="Phone Number"
@@ -96,7 +87,6 @@ const RegisterRestaurant = () => {
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           className="w-full p-2 border rounded"
         />
-
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"

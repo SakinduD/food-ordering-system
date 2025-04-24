@@ -265,4 +265,28 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c; // Distance in km
 }
 
+export const getDeliveryById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+    
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
+    }
+
+    // Return full delivery details including locations
+    res.json({
+      deliveryId: delivery._id,
+      status: delivery.status,
+      restaurantLocation: delivery.restaurantLocation,
+      customerLocation: delivery.customerLocation,
+      currentLocation: delivery.currentLocation
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 

@@ -1,4 +1,4 @@
-import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings, ShoppingCart } from "lucide-react"
+import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings, ShoppingCart, Package } from "lucide-react"
 import { useState, useContext, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/userContext"
@@ -86,6 +86,14 @@ function Header() {
                 >
                   <User className="h-4 w-4" />
                   Profile
+                </Link>
+                <Link
+                  to="/orders"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <Package className="h-4 w-4" />
+                  My Orders
                 </Link>
                 <Link
                   to="/settings"
@@ -205,7 +213,7 @@ function Header() {
                   )
                 ))}
               </nav>
-              <div className="flex flex-col gap-4 pt-4 border-t border-orange-100">
+              <div className="flex flex-col gap-4 pt-4 border-t border-orange-100 bg-orange-200 rounded-lg p-4">
                 {user ? (
                   <>
                     <Link
@@ -214,6 +222,13 @@ function Header() {
                     >
                       <ShoppingCart className="h-4 w-4" />
                       Cart
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                    >
+                      <Package className="h-4 w-4" />
+                      My Orders
                     </Link>
                     <Link
                       to="/profile"

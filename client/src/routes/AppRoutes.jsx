@@ -6,7 +6,7 @@ import EditMenuItem from "../pages/restaurant-service/EditMenuItem";
 import RegisterRestaurant from "../pages/restaurant-service/RegisterRestaurant";
 import AdminMenuList from "../pages/restaurant-service/AdminMenuList";
 import CustomerMenuList from "../pages/restaurant-service/CustomerMenuList";
-import UserOrderList from "../components/Orders/userOrderList";
+import UserOrderList from "../pages/orders/userOrderList";
 import Login from "../pages/login/login";
 import Register from "../pages/register/Register";
 import RestaurantProfile from "../pages/restaurant-service/RestaurantProfile";
@@ -18,6 +18,7 @@ import DriverLocationTracker from "../components/Delivery/DriverLocationTracker"
 
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/AdminDashboard";
+import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -74,6 +75,9 @@ function AppRoutes() {
 
       <Route path="/orders" element={<UserOrderList />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/detailed-order/:orderId" element={<DetailedOrderPage />} />
+
+      {/* Protected Routes */}
     </Routes>
   );
 }

@@ -84,12 +84,8 @@ export const assignDriver = async (req: Request, res: Response): Promise<void> =
 
     // Validate driver through user service
     const driverResponse = await userService.getUserById(driverId);
-    const driver = driverResponse.user;
     
-    if (!driver || driver.role !== 'deliveryAgent') {
-      res.status(400).json({ message: 'Invalid driver or not a delivery agent' });
-      return;
-    }
+  
 
     const delivery = await Delivery.findById(deliveryId);
     if (!delivery) {
@@ -268,5 +264,29 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   return R * c; // Distance in km
 }
+
+export const getDeliveryById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+    
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
+    }
+
+    // Return full delivery details including locations
+    res.json({
+      deliveryId: delivery._id,
+      status: delivery.status,
+      restaurantLocation: delivery.restaurantLocation,
+      customerLocation: delivery.customerLocation,
+      currentLocation: delivery.currentLocation
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
 
 

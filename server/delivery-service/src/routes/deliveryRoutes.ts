@@ -6,7 +6,8 @@ import {
   getAllDeliveries,
   getDeliveryLocation,
   getActiveDriversLocations,
-  getNearbyDrivers
+  getNearbyDrivers,
+  getDeliveryById
 } from '../controllers/deliveryController';
 import { authenticate, authorize } from '../middleware/authMiddleware';
 
@@ -28,5 +29,6 @@ router.get('/', getAllDeliveries);
 router.get('/active-drivers', getActiveDriversLocations);
 router.get('/:deliveryId/location', getDeliveryLocation);
 router.get('/:deliveryId/nearby-drivers', getNearbyDrivers);
+router.get('/:deliveryId', getDeliveryById);
 
 export default router;

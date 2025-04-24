@@ -34,7 +34,6 @@ const MenuItemCustomerCard = ({ item }) => {
                 toast.error('Please login to add items to cart');
                 return;
             }
-            console.log("User ID:", user?.userId);
 
             dispatch({
                 type: 'Add',

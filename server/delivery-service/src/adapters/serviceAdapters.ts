@@ -36,7 +36,10 @@ export class UserServiceAdapter {
       const response = await axios.get(`${this.baseUrl}/users`, {
         params: { role: 'deliveryAgent', isAvailable: true }
       });
-      return response.data;
+      
+      // Ensure each item in the response has a user property
+      const drivers = Array.isArray(response.data) ? response.data : [];
+      return drivers.map(user => ({ user }));
     } catch (error: any) {
       throw new ServiceError('UserService',
         error.response?.data?.message || 'Failed to fetch active drivers',

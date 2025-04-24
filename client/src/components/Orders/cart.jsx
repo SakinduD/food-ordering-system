@@ -10,6 +10,7 @@ import axios from 'axios';
 import LocationPicker from './LocationPicker';
 import handleCheckout from '../../handlers/checkOutHandler';
 import { MapPin } from 'lucide-react';
+import Spinner from '../Spinner';
 
 const Cart = () => {
     const { cart, dispatch, user, loading } = useContext(UserContext);
@@ -122,7 +123,11 @@ const Cart = () => {
     };
 
     if (loading) {
-        return <div>Loading user data...</div>;
+        return (
+            <div>
+                <Spinner />
+            </div>
+        );
     }
 
     const handleLocationSelect = async (location) => {
@@ -226,7 +231,7 @@ const Cart = () => {
                         {/* Checkout Form Section */}
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6 sticky top-24">
-                                <h3 className="text-xl font-semibold mb-6 text-gray-800 text-center">Place the order</h3>
+                                <h3 className="text-xl font-semibold mb-6 text-orange-500 text-center">Place the order</h3>
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">

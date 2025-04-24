@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast, { Toaster } from "react-hot-toast";
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { UserContext } from '../../context/userContext';
 
 const Login = () => {
-
+    const navigate = useNavigate();
+    const { login } = useContext(UserContext);
     const [data, setData] = useState({
         email: '',
         password: ''
     });
-
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setData({
@@ -21,54 +24,32 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
 
         try {
-            const response = await axios.post('http://localhost:5010/api/auth/login', data, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
+            const response = await axios.post('http://localhost:5010/api/auth/login', data);
+            const { token, user } = response.data;
 
-            if (response.status === 200) {
-                const tokenData = await response.data;
-                console.log("Token Data:", tokenData);
+            if (token) {
+                await login(token, user);
+                toast.success('Login Successful!');
 
-                if (tokenData.token) {
-                    console.log("Token received:", tokenData.token);
-
-                    localStorage.setItem('token', tokenData.token);
-
-                    toast.success('Login Successful!!');
-
-                    if (tokenData.user.role === 'admin') {
-                        setTimeout(() => {
-                            window.location = '/dashboard';
-                        }, 1500);
-                    } else {
-                        setTimeout(() => {
-                            window.location = '/';
-                        }, 1500);
-                    }
+                // Navigate based on user role
+                if (user.isAdmin) {
+                    navigate('/admin');
                 } else {
-                    throw new Error('Login successful but no token received');
+                    navigate('/');
                 }
-            } else {
-                throw new Error(tokenData.message || 'Login failed');
             }
-
         } catch (err) {
-            console.error(err);
-            if (err.response) {
-                setError(err.response.data.message || 'Server returned an error');
-            } else {
-                setError('Network error or server is unreachable');
-            }
+            console.error('Login error:', err);
+            setError(err.response?.data?.message || 'Login failed');
+            toast.error('Login failed!');
+        } finally {
+            setLoading(false);
         }
-        
-        
-    }
-
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -146,13 +127,21 @@ const Login = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
+                        disabled={loading}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r 
                         from-orange-500 to-orange-600 text-white font-semibold rounded-xl 
                         shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 
-                        transform hover:scale-[1.02] transition-all duration-200"
+                        transform hover:scale-[1.02] transition-all duration-200
+                        disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Sign in
-                        <ArrowRight className="h-5 w-5" />
+                        {loading ? (
+                            <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                            <>
+                                Sign in
+                                <ArrowRight className="h-5 w-5" />
+                            </>
+                        )}
                     </button>
 
                     {/* Additional Links */}

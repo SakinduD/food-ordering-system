@@ -2,11 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { UserContext } from "../../context/userContext";
+import { useContext } from "react";
 
 const RestaurantProfile = () => {
   const [restaurant, setRestaurant] = useState(null);
   const navigate = useNavigate();
-  const userId = localStorage.getItem('userId'); // replace with decoded token if needed
+  const { user } = useContext(UserContext);
+  const userId = user.userId;
 
   useEffect(() => {
     const fetchProfile = async () => {

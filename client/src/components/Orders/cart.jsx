@@ -10,6 +10,7 @@ import axios from 'axios';
 import LocationPicker from './LocationPicker';
 import handleCheckout from '../../handlers/checkOutHandler';
 import { MapPin } from 'lucide-react';
+import Spinner from '../Spinner';
 
 const Cart = () => {
     const { cart, dispatch, user, loading } = useContext(UserContext);
@@ -122,7 +123,11 @@ const Cart = () => {
     };
 
     if (loading) {
-        return <div>Loading user data...</div>;
+        return (
+            <div>
+                <Spinner />
+            </div>
+        );
     }
 
     const handleLocationSelect = async (location) => {

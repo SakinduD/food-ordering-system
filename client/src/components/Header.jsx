@@ -1,4 +1,4 @@
-import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings } from "lucide-react"
+import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings, ShoppingCart } from "lucide-react"
 import { useState, useContext, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/userContext"
@@ -55,48 +55,58 @@ function Header() {
   const renderDesktopAuth = () => (
     <div className="hidden md:flex items-center gap-6">
       {user ? (
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        <>
+          <Link
+            to="/cart"
             className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
           >
             <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
-              <User className="h-4 w-4 text-orange-500" />
+              <ShoppingCart className="h-4 w-4 text-orange-500" />
             </div>
-            <span className="text-sm font-medium">{formatName(user.name)}</span>
-            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
+          </Link>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+            >
+              <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <User className="h-4 w-4 text-orange-500" />
+              </div>
+              <span className="text-sm font-medium">{formatName(user.name)}</span>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg border border-orange-100 py-2 z-50">
-              <Link
-                to="/profile"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
-                onClick={() => setIsDropdownOpen(false)}
-              >
-                <User className="h-4 w-4" />
-                Profile
-              </Link>
-              <Link
-                to="/settings"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
-                onClick={() => setIsDropdownOpen(false)}
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </Link>
-              <div className="h-px bg-orange-100 my-2"></div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50 w-full"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg border border-orange-100 py-2 z-50">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <User className="h-4 w-4" />
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+                <div className="h-px bg-orange-100 my-2"></div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50 w-full"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       ) : (
         <>
           <Link
@@ -198,6 +208,13 @@ function Header() {
               <div className="flex flex-col gap-4 pt-4 border-t border-orange-100">
                 {user ? (
                   <>
+                    <Link
+                      to="/cart"
+                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Cart
+                    </Link>
                     <Link
                       to="/profile"
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"

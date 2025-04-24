@@ -14,6 +14,7 @@ import EditRestaurant from "../pages/restaurant-service/EditRestaurant";
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 import Cart from "../components/Orders/cart";
+import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
 
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/AdminDashboard";
@@ -69,6 +70,7 @@ function AppRoutes() {
       <Route path="/edit-restaurant" element={<EditRestaurant />} />
       <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
       <Route path="/create-delivery" element={<CreateDelivery />} />
+      <Route path="/location-tracker" element={<DriverLocationTracker />} />
 
       <Route path="/orders" element={<UserOrderList />} />
       <Route path="/cart" element={<Cart />} />

@@ -1,31 +1,50 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import jwt from "jsonwebtoken";
 
-dotenv.config();
-
-// Custom request type to allow `user` field
-interface AuthenticatedRequest extends Request {
-  user?: any;
+// Define interface for decoded token
+interface JwtPayload {
+    _id: string;
+    role: string;
 }
 
-const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-  const authHeader = req.headers.authorization;
+// Extend Request type to include `user`
+export interface AuthenticatedRequest extends Request {
+    user?: JwtPayload;
+}
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'Authorization header missing or malformed' });
-    return;
-  }
+//middleware for check user is logged
+const authMiddleware: RequestHandler = (
+    req: AuthenticatedRequest, 
+    res: Response, 
+    next: NextFunction
+): void => {
+    try {
+        const JWT_SECRET = process.env.JWT_SECRET as string;
 
-  const token = authHeader.split(' ')[1];
+        if (!JWT_SECRET) {
+            res.status(500).json({ message: "Internal Server Error: JWT_SECRET not set" });
+            return;
+        }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token!' });
-  }
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            res.status(401).json({ message: "Authentication failed: No token provided" });
+            return;
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        if (!token) {
+            res.status(401).json({ message: "Authentication failed [No Token]" });
+            return;
+        }
+
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+        req.user = decoded;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Authentication failed [Error]" });
+    }
 };
 
 export default authMiddleware;

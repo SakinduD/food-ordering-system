@@ -5,7 +5,7 @@ import { getOrdersByRestaurantId, updateOrderStatus, deleteOrder } from '../serv
 // Create a new restaurant for the logged-in user
 export const createRestaurant = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user._id;
     if (!userId) {
       res.status(401).json({ message: 'Unauthorized: No user ID found in token' });
       return;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchMenuItems } from '../../services/restaurantService';
 import MenuItemCustomerCard from '../../components/restaurant-service/MenuItemCustomerCard';
+import { Link } from 'react-router-dom';
 
 const CustomerMenuList = () => {
   const [items, setItems] = useState([]);

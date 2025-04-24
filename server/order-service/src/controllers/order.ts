@@ -22,9 +22,19 @@ const placeOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { customerLat, customerLon, userName, userPhone, orderItems, foodTotalProce } = req.body;
+        const { customerLat, customerLon, userName, userPhone, orderItems, comments, foodTotalPrice, address } = req.body;
         const userId = (req as IOrderRequest).user._id;
         const restaurantId = orderItems[0].restaurantId;
+
+        const invalidItem = orderItems.find(
+            (item: OrderDetail) => item.restaurantId.toString() !== restaurantId.toString()
+        );
+
+        if (invalidItem) {
+            res.status(400)
+                .json({ message: 'All items in an order must come from the same restaurant.' });
+                return
+        }
 
         const restaurant = await getRestaurantById(restaurantId);
         if (!restaurant) {
@@ -43,7 +53,7 @@ const placeOrder = async (
         //calculate the delivery fee based on the road distance
         const deliveryFeeAmount = deliveryFee(roadDistance);
 
-        const totalAmount: number = deliveryFeeAmount + foodTotalProce;
+        const totalAmount: number = deliveryFeeAmount + foodTotalPrice;
 
         const order:OrderDetail = await Order.create({
             invoiceId,
@@ -53,6 +63,8 @@ const placeOrder = async (
             userName,
             userPhone,
             orderItems,
+            comments,
+            address,
             orderLocation: [customerLon, customerLat],
             roadDistance,
             deliveryFee: deliveryFeeAmount,
@@ -169,7 +181,7 @@ const updateOrderStatus = async (
     }
 };
 
-// Remove order by restraurant owner
+// Remove order
 const removeOrder = async (
     req: Request<{ id: string }>, 
     res: Response, next: NextFunction

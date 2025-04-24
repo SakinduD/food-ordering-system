@@ -1,5 +1,15 @@
+import React, { useContext } from 'react';
+import { UserContext } from '../../context/userContext';
+import toast, { Toaster } from "react-hot-toast";
+
 const MenuItemCustomerCard = ({ item }) => {
+  const { dispatch } = useContext(UserContext);
+  const { user } = useContext(UserContext);
+
+
   return (
+    <div>
+    <Toaster/>
     <div className="bg-white p-4 rounded shadow mb-4">
       {/* ✅ Show image if available */}
       {item.imageUrl && (
@@ -17,13 +27,30 @@ const MenuItemCustomerCard = ({ item }) => {
         {item.available ? 'Available' : 'Not Available'}
       </p>
 
-      <button
-        onClick={() => addToCart(item)}
-        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
+      <button className={`mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700
+        ${item.available ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+        onClick={() => {
+            if(user === null) {
+                toast.error('Please login to add items to cart');
+                return;
+            }
+            console.log("User ID:", user?.userId);
+
+            dispatch({
+                type: 'Add',
+                item: { ...item, cartUsage: 1 },
+                userId: user?.userId,
+            });
+            toast.success('Item added to cart!');
+            console.log("Item added to cart:", item);
+
+        }}
+        disabled={!item.available}
+    >
         🛒 Add to Cart
-      </button>
+    </button>
       
+    </div>
     </div>
   );
 };

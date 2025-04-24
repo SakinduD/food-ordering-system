@@ -1,13 +1,7 @@
 import md5 from "crypto-js/md5";
+import { v4 as uuIdv4 } from 'uuid';
 require('dotenv').config();
 import { Request, Response } from 'express';
-
-interface IOrderRequest extends Request {
-    user: {
-        userId: string;
-        role: string;
-    };
-}
 
 interface PaymentData {
     merchantId: string;
@@ -25,7 +19,7 @@ interface PaymentData {
     orderId: string;
     items: string;
     currency: string;
-    amount: number;
+    amount: string;
     userId: string;
     hash?: string;
 }
@@ -35,10 +29,14 @@ let paymentData: PaymentData | null = null;
 function generateHash(data: PaymentData): string {
     const { merchantId, orderId, amount, currency, merchantSecret } = data;
     const hashedSecret = md5(merchantSecret).toString().toUpperCase();
-    const amountFormatted = Number(amount).toFixed(2);
-    const hash = md5(merchantId + orderId + amountFormatted + currency + hashedSecret).toString().toUpperCase();
+    const amountFormatted = parseFloat(amount)
+      .toLocaleString('en-us', { minimumFractionDigits: 2 })
+      .replace(/,/g, '');
+    const hash = md5(merchantId + orderId + amountFormatted + currency + hashedSecret)
+      .toString()
+      .toUpperCase();
     return hash;
-}
+  }
 
 // Create a payment
 const createPayment = (req: Request, res: Response) => {
@@ -51,17 +49,17 @@ const createPayment = (req: Request, res: Response) => {
         address,
         city,
         currency = 'LKR',
-        orderId
+        userId,
     } = req.body;
 
-    const { userId } = (req as IOrderRequest).user;
+    const orderId = uuIdv4();
 
     paymentData = {
-        merchantId: process.env.MERCHANT_ID as string || '',
-        return_url: 'http://localhost:5173/',
-        cancel_url: 'http://localhost:5173/',
-        notify_url: 'http://localhost:5173/',
-        merchantSecret: process.env.MERCHANT_SECRET as string || '',
+        merchantId: process.env.MERCHANT_ID || '',
+        return_url: 'http://localhost:3000/',
+        cancel_url: 'http://localhost:3000/',
+        notify_url: 'http://localhost:3000/',
+        merchantSecret: process.env.MERCHANT_SECRET || '',
         first_name,
         last_name,
         email,

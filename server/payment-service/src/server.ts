@@ -5,13 +5,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log('Order service is running');
+console.log('Payment service is running');
 
 const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: 'http://localhost:3000',
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -21,24 +21,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 import paymentRoutes from './routes/paymentRoutes';
 app.use('/api/payment', paymentRoutes);
 
-
-import jwt from 'jsonwebtoken';
-const SECRET_KEY = process.env.JWT_SECRET as string;
-const generateToken = (userId: string, role: string) => {
-    const payload = {
-        userId,
-        role, // Adding role in token payload
-    };
-
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '5h' });
-    return token;
-};
-// Example Usage
-const token = generateToken('67e5ab7ba2faacd3c42aa556', 'customer');
-console.log('Generated Token:', token);
-
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    console.log(`Order Server is running on port ${PORT}`);
+    console.log(`Payment Server is running on port ${PORT}`);
 });

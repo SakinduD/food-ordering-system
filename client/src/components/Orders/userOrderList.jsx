@@ -4,13 +4,15 @@ import { useContext } from "react";
 import axios from "axios";
 
 const UserOrderList = () => {
-    const { user } = useContext(UserContext);
+    const { user, loading } = useContext(UserContext);
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [itemLoading, setItemLoading] = useState(true);
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
+                if (!user?.userId) return;
+                
                 const token = localStorage.getItem("token");
                 if (!token) return;
 
@@ -25,14 +27,14 @@ const UserOrderList = () => {
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
             } finally {
-                setLoading(false);
+                setItemLoading(false);
             }
         };
 
         fetchOrders();
     }, [user?.userId]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading || itemLoading) return <div>Loading...</div>;
 
     return (
         <div className="user-order-list">
@@ -45,8 +47,7 @@ const UserOrderList = () => {
                     {orders.map(order => (
                         <li key={order._id}>
                             <h3>Invoice ID: {order.invoiceId}</h3>
-                            <p>Total Amount: ${order.totalAmount}</p>
-                            <p>Status: {order.status}</p>
+                            <p>Status: {order.orderStatus}</p>
                             <p>Items:</p>
                             <ul>
                                 {order.orderItems.map(item => (
@@ -55,6 +56,8 @@ const UserOrderList = () => {
                                     </li>
                                 ))}
                             </ul>
+                            <p>Delivery Fee : ${order.deliveryFee}</p>
+                            <p>Total Amount (With Delivery Fee): ${order.totalAmount}</p>
                         </li>
                     ))}
                 </ul>

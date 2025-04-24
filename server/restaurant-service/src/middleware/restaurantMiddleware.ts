@@ -7,7 +7,7 @@ const restaurantMiddleware: RequestHandler = (
     res: Response, next: NextFunction
 ): void => {
     try {
-        if (req.user && req.user.role === 'restaurantOwner') {
+        if (req.user && req.user.role === 'restaurant') {
             next();
         } else {
             res.status(403).json({ message: 'You must be logged in as a restaurant owner to access this route.' });

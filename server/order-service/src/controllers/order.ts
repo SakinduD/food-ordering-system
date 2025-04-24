@@ -107,7 +107,7 @@ const getOrdersByRestaurantId = async (
         }
 
         const restaurant = restaurants.find((restaurant: any) => restaurant.userId === userId);
-
+        console.log('Restaurant:', restaurant);
         if (!restaurant) {
             res.status(404).json({ message: 'Restaurant not found' });
             return;

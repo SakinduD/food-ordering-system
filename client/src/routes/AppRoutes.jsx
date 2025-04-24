@@ -17,12 +17,7 @@ import Cart from "../components/Orders/cart";
 import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
 
 import LandingPage from "../pages/landing-page/LandingPage";
-<<<<<<< Updated upstream
-import AdminDashboard from "../pages/AdminDashboard";
-import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
-=======
 import AdminDashboard from "../pages/admin/AdminDashboard";
->>>>>>> Stashed changes
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {

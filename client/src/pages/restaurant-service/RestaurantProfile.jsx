@@ -37,7 +37,6 @@ const RestaurantProfile = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      // Remove the trailing slash
       const res = await axios.get('http://localhost:5001/api/order/getOrdersByRestaurantId', {
         headers: {
           Authorization: `Bearer ${token}`,

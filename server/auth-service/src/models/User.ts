@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 // Define the role types
-export type UserRole = 'customer' | 'restaurantOwner' | 'deliveryAgent';
+export type UserRole = 'customer' | 'restaurant' | 'deliveryAgent';
 
 // Define the interface for the User document
 export interface IUser extends Document {
@@ -28,7 +28,7 @@ const userSchema: Schema = new Schema(
     password: { type: String, required: true },
     role: { 
       type: String, 
-      enum: ['customer', 'restaurantOwner', 'deliveryAgent'], 
+      enum: ['customer', 'restaurant', 'deliveryAgent'], 
       required: true 
     },
     isAdmin: { type: Boolean, default: false },

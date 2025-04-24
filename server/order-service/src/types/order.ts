@@ -11,6 +11,7 @@ export interface OrderDetail {
     orderStatus: string;
     orderItems: {
         itemName: string;
+        itemPrice: number;
         itemQuantity: number;
     }[];
     comments?: string;

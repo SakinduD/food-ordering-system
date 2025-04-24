@@ -67,6 +67,7 @@ const handleCheckout = async (formData, location, cart, dispatch, userId) => {
                                     comments: formData.comments,
                                     orderItems: cart.map((item) => ({
                                         itemName: item.name,
+                                        itemPrice: item.price,
                                         itemQuantity: item.cartUsage,
                                         restaurantId: item.restaurantId,
                                     })),

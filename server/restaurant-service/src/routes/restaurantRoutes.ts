@@ -13,16 +13,18 @@ import {
 } from '../controllers/restaurantController';
 
 import authMiddleware from '../middleware/authMiddleware';
+import restaurantMiddleware from '../middleware/restaurantMiddleware';
+import adminMiddleware from '../middleware/adminMiddleware';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createRestaurant);
+router.post('/', authMiddleware, restaurantMiddleware, createRestaurant);
 router.get('/', getRestaurants);
-router.get('/user/:userId', getRestaurantByUserId); 
-router.get('/:id', getRestaurantById);
-router.put('/:id', authMiddleware, updateRestaurant);
-router.delete('/:id', authMiddleware, deleteRestaurant);
-router.put('/:id/availability', authMiddleware, setAvailability);
+router.get('/user/:userId', authMiddleware, restaurantMiddleware, getRestaurantByUserId); 
+router.get('/:id', adminMiddleware, getRestaurantById);
+router.put('/:id', authMiddleware, restaurantMiddleware, updateRestaurant);
+router.delete('/:id', adminMiddleware, deleteRestaurant);
+router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailability);
 router.get('/:id/orders', authMiddleware, fetchRestaurantOrders); // View all orders
 router.put('/orders/:id/status', authMiddleware, handleUpdateOrderStatus); // Update order
 router.delete('/orders/:id', authMiddleware, handleDeleteOrder); // Delete order

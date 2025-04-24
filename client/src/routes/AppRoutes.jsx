@@ -17,33 +17,37 @@ import Cart from "../components/Orders/cart";
 import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
 
 import LandingPage from "../pages/landing-page/LandingPage";
+<<<<<<< Updated upstream
 import AdminDashboard from "../pages/AdminDashboard";
 import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
+=======
+import AdminDashboard from "../pages/admin/AdminDashboard";
+>>>>>>> Stashed changes
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
-    const { user } = useContext(UserContext);
-    
-    if (!user) {
-      return <Navigate to="/login" replace />;
-    }
-    
-    return children;
-  };
+  const { user } = useContext(UserContext);
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
 
 const AdminRoute = ({ children }) => {
   const { user } = useContext(UserContext);
-  
-  console.log('AdminRoute check:', {
+
+  console.log("AdminRoute check:", {
     user,
     isAdmin: user?.isAdmin,
-    hasToken: !!localStorage.getItem('token')
+    hasToken: !!localStorage.getItem("token"),
   });
 
   if (!user || !user.isAdmin) {
     return <Navigate to="/" replace />;
   }
-  
+
   return children;
 };
 
@@ -51,13 +55,13 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route
-        path="/admin"
+      <Route 
+        path="/admin/*" 
         element={
           <AdminRoute>
             <AdminDashboard />
           </AdminRoute>
-        }
+        } 
       />
       <Route path="/add-menu" element={<AddMenuItem />} />
       <Route path="/edit-menu/:id" element={<EditMenuItem />} />

@@ -50,7 +50,7 @@ const RegisterRestaurant = () => {
       });
 
       alert('✅ Restaurant registered successfully!');
-      navigate('/');
+      navigate('/restaurant-profile');
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to register';
       setError(msg);

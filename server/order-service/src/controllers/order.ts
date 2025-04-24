@@ -3,8 +3,7 @@ import Order from '../models/orderDetail';
 import { OrderDetail } from '../types/order';
 import deliveyDistance from '../utils/deliveryDistance';
 import deliveryFee from '../utils/deliveryFee';
-import { getAllRestaurants } from '../services/restrauntService';
-import { getRestaurantById } from "../services/restrauntService";
+import { RestaurantService } from "../services/restrauntService";
 
 // Define the interface for the request body
 interface IOrderRequest extends Request {
@@ -14,6 +13,8 @@ interface IOrderRequest extends Request {
     };
     body: OrderDetail;
 }
+
+const restaurantService = new RestaurantService();
 
 // Place a order by logged in customer
 const placeOrder = async (
@@ -36,7 +37,7 @@ const placeOrder = async (
                 return
         }
 
-        const restaurant = await getRestaurantById(restaurantId);
+        const restaurant = await restaurantService.getRestaurantById(restaurantId);
         if (!restaurant) {
             res.status(404).json({ message: 'Restaurant not found' });
             return;
@@ -99,7 +100,7 @@ const getOrdersByRestaurantId = async (
     try {
         const userId = (req as IOrderRequest).user._id;
 
-        const restaurants = await getAllRestaurants();
+        const restaurants = await restaurantService.getAllRestaurants();
         if (!restaurants || restaurants.length === 0) {
             res.status(404).json({ message: 'No restaurants found' });
             return;

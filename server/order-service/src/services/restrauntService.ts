@@ -15,28 +15,41 @@ export interface IRestaurant extends Document {
     };
   }
 
-const RESTRAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL;
-
-if (!RESTRAURANT_SERVICE_URL) {
-    throw new Error('RESTAURANT_SERVICE_URL is not defined in .env file');
+export interface RestaurantServiceInterface {
+    getAllRestaurants(): Promise<IRestaurant[]>;
+    getRestaurantById(restaurantId: string): Promise<IRestaurant | null>;
 }
 
-export const getAllRestaurants = async (): Promise<IRestaurant[]> => {
-    try {
-        const response = await axios.get(`${RESTRAURANT_SERVICE_URL}/api/restaurants`);
-        return response.data.data;
-    } catch (error) {
-        console.error('Error fetching restaurants:', error);
-        return [];
+export class RestaurantService implements RestaurantServiceInterface {
+    private baseUrl: string;
+
+    constructor() {
+        const serviceUrl = process.env.RESTAURANT_SERVICE_URL;
+
+        if (!serviceUrl) {
+            throw new Error('RESTAURANT_SERVICE_URL is not defined in .env file');
+        }
+
+        this.baseUrl = serviceUrl;
+    }
+
+    async getAllRestaurants(): Promise<IRestaurant[]> {
+        try {
+            const response = await axios.get(`${this.baseUrl}/api/restaurants`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error fetching restaurants:', error);
+            return [];
+        }
+    }
+
+    async getRestaurantById(restaurantId: string): Promise<IRestaurant | null> {
+        try {
+            const response = await axios.get(`${this.baseUrl}/api/restaurants/${restaurantId}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error fetching restaurant:', error);
+            return null;
+        }
     }
 }
-
-export const getRestaurantById = async (restaurantId: String): Promise<IRestaurant | null> => {
-    try {
-        const response = await axios.get(`${RESTRAURANT_SERVICE_URL}/api/restaurants/${restaurantId}`);
-        return response.data.data;
-    } catch (error) {
-        console.error('Error fetching restaurant:', error);
-        return null;
-    }
-};

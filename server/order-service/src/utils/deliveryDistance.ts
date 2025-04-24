@@ -1,14 +1,16 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
-import { getRestaurantById } from "../services/restrauntService";
+import { RestaurantService } from "../services/restrauntService";
+
+const restaurantService = new RestaurantService();
 
 const deliveryDistance = async (
-    customerLat: number, customerLon: number, restaurantId: String
+    customerLat: number, customerLon: number, restaurantId: string
 ): Promise<number> => {
     try{
         //find the restaurant
-        const restaurant = await getRestaurantById(restaurantId);
+        const restaurant = await restaurantService.getRestaurantById(restaurantId);
         if (!restaurant) {
             throw new Error('Restaurant not found');
         }

@@ -129,16 +129,30 @@ const RestaurantProfile = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
             <div className="container mx-auto px-4 max-w-6xl">
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                     <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                        Restaurant Dashboard
+                        Restaurant Profile
                     </h2>
-                    <Link
-                        to="/edit-restaurant"
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                    >
-                        Edit Restaurant
-                    </Link>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="px-6 py-2.5 rounded-xl border-2 border-orange-200 bg-white text-orange-600 font-semibold hover:bg-orange-50 hover:border-orange-300 transition-all duration-200"
+                            >
+                            ← Back
+                        </button>
+                        <button
+                            onClick={() => navigate('/register-restaurant')}
+                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold shadow hover:shadow-orange-400/40 hover:scale-105 transition duration-200"
+                            >
+                            ➕ Register Restaurant
+                        </button>
+                        <button
+                            onClick={() => navigate('/edit-restaurant', { state: restaurant })}
+                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg hover:shadow-orange-500/30 hover:scale-105 transition-all duration-200"
+                            >
+                            ✏️ Edit Profile
+                        </button>
+                    </div>
                 </div>
 
                 {/* Restaurant Details Card */}

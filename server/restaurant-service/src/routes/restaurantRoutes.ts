@@ -21,7 +21,7 @@ const router = express.Router();
 router.post('/', authMiddleware, restaurantMiddleware, createRestaurant);
 router.get('/', getRestaurants);
 router.get('/user/:userId', authMiddleware, restaurantMiddleware, getRestaurantByUserId); 
-router.get('/:id', adminMiddleware, getRestaurantById);
+router.get('/:id', getRestaurantById);
 router.put('/:id', authMiddleware, restaurantMiddleware, updateRestaurant);
 router.delete('/:id', adminMiddleware, deleteRestaurant);
 router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailability);

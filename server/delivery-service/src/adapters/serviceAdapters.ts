@@ -19,9 +19,14 @@ export class UserServiceAdapter {
     this.baseUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5010/api';
   }
 
-  async getUserById(userId: string): Promise<IUserResponse> {
+  async getUserById(userId: string, token?: string): Promise<IUserResponse> {
     try {
-      const response = await axios.get(`${this.baseUrl}/users/${userId}`);
+      if (!token) {
+        throw new ServiceError('UserService', 'Authentication failed: No token provided', 401);
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(`${this.baseUrl}/users/${userId}`, config);
       return response.data;
     } catch (error: any) {
       throw new ServiceError('UserService',
@@ -31,14 +36,23 @@ export class UserServiceAdapter {
     }
   }
 
-  async getActiveDrivers(): Promise<IUserResponse[]> {
+  async getActiveDrivers(token?: string): Promise<IUserResponse[]> {
     try {
+      if (!token) {
+        throw new ServiceError('UserService', 'Authentication failed: No token provided', 401);
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const response = await axios.get(`${this.baseUrl}/users`, {
-        params: { role: 'deliveryAgent', isAvailable: true }
+        ...config,
+        params: { role: 'deliveryAgent' }
       });
       
-      // Ensure each item in the response has a user property
-      const drivers = Array.isArray(response.data) ? response.data : [];
+      // Filter active drivers from the response
+      const drivers = Array.isArray(response.data) ? 
+        response.data.filter((user: any) => user.role === 'deliveryAgent' && user.isAvailable) : 
+        [];
+
       return drivers.map(user => ({ user }));
     } catch (error: any) {
       throw new ServiceError('UserService',

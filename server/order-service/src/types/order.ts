@@ -1,5 +1,13 @@
 import { Types } from "mongoose";
 
+export type OrderStatus = 
+    | 'pending'
+    | 'accepted'
+    | 'completed'
+    | 'delivered'
+    | 'cancelled'
+    | 'out_for_delivery';
+
 export interface OrderDetail {
     invoiceId: string;
     userId: Types.ObjectId;
@@ -8,7 +16,7 @@ export interface OrderDetail {
     userName: string;
     userPhone: string;
     orderDate: Date;
-    orderStatus: string;
+    orderStatus: OrderStatus;
     orderItems: {
         itemName: string;
         itemPrice: number;

@@ -18,6 +18,7 @@ const userService = new UserServiceAdapter();
 export const createDelivery = async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderId } = req.body;
+    const token = req.headers.authorization?.split(' ')[1];
 
     // Fetch order details through adapter
     const orderResponse = await orderService.getOrderById(orderId);
@@ -81,12 +82,11 @@ export const assignDriver = async (req: Request, res: Response): Promise<void> =
   try {
     const { deliveryId } = req.params;
     const { driverId } = req.body;
+    const token = req.headers.authorization?.split(' ')[1];
 
     // Validate driver through user service
-    const driverResponse = await userService.getUserById(driverId);
+    const driverResponse = await userService.getUserById(driverId, token);
     
-  
-
     const delivery = await Delivery.findById(deliveryId);
     if (!delivery) {
       res.status(404).json({ message: 'Delivery not found' });
@@ -180,7 +180,8 @@ export const getAllDeliveries = async (req: Request, res: Response): Promise<voi
 
 export const getActiveDriversLocations = async (req: Request, res: Response): Promise<void> => {
   try {
-    const activeDrivers = await userService.getActiveDrivers();
+    const token = req.headers.authorization?.split(' ')[1];
+    const activeDrivers = await userService.getActiveDrivers(token);
     
     res.json({
       success: true,
@@ -203,6 +204,7 @@ export const getActiveDriversLocations = async (req: Request, res: Response): Pr
 export const getNearbyDrivers = async (req: Request, res: Response): Promise<void> => {
   try {
     const { deliveryId } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
     
     // Verify the delivery exists and belongs to the requesting restaurant
     const delivery = await Delivery.findById(deliveryId);
@@ -212,7 +214,7 @@ export const getNearbyDrivers = async (req: Request, res: Response): Promise<voi
     }
 
     // Get active drivers through user service
-    const activeDrivers = await userService.getActiveDrivers();
+    const activeDrivers = await userService.getActiveDrivers(token);
     
     // Calculate distance and sort drivers by proximity to restaurant
     const availableDrivers = activeDrivers.map(({ user }) => {

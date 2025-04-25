@@ -7,8 +7,6 @@ import RegisterRestaurant from "../pages/restaurant-service/RegisterRestaurant";
 import AdminMenuList from "../pages/restaurant-service/AdminMenuList";
 import CustomerMenuList from "../pages/restaurant-service/CustomerMenuList";
 import UserOrderList from "../pages/orders/userOrderList";
-import Login from "../pages/login/login";
-import Register from "../pages/register/Register";
 import RestaurantProfile from "../pages/restaurant-service/RestaurantProfile";
 import EditRestaurant from "../pages/restaurant-service/EditRestaurant";
 import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
@@ -22,6 +20,10 @@ import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UserProfile from '../pages/UserProfile';
+import VerifyOTP from '../pages/register/VerifyOTP';
+import Login from "../pages/login/login";
+import Register from "../pages/register/Register";
+
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -62,6 +64,7 @@ function AppRoutes() {
           </AdminRoute>
         } 
       />
+      <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/add-menu" element={<AddMenuItem />} />
       <Route path="/edit-menu/:id" element={<EditMenuItem />} />
       <Route path="/register-restaurant" element={<RegisterRestaurant />} />

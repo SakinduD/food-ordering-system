@@ -1,4 +1,15 @@
-import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings, ShoppingCart, Package } from "lucide-react"
+import { 
+  Utensils, 
+  Menu, 
+  X, 
+  User, 
+  LogOut, 
+  ChevronDown, 
+  Settings, 
+  ShoppingCart, 
+  Package,
+  LayoutDashboard
+} from "lucide-react"
 import { useState, useContext, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/userContext"
@@ -95,6 +106,16 @@ function Header() {
                   <Package className="h-4 w-4" />
                   My Orders
                 </Link>
+                {user?.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                )}
                 <Link
                   to="/settings"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
@@ -139,7 +160,10 @@ function Header() {
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl group">
+          <Link 
+            to={user?.isAdmin ? "/admin" : "/"} 
+            className="flex items-center gap-2 font-bold text-xl group"
+          >
             <div className="p-1.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
               <Utensils className="h-6 w-6 text-orange-500" />
             </div>
@@ -155,7 +179,7 @@ function Header() {
             item === "Home" ? (
               <Link
                 key={item}
-                to="/"
+                to={user?.isAdmin ? "/admin" : "/"}
                 className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
               >
                 {item}
@@ -197,7 +221,7 @@ function Header() {
                   item === "Home" ? (
                     <Link
                       key={item}
-                      to="/"
+                      to={user?.isAdmin ? "/admin" : "/"}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       {item}
@@ -237,6 +261,15 @@ function Header() {
                       <User className="h-4 w-4" />
                       Profile
                     </Link>
+                    {user?.isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    )}
                     <Link
                       to="/settings"
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"

@@ -8,7 +8,7 @@ const adminMiddleware: RequestHandler = (
     next: NextFunction
 ): void => {
     try {
-        if (req.user && req.user.role === 'admin') {
+        if (req.user && req.user.isAdmin === true) {
             next();
         } else {
             res.status(403).json({ message: 'You must be logged in as a head admin to access this route.' });

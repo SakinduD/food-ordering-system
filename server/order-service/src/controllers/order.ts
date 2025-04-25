@@ -166,7 +166,7 @@ const updateOrderStatus = async (
             return;
         }
 
-        const reqOrderStatus = req.body.status.toLowerCase();
+        const reqOrderStatus = req.body.orderStatus.toLowerCase();
         const validStatuses = new Set([
             "delivered", 
             "cancelled", 

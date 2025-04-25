@@ -131,7 +131,7 @@ const RestaurantProfile = () => {
             <div className="container mx-auto px-4 max-w-6xl">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                     <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                        Restaurant Profile
+                        Restaurant Dashboard
                     </h2>
                     <div className="flex gap-4">
                         <button
@@ -140,17 +140,17 @@ const RestaurantProfile = () => {
                             >
                             ← Back
                         </button>
-                        <button
+                        {/* <button
                             onClick={() => navigate('/register-restaurant')}
                             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold shadow hover:shadow-orange-400/40 hover:scale-105 transition duration-200"
                             >
                             ➕ Register Restaurant
-                        </button>
+                        </button> */}
                         <button
                             onClick={() => navigate('/edit-restaurant', { state: restaurant })}
                             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg hover:shadow-orange-500/30 hover:scale-105 transition-all duration-200"
                             >
-                            ✏️ Edit Profile
+                            ✏️ Edit Restaurant Profile
                         </button>
                     </div>
                 </div>

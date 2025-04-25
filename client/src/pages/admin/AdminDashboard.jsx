@@ -4,24 +4,90 @@ import { Navigate, Link, Routes, Route } from 'react-router-dom';
 import { Users, Store, LayoutDashboard, Coffee, ChefHat, ShoppingBag } from 'lucide-react';
 import AdminUser from './AdminUser';
 import AdminRestaurants from './AdminRestaurants';
+import AdminAllOrders from './AdminAllOrders';
+import axios from 'axios';
+import Spinner from '../../components/Spinner';
 
 function AdminDashboard() {
   const { user } = useContext(UserContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [stats, setStats] = useState({
-    users: 0,
-    restaurants: 0,
-    orders: 0
-  });
+
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+
+  const [userLoading, setUserLoading] = useState(true);
+  const [restaurantsLoading, setRestaurantsLoading] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  //fetch user data
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5010/api/users/', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      console.log('Fetched users:', response.data);
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to fetch users');
+    } finally {
+      setUserLoading(false);
+    }
+  };
+
+  //fetch restaurants data
+  const fetchRestaurants = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/restaurants', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Check if response.data is an array or has a nested data property
+      const restaurantData = Array.isArray(response.data) 
+        ? response.data 
+        : response.data.data || [];
+
+      setRestaurants(restaurantData);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+      toast.error('Failed to fetch restaurants');
+      setRestaurants([]); // Set empty array on error
+    } finally {
+      setRestaurantsLoading(false);
+    }
+  };
+
+  //fetch orders data
+  const fetchOrders = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5001/api/order/getAllOrders", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        setOrders(response.data.orders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Failed to fetch orders");
+    } finally {
+        setLoadingOrders(false);
+    }   
+  }
 
   // Fetch dashboard stats
   useEffect(() => {
-    // TODO: Replace with actual API calls
-    setStats({
-      users: 150,
-      restaurants: 25,
-      orders: 1200
-    });
+    fetchUsers();
+    fetchRestaurants();
+    fetchOrders();
   }, []);
 
   if (!user?.isAdmin) {
@@ -43,6 +109,11 @@ function AdminDashboard() {
       title: 'Restaurants',
       icon: <Store className="h-5 w-5" />,
       path: '/admin/restaurants'
+    },
+    {
+      title: 'Orders',
+      icon: <ShoppingBag className="h-5 w-5" />,
+      path: '/admin/orders'
     }
   ];
 
@@ -62,7 +133,7 @@ function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Users</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.users}</h3>
+              <h3 className="text-2xl font-bold text-gray-800">{users.length}</h3>
             </div>
             <Users className="h-8 w-8 text-orange-500" />
           </div>
@@ -71,7 +142,7 @@ function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Restaurants</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.restaurants}</h3>
+              <h3 className="text-2xl font-bold text-gray-800">{restaurants.length}</h3>
             </div>
             <Store className="h-8 w-8 text-orange-500" />
           </div>
@@ -80,7 +151,7 @@ function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Orders</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.orders}</h3>
+              <h3 className="text-2xl font-bold text-gray-800">{orders.length}</h3>
             </div>
             <ShoppingBag className="h-8 w-8 text-orange-500" />
           </div>
@@ -130,6 +201,11 @@ function AdminDashboard() {
     </div>
   );
 
+  if (userLoading || restaurantsLoading || loadingOrders) {
+    return <Spinner />;
+  }
+
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -170,6 +246,7 @@ function AdminDashboard() {
           <Route path="/" element={<DashboardHome />} />
           <Route path="/users" element={<AdminUser />} />
           <Route path="/restaurants" element={<AdminRestaurants />} />
+          <Route path="/orders" element={<AdminAllOrders />} />
         </Routes>
       </div>
     </div>

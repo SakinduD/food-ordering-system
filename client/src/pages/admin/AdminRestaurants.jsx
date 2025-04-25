@@ -119,7 +119,7 @@ function AdminRestaurants() {
             <div key={restaurant._id} className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="relative h-48">
                 <img
-                  src={restaurant.image || 'https://via.placeholder.com/400x200'}
+                  src={`http://localhost:5000${restaurant.imageUrl}` || 'https://via.placeholder.com/400x200'}
                   alt={restaurant.name}
                   className="w-full h-full object-cover"
                 />

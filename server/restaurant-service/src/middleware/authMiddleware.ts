@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 interface JwtPayload {
     _id: string;
     role: string;
+    isAdmin: boolean;
 }
 
 // Extend Request type to include `user`

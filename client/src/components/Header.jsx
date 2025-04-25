@@ -1,4 +1,15 @@
-import { Utensils, Menu, X, User, LogOut, ChevronDown, Settings, ShoppingCart, Package } from "lucide-react"
+import { 
+  Utensils, 
+  Menu, 
+  X, 
+  User, 
+  LogOut, 
+  ChevronDown, 
+  Settings, 
+  ShoppingCart, 
+  Package,
+  LayoutDashboard
+} from "lucide-react"
 import { useState, useContext, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/userContext"
@@ -56,14 +67,16 @@ function Header() {
     <div className="hidden md:flex items-center gap-6">
       {user ? (
         <>
-          <Link
-            to="/cart"
-            className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
-          >
-            <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
-              <ShoppingCart className="h-4 w-4 text-orange-500" />
-            </div>
-          </Link>
+          {!user.isAdmin && (
+            <Link
+              to="/cart"
+              className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+            >
+              <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-orange-500" />
+              </div>
+            </Link>
+          )}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -87,14 +100,26 @@ function Header() {
                   <User className="h-4 w-4" />
                   Profile
                 </Link>
-                <Link
-                  to="/orders"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  <Package className="h-4 w-4" />
-                  My Orders
-                </Link>
+                {!user?.isAdmin && (
+                  <Link
+                    to="/orders"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <Package className="h-4 w-4" />
+                    My Orders
+                  </Link>
+                )}
+                {user?.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                )}
                 <Link
                   to="/settings"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
@@ -139,7 +164,10 @@ function Header() {
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl group">
+          <Link 
+            to={user?.isAdmin ? "/admin" : "/"} 
+            className="flex items-center gap-2 font-bold text-xl group"
+          >
             <div className="p-1.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
               <Utensils className="h-6 w-6 text-orange-500" />
             </div>
@@ -155,7 +183,7 @@ function Header() {
             item === "Home" ? (
               <Link
                 key={item}
-                to="/"
+                to={user?.isAdmin ? "/admin" : "/"}
                 className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
               >
                 {item}
@@ -197,7 +225,7 @@ function Header() {
                   item === "Home" ? (
                     <Link
                       key={item}
-                      to="/"
+                      to={user?.isAdmin ? "/admin" : "/"}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       {item}
@@ -216,20 +244,26 @@ function Header() {
               <div className="flex flex-col gap-4 pt-4 border-t border-orange-100 bg-orange-200 rounded-lg p-4">
                 {user ? (
                   <>
-                    <Link
-                      to="/cart"
-                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                      Cart
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
-                    >
-                      <Package className="h-4 w-4" />
-                      My Orders
-                    </Link>
+                    {!user.isAdmin && (
+                      <>
+                        <Link
+                          to="/cart"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                          Cart
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                        >
+                          <Package className="h-4 w-4" />
+                          My Orders
+                        </Link>
+                      </>
+                    )}
                     <Link
                       to="/profile"
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
@@ -237,6 +271,15 @@ function Header() {
                       <User className="h-4 w-4" />
                       Profile
                     </Link>
+                    {user?.isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    )}
                     <Link
                       to="/settings"
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"

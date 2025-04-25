@@ -130,6 +130,17 @@ const RestaurantProfile = () => {
               </span>
             </div>
 
+            {restaurant.imageUrl && (
+              <div className="w-full rounded-xl overflow-hidden border border-orange-100 mb-6">
+                <img
+                  src={`http://localhost:5000${restaurant.imageUrl}`}
+                  alt="Restaurant"
+                  className="w-full h-[320px] object-contain bg-white"
+                />
+              </div>
+            )}
+
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
@@ -165,18 +176,19 @@ const RestaurantProfile = () => {
             </div>
 
             {restaurant.location?.coordinates && (
-              <div className="mt-6 rounded-xl overflow-hidden border border-orange-100">
-                <img
-                  className="w-full h-[300px] object-cover"
-                  alt="Restaurant Location Map"
-                  src={`https://maps.wikimedia.org/img/osm-intl,15,${restaurant.location.coordinates[1]},${restaurant.location.coordinates[0]},600x300.png`}
-                  onError={(e) => {
-                    e.target.src = '';
-                    e.target.alt = 'Map failed to load';
-                  }}
-                />
-              </div>
-            )}
+  <div className="w-full mt-6 rounded-xl overflow-hidden border border-orange-200 bg-white">
+    <img
+      src={`https://maps.wikimedia.org/img/osm-intl,15,${restaurant.location.coordinates[1]},${restaurant.location.coordinates[0]},800x350.png`}
+      alt="Restaurant Location Map"
+      className="w-full h-[280px] object-cover transition duration-300 hover:scale-[1.01]"
+      onError={(e) => {
+        e.target.src = '';
+        e.target.alt = 'Map failed to load';
+      }}
+    />
+  </div>
+)}
+
           </div>
         </div>
 

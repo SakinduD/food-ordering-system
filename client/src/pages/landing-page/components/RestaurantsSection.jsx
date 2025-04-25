@@ -135,11 +135,15 @@ function RestaurantCard({ restaurant, isActive }) {
         isActive ? "ring-2 ring-orange-300 ring-offset-2" : ""
       }`}
     >
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative bg-white h-40 w-full overflow-hidden flex items-center justify-center border-b">
         <img
-          src={restaurant.imageUrl || restaurant.image || "https://via.placeholder.com/400x200"}
+          src={
+            restaurant.imageUrl
+              ? `http://localhost:5000${restaurant.imageUrl}`
+              : "https://via.placeholder.com/400x200?text=No+Image"
+          }
           alt={restaurant.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          className="h-full w-auto object-contain"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         {restaurant.specialty && (

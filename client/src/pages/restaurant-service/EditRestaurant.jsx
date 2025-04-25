@@ -11,6 +11,7 @@ const EditRestaurant = () => {
   const [form, setForm] = useState(state || {});
   const [error, setError] = useState('');
   const [showMap, setShowMap] = useState(false);
+  const [image, setImage] = useState(null); 
 
   useEffect(() => {
     if (!form?._id) {
@@ -41,16 +42,21 @@ const EditRestaurant = () => {
     }
 
     try {
-      const payload = {
-        ...form,
-        location: {
-          ...form.location,
-          coordinates: form.location.coordinates.map(Number),
-        },
-      };
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('address', form.address);
+      formData.append('phone', form.phone);
+      formData.append('available', String(form.available));
+      formData.append('location[type]', 'Point');
+      formData.append('location[coordinates][]', form.location.coordinates[0]);
+      formData.append('location[coordinates][]', form.location.coordinates[1]);
+      if (image) formData.append('image', image); // ✅ Append image if selected
 
-      await axios.put(`http://localhost:5000/api/restaurants/${form._id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.put(`http://localhost:5000/api/restaurants/${form._id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       alert('✅ Profile updated!');
@@ -108,6 +114,14 @@ const EditRestaurant = () => {
         <div className="text-sm text-gray-700 mt-2">
           Coordinates: Longitude: {form.location?.coordinates?.[0]}, Latitude: {form.location?.coordinates?.[1]}
         </div>
+
+        {/* ✅ Image Upload */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+          className="w-full p-2 border rounded"
+        />
 
         <label className="flex items-center space-x-2">
           <input

@@ -36,7 +36,7 @@ const OrderDetailSchema = new Schema({
     },
     orderStatus: {
         type: String,
-        default: 'Pending',
+        default: 'pending',
         required: true
     },
     orderItems: [{

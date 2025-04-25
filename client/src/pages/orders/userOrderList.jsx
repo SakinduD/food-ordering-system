@@ -3,7 +3,7 @@ import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import axios from "axios";
 import Spinner from "../../components/Spinner";
-import { ClockIcon, PackageIcon, TruckIcon } from "lucide-react";
+import { ClockIcon, PackageIcon, TruckIcon, CheckCircleIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const UserOrderList = () => {
@@ -35,17 +35,24 @@ const UserOrderList = () => {
 
         fetchOrders();
     }, [user?.userId]);
+    console.log(orders);
 
     const getStatusIcon = (status) => {
         switch (status.toLowerCase()) {
             case 'pending':
                 return <ClockIcon className="h-5 w-5 text-yellow-500" />;
-            case 'processing':
-                return <PackageIcon className="h-5 w-5 text-blue-500" />;
+            case 'accepted':
+                return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+            case 'out_for_delivery':
+                return <TruckIcon className="h-5 w-5 text-orange-500" />;
             case 'delivered':
                 return <TruckIcon className="h-5 w-5 text-green-500" />;
+            case 'completed':
+                return <ClipboardDocumentCheckIcon className="h-5 w-5 text-teal-500" />;
+            case 'cancelled':
+                return <XCircleIcon className="h-5 w-5 text-red-500" />;
             default:
-                return <ClockIcon className="h-5 w-5 text-gray-500" />;
+                return <ArrowPathIcon className="h-5 w-5 text-gray-500" />;
         }
     };
 

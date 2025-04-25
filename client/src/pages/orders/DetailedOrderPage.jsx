@@ -4,7 +4,15 @@ import { useParams, Link } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import Spinner from "../../components/Spinner";
-import { ClockIcon, PackageIcon, TruckIcon, CalendarIcon, MapPinIcon, CreditCardIcon, StoreIcon, UserIcon, Navigation } from "lucide-react";
+import { CalendarIcon, MapPinIcon, CreditCardIcon, StoreIcon, UserIcon, Navigation } from "lucide-react";
+import {
+    CheckCircleIcon,
+    ClockIcon,
+    TruckIcon,
+    XCircleIcon,
+    ArrowPathIcon,
+    ClipboardDocumentCheckIcon,
+  } from '@heroicons/react/24/solid';
 
 const DetailedOrderPage = () => {
     const { orderId } = useParams();
@@ -59,16 +67,18 @@ const DetailedOrderPage = () => {
         switch (status?.toLowerCase()) {
             case 'pending':
                 return <ClockIcon className="h-5 w-5 text-yellow-500" />;
-            case 'processing':
             case 'accepted':
-                return <PackageIcon className="h-5 w-5 text-blue-500" />;
+                return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+            case 'out_for_delivery':
+                return <TruckIcon className="h-5 w-5 text-orange-500" />;
             case 'delivered':
-            case 'completed':
                 return <TruckIcon className="h-5 w-5 text-green-500" />;
+            case 'completed':
+                return <ClipboardDocumentCheckIcon className="h-5 w-5 text-teal-500" />;
             case 'cancelled':
-                return <ClockIcon className="h-5 w-5 text-red-500" />;
+                return <XCircleIcon className="h-5 w-5 text-red-500" />;
             default:
-                return <ClockIcon className="h-5 w-5 text-gray-500" />;
+                return <ArrowPathIcon className="h-5 w-5 text-gray-500" />;
         }
     };
 

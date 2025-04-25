@@ -2,10 +2,16 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from '../../context/userContext';
+import LocationPicker from "../../components/Orders/LocationPicker";
+import { MapPin } from 'lucide-react';
 
 const RegisterRestaurant = () => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
+
+  const [showMap, setShowMap] = useState(false);
+  const [error, setError] = useState('');
+
   const [form, setForm] = useState({
     name: '',
     address: '',
@@ -13,33 +19,35 @@ const RegisterRestaurant = () => {
     available: true,
     location: {
       type: 'Point',
-      coordinates: ['', ''],
+      coordinates: [80.7718, 7.8731], // default Sri Lanka (lng, lat)
     },
   });
-  const [error, setError] = useState('');
 
-  const handleCoordinateChange = (index, value) => {
-    const updated = [...form.location.coordinates];
-    updated[index] = value;
-    setForm({ ...form, location: { ...form.location, coordinates: updated } });
+  const handleLocationSelect = (loc) => {
+    setForm((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        coordinates: [loc.lng, loc.lat], // Save in GeoJSON order
+      },
+    }));
+    setShowMap(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    console.log('token', token);
     if (!token || !user) {
       setError('You must be logged in to register a restaurant.');
       return;
     }
 
     try {
-      const formattedCoordinates = form.location.coordinates.map(Number);
       const payload = {
         ...form,
         location: {
           ...form.location,
-          coordinates: formattedCoordinates,
+          coordinates: form.location.coordinates.map(Number),
         },
       };
 
@@ -62,7 +70,9 @@ const RegisterRestaurant = () => {
     <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Register Restaurant</h2>
 
-      {error && <div className="mb-4 text-red-600 bg-red-100 p-2 rounded">{error}</div>}
+      {error && (
+        <div className="mb-4 text-red-600 bg-red-100 p-2 rounded">{error}</div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -91,36 +101,41 @@ const RegisterRestaurant = () => {
           <input
             type="checkbox"
             checked={form.available}
-            onChange={(e) => setForm({ ...form, available: e.target.checked })}
+            onChange={(e) =>
+              setForm({ ...form, available: e.target.checked })
+            }
             className="accent-green-600"
           />
           <span className="text-sm text-gray-700">Available</span>
         </label>
 
-        <div className="flex space-x-4">
-          <input
-            type="text"
-            placeholder="Longitude"
-            value={form.location.coordinates[0]}
-            onChange={(e) => handleCoordinateChange(0, e.target.value)}
-            className="w-1/2 p-2 border rounded"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Latitude"
-            value={form.location.coordinates[1]}
-            onChange={(e) => handleCoordinateChange(1, e.target.value)}
-            className="w-1/2 p-2 border rounded"
-            required
-          />
+        {/* ✅ Location picker button */}
+        <button
+          type="button"
+          onClick={() => setShowMap(true)}
+          className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-orange-100 text-orange-600 font-semibold hover:bg-orange-200 transition-colors"
+        >
+          <MapPin className="h-5 w-5" />
+          Select Restaurant Location
+        </button>
+
+        <LocationPicker
+          isOpen={showMap}
+          onClose={() => setShowMap(false)}
+          onLocationSelect={handleLocationSelect}
+        />
+
+        {/* ✅ Show selected coordinates */}
+        <div className="text-sm text-gray-700 mt-2">
+          Selected Coordinates: Longitude: {form.location.coordinates[0]}, Latitude:{' '}
+          {form.location.coordinates[1]}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          className="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700 transition"
         >
-          Register
+          Register Restaurant
         </button>
       </form>
     </div>

@@ -98,6 +98,12 @@ const RestaurantProfile = () => {
               ← Back
             </button>
             <button
+              onClick={() => navigate('/register-restaurant')}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold shadow hover:shadow-orange-400/40 hover:scale-105 transition duration-200"
+            >
+              ➕ Register Restaurant
+            </button>
+            <button
               onClick={() => navigate('/edit-restaurant', { state: restaurant })}
               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg hover:shadow-orange-500/30 hover:scale-105 transition-all duration-200"
             >

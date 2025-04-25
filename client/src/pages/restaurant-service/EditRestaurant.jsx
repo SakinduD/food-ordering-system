@@ -2,12 +2,15 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import LocationPicker from '../../components/Orders/LocationPicker';
+import { MapPin } from 'lucide-react';
 
 const EditRestaurant = () => {
-  const location = useLocation();
+  const { state } = useLocation();
   const navigate = useNavigate();
-  const [form, setForm] = useState(location.state || {});
+  const [form, setForm] = useState(state || {});
   const [error, setError] = useState('');
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     if (!form?._id) {
@@ -15,6 +18,17 @@ const EditRestaurant = () => {
       navigate('/');
     }
   }, [form, navigate]);
+
+  const handleLocationSelect = (loc) => {
+    setForm((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        coordinates: [loc.lng, loc.lat], // GeoJSON format
+      },
+    }));
+    setShowMap(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,24 +41,24 @@ const EditRestaurant = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/restaurants/${form._id}`, form, {
+      const payload = {
+        ...form,
+        location: {
+          ...form.location,
+          coordinates: form.location.coordinates.map(Number),
+        },
+      };
+
+      await axios.put(`http://localhost:5000/api/restaurants/${form._id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       alert('✅ Profile updated!');
       navigate('/restaurant-profile');
     } catch (err) {
       console.error(err);
       setError('Failed to update profile');
     }
-  };
-
-  const handleCoordinateChange = (index, value) => {
-    const updated = [...form.location.coordinates];
-    updated[index] = value;
-    setForm({
-      ...form,
-      location: { ...form.location, coordinates: updated },
-    });
   };
 
   return (
@@ -74,21 +88,25 @@ const EditRestaurant = () => {
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
         />
 
-        <div className="flex space-x-2">
-          <input
-            className="w-1/2 p-2 border rounded"
-            placeholder="Longitude"
-            value={form.location?.coordinates[0]}
-            onChange={(e) => handleCoordinateChange(0, e.target.value)}
-            required
-          />
-          <input
-            className="w-1/2 p-2 border rounded"
-            placeholder="Latitude"
-            value={form.location?.coordinates[1]}
-            onChange={(e) => handleCoordinateChange(1, e.target.value)}
-            required
-          />
+        {/* ✅ Location Picker Button */}
+        <button
+          type="button"
+          onClick={() => setShowMap(true)}
+          className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-orange-100 text-orange-600 font-semibold hover:bg-orange-200 transition-colors"
+        >
+          <MapPin className="h-5 w-5" />
+          Select Location on Map
+        </button>
+
+        <LocationPicker
+          isOpen={showMap}
+          onClose={() => setShowMap(false)}
+          onLocationSelect={handleLocationSelect}
+        />
+
+        {/* ✅ Show selected coordinates */}
+        <div className="text-sm text-gray-700 mt-2">
+          Coordinates: Longitude: {form.location?.coordinates?.[0]}, Latitude: {form.location?.coordinates?.[1]}
         </div>
 
         <label className="flex items-center space-x-2">

@@ -65,7 +65,7 @@ function AppRoutes() {
       <Route path="/edit-menu/:id" element={<EditMenuItem />} />
       <Route path="/register-restaurant" element={<RegisterRestaurant />} />
       <Route path="/admin/menu" element={<AdminMenuList />} />
-      <Route path="/menu" element={<CustomerMenuList />} />
+      <Route path="/restaurant/:id" element={<CustomerMenuList />} />
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

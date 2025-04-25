@@ -67,6 +67,17 @@ export const getMenuItems = async (req: Request, res: Response): Promise<void> =
   }
 };
 
+// ✅ Get menu items by restaurant ID
+export const getMenuItemsByRestaurantId = async (req: Request, res: Response) => {
+  try {
+    const { restaurantId } = req.params;
+    const items = await MenuItem.find({ restaurantId });
+    res.status(200).json({ data: items });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // ✅ Update menu item by ID
 export const updateMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {

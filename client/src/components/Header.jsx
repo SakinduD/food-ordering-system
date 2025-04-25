@@ -160,7 +160,10 @@ function Header() {
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl group">
+          <Link 
+            to={user?.isAdmin ? "/admin" : "/"} 
+            className="flex items-center gap-2 font-bold text-xl group"
+          >
             <div className="p-1.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
               <Utensils className="h-6 w-6 text-orange-500" />
             </div>
@@ -176,7 +179,7 @@ function Header() {
             item === "Home" ? (
               <Link
                 key={item}
-                to="/"
+                to={user?.isAdmin ? "/admin" : "/"}
                 className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
               >
                 {item}
@@ -218,7 +221,7 @@ function Header() {
                   item === "Home" ? (
                     <Link
                       key={item}
-                      to="/"
+                      to={user?.isAdmin ? "/admin" : "/"}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       {item}

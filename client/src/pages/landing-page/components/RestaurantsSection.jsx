@@ -52,13 +52,13 @@ function RestaurantsSection() {
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
             Popular Sri Lankan Restaurants
           </h2>
-          <a
-            href="#"
+          <Link
+            to="/restaurants"
             className="group flex items-center gap-2 text-orange-500 font-medium hover:text-orange-600 transition-colors"
           >
             View All
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
         </div>
 
         {/* Cuisine filter tabs */}

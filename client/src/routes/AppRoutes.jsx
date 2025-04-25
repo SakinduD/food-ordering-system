@@ -11,6 +11,7 @@ import Login from "../pages/login/login";
 import Register from "../pages/register/Register";
 import RestaurantProfile from "../pages/restaurant-service/RestaurantProfile";
 import EditRestaurant from "../pages/restaurant-service/EditRestaurant";
+import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 import Cart from "../components/Orders/cart";
@@ -66,6 +67,7 @@ function AppRoutes() {
       <Route path="/register-restaurant" element={<RegisterRestaurant />} />
       <Route path="/admin/menu" element={<AdminMenuList />} />
       <Route path="/restaurant/:id" element={<CustomerMenuList />} />
+      <Route path="/restaurants" element={<AllRestaurants />} />
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

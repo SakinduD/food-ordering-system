@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { User, Mail, Shield, Edit2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // API base URL - makes it easier to change in development/production
 const API_BASE_URL = 'http://localhost:5010/api';
@@ -332,10 +333,20 @@ function UserProfile() {
                   <Mail className="h-5 w-5 text-orange-500" />
                   <span>{profile.email}</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-700">
-                  <Shield className="h-5 w-5 text-orange-500" />
-                  <span>{profile.role}</span>
-                </div>
+                {profile.role === 'restaurant' ? (
+                  <Link
+                    to="/restaurant-profile"
+                    className="flex items-center space-x-3 text-gray-700 hover:text-orange-600 transition"
+                  >
+                    <Shield className="h-5 w-5 text-orange-500" />
+                    <span>{profile.role}</span>
+                  </Link>
+                ) : (
+                  <div className="flex items-center space-x-3 text-gray-700">
+                    <Shield className="h-5 w-5 text-orange-500" />
+                    <span>{profile.role}</span>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 pt-6 border-t border-gray-200">

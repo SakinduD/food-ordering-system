@@ -73,10 +73,14 @@ const Register = () => {
             });
 
             if (response.status === 201) {
-                toast.success('Registration Successful!');
-                setTimeout(() => {
-                    navigate('/login');
-                }, 1500);
+                toast.success('Registration successful! Please verify your account.');
+                // Navigate to OTP verification page with userId
+                navigate('/verify-otp', { 
+                    state: { 
+                        userId: response.data.userId,
+                        email: data.email 
+                    } 
+                });
             }
         } catch (err) {
             console.error(err);

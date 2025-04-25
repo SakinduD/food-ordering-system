@@ -38,6 +38,8 @@ const Login = () => {
                 // Navigate based on user role
                 if (user.isAdmin) {
                     navigate('/admin');
+                } else if(user.role === 'restaurant') {
+                    navigate('/restaurant-profile');
                 } else {
                     navigate('/');
                 }

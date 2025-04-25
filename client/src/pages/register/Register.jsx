@@ -26,7 +26,7 @@ const Register = () => {
             icon: <User className="h-6 w-6" />
         },
         {
-            role: 'restaurantOwner',
+            role: 'restaurant',
             title: 'Restaurant Owner',
             description: 'Partner with us to reach more customers',
             icon: <Store className="h-6 w-6" />

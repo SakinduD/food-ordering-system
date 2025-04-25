@@ -2,27 +2,35 @@ import { Request, Response } from 'express';
 import Restaurant from '../models/Restaurant';
 import { getOrdersByRestaurantId, updateOrderStatus, deleteOrder } from '../services/orderService';
 
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
 // Create a new restaurant for the logged-in user
-export const createRestaurant = async (req: Request, res: Response): Promise<void> => {
+export const createRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user._id;
     if (!userId) {
-      res.status(401).json({ message: 'Unauthorized: No user ID found in token' });
+      res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
     const existing = await Restaurant.findOne({ userId });
     if (existing) {
-      res.status(400).json({ message: 'A restaurant is already registered for this user.' });
+      res.status(400).json({ message: 'Restaurant already exists for this user' });
       return;
     }
 
-    const restaurant = await Restaurant.create({ ...req.body, userId });
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+    const restaurant = await Restaurant.create({ ...req.body, userId, imageUrl });
+
     res.status(201).json({ message: 'Restaurant created successfully!', data: restaurant });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
+
+
 
 // Get all restaurants
 export const getRestaurants = async (_req: Request, res: Response): Promise<void> => {
@@ -63,18 +71,25 @@ export const getRestaurantByUserId = async (req: Request, res: Response): Promis
 };
 
 // Update a restaurant by ID
-export const updateRestaurant = async (req: Request, res: Response): Promise<void> => {
+export const updateRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const updated = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (updated) {
-      res.status(200).json({ message: 'Restaurant updated!', data: updated });
-    } else {
-      res.status(404).json({ message: 'Restaurant not found' });
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
+
+    const updated = await Restaurant.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updated) {
+      res.status(404).json({ message: 'Restaurant not found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Restaurant updated successfully!', data: updated });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
+
 
 // Delete a restaurant
 export const deleteRestaurant = async (req: Request, res: Response): Promise<void> => {

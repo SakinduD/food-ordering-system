@@ -15,14 +15,15 @@ import {
 import authMiddleware from '../middleware/authMiddleware';
 import restaurantMiddleware from '../middleware/restaurantMiddleware';
 import adminMiddleware from '../middleware/adminMiddleware';
+import { upload } from '../middleware/upload';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, restaurantMiddleware, createRestaurant);
+router.post('/', authMiddleware, restaurantMiddleware, upload.single('image'), createRestaurant);
 router.get('/', getRestaurants);
 router.get('/user/:userId', authMiddleware, restaurantMiddleware, getRestaurantByUserId); 
-router.get('/:id', adminMiddleware, getRestaurantById);
-router.put('/:id', authMiddleware, restaurantMiddleware, updateRestaurant);
+router.get('/:id', getRestaurantById);
+router.put('/:id', authMiddleware, restaurantMiddleware, upload.single('image'), updateRestaurant);
 router.delete('/:id', adminMiddleware, deleteRestaurant);
 router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailability);
 router.get('/:id/orders', authMiddleware, fetchRestaurantOrders); // View all orders

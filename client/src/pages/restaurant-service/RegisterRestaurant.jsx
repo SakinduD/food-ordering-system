@@ -11,6 +11,7 @@ const RegisterRestaurant = () => {
 
   const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState('');
+  const [image, setImage] = useState(null);
 
   const [form, setForm] = useState({
     name: '',
@@ -36,33 +37,37 @@ const RegisterRestaurant = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (!token || !user) {
-      setError('You must be logged in to register a restaurant.');
+      setError("You must be logged in to register a restaurant.");
       return;
     }
 
     try {
-      const payload = {
-        ...form,
-        location: {
-          ...form.location,
-          coordinates: form.location.coordinates.map(Number),
-        },
-      };
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("address", form.address);
+      formData.append("phone", form.phone);
+      formData.append("available", String(form.available));
+      formData.append("location[type]", "Point");
+      formData.append("location[coordinates][]", form.location.coordinates[0]);
+      formData.append("location[coordinates][]", form.location.coordinates[1]);
+      if (image) formData.append("image", image);
 
-      await axios.post('http://localhost:5000/api/restaurants', payload, {
+      await axios.post("http://localhost:5000/api/restaurants", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      alert('✅ Restaurant registered successfully!');
-      navigate('/restaurant-profile');
+      alert("✅ Restaurant registered successfully!");
+      navigate("/restaurant-profile");
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to register';
+      const msg = err.response?.data?.message || "Failed to register";
       setError(msg);
-      console.error('Register error:', err);
+      console.error("Register error:", err);
     }
   };
 
@@ -95,6 +100,13 @@ const RegisterRestaurant = () => {
           placeholder="Phone Number"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          className="w-full p-2 border rounded"
+        />
+        {/* ✅ Image upload field */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
           className="w-full p-2 border rounded"
         />
         <label className="flex items-center space-x-2">

@@ -30,12 +30,16 @@ const AllRestaurants = () => {
           restaurants.map((restaurant) => (
             <Link key={restaurant._id} to={`/restaurant/${restaurant._id}`}>
               <div className="group rounded-2xl bg-white border border-orange-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-500 transform hover:scale-[1.02]">
-                <div className="relative h-48 w-full overflow-hidden">
-                  <img
-                    src={restaurant.imageUrl || restaurant.image || "https://via.placeholder.com/400x200"}
-                    alt={restaurant.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
+              <div className="relative bg-white h-40 w-full overflow-hidden flex items-center justify-center border-b">
+                <img
+                  src={
+                    restaurant.imageUrl
+                      ? `http://localhost:5000${restaurant.imageUrl}`
+                      : "https://via.placeholder.com/400x200?text=No+Image"
+                  }
+                  alt={restaurant.name}
+                  className="h-full w-auto object-contain"
+                />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   {restaurant.specialty && (
                     <div className="absolute bottom-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">

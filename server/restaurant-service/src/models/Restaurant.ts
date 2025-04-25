@@ -5,6 +5,7 @@ export interface IRestaurant extends Document {
   address?: string;
   phone?: string;
   available: boolean;
+  isVerified: boolean;
   userId: string;
   location?: {
     type: string;
@@ -19,6 +20,7 @@ const restaurantSchema = new Schema<IRestaurant>(
     address: { type: String, default: '' },
     phone: { type: String, default: '' },
     available: { type: Boolean, default: true },
+    isVerified: { type: Boolean, default: false },
     userId: { type: String, required: true, unique: true },
 
     location: {

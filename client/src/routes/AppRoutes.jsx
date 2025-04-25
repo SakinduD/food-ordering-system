@@ -16,6 +16,11 @@ import Cart from "../components/Orders/cart";
 import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
 import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
+// New import for Delivery Tracking
+import DeliveryCreationPage from "../pages/delivery/DeliveryCreationPage";
+import DeliveryDriverAssignmentPage from "../pages/delivery/DeliveryDriverAssignmentPage";
+import DeliveryTrackingPage from "../pages/delivery/DeliveryTrackingPage";
+
 //Methush imports
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -79,6 +84,31 @@ function AppRoutes() {
       <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
       <Route path="/create-delivery" element={<CreateDelivery />} />
       <Route path="/location-tracker" element={<DriverLocationTracker />} />
+
+      <Route 
+        path="/create-delivery/:orderId" 
+        element={
+          <ProtectedRoute>
+            <DeliveryCreationPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/delivery-driver-assignment/:deliveryId" 
+        element={
+          <ProtectedRoute>
+            <DeliveryDriverAssignmentPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/delivery-tracking/:deliveryId" 
+        element={
+          <ProtectedRoute>
+            <DeliveryTrackingPage />
+          </ProtectedRoute>
+        } 
+      />
 
       <Route path="/orders" element={<UserOrderList />} />
       <Route path="/cart" element={<Cart />} />

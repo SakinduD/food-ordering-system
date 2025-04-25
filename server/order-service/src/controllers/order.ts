@@ -166,8 +166,15 @@ const updateOrderStatus = async (
             return;
         }
 
-        const reqOrderStatus = req.body.orderStatus;
-        const validStatuses = new Set(['Pending', 'Driver_Assigned', 'Picked_Up', 'On_the_Way', 'Delivered', 'Cancelled']);
+        const reqOrderStatus = req.body.status.toLowerCase();
+        const validStatuses = new Set([
+            "delivered", 
+            "cancelled", 
+            "pending", 
+            "completed", 
+            "accepted",
+            "out_for_delivery"
+        ]);
 
         if (!validStatuses.has(reqOrderStatus)) {
             res.status(400).json({ message: 'Invalid Order Status' });

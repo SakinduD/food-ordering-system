@@ -215,6 +215,203 @@ const removeOrder = async (
     }
 };
 
+// Get order summary for a specific user
+const getUserOrderSummary = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+): Promise<void> => {
+    try {
+        // Get userId from query parameter or from the authenticated user
+        const userId = req.query.userId || (req as IOrderRequest).user._id;
+        
+        if (!userId) {
+            res.status(400).json({ message: 'User ID is required' });
+            return;
+        }
+        
+        // Find all orders for the user
+        const orders = await Order.find({ userId });
+        
+        if (!orders || orders.length === 0) {
+            res.status(200).json({ 
+                message: 'No orders found for this user',
+                summary: {
+                    userId,
+                    totalOrders: 0,
+                    totalSpent: 0,
+                    averageOrderValue: 0,
+                    recentOrders: [],
+                    statusDistribution: {},
+                    topRestaurants: [],
+                    ordersByMonth: {},
+                    firstOrderDate: null,
+                    lastOrderDate: null
+                } 
+            });
+            return;
+        }
+        
+        // Calculate summary statistics
+        const totalOrders = orders.length;
+        const totalSpent = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        const averageOrderValue = totalSpent / totalOrders;
+        
+        // Get the most recent orders (limit to 10)
+        // Note: orderDate is defined in your schema, but you also have timestamps enabled
+        const recentOrders = [...orders]
+            .sort((a, b) => {
+                // Use orderDate from the schema
+                const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+                const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+                return dateB - dateA; // newest first
+            })
+            .slice(0, 10)
+            .map(order => ({
+                _id: order._id,
+                invoiceId: order.invoiceId,
+                userId: order.userId,
+                restaurantId: order.restaurantId,
+                restaurantName: order.restaurantName,
+                userName: order.userName,
+                userPhone: order.userPhone,
+                orderDate: order.orderDate,
+                orderStatus: order.orderStatus,
+                roadDistance: order.roadDistance,
+                deliveryFee: order.deliveryFee,
+                totalAmount: order.totalAmount,
+                // Don't include orderItems to keep response size manageable
+            }));
+        
+        // Get order status distribution
+        const statusCounts = orders.reduce((acc, order) => {
+            const status = order.orderStatus || 'unknown';
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        
+        // Get restaurant distribution
+        const restaurantCounts = orders.reduce((acc, order) => {
+            if (!order.restaurantId) {
+                const unknownKey = 'unknown';
+                if (!acc[unknownKey]) {
+                    acc[unknownKey] = {
+                        name: 'Unknown Restaurant',
+                        count: 0,
+                        total: 0
+                    };
+                }
+                acc[unknownKey].count += 1;
+                acc[unknownKey].total += (order.totalAmount || 0);
+                return acc;
+            }
+            
+            const restaurantId = order.restaurantId.toString();
+            const restaurantName = order.restaurantName || 'Unknown Restaurant';
+            
+            if (!acc[restaurantId]) {
+                acc[restaurantId] = {
+                    name: restaurantName,
+                    count: 0,
+                    total: 0
+                };
+            }
+            
+            acc[restaurantId].count += 1;
+            acc[restaurantId].total += (order.totalAmount || 0);
+            
+            return acc;
+        }, {} as Record<string, { name: string, count: number, total: number }>);
+        
+        // Convert restaurant counts to array and sort by count
+        const topRestaurants = Object.values(restaurantCounts)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+        
+        // Get order counts by month for the past year
+        const now = new Date();
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(now.getFullYear() - 1);
+        
+        const ordersByMonth: Record<string, number> = {};
+        
+        orders.forEach(order => {
+            // Use orderDate from the schema
+            if (order.orderDate) {
+                const orderDate = new Date(order.orderDate);
+                
+                if (orderDate >= oneYearAgo) {
+                    const monthYear = `${orderDate.getFullYear()}-${(orderDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                    ordersByMonth[monthYear] = (ordersByMonth[monthYear] || 0) + 1;
+                }
+            }
+        });
+        
+        // Find first and last order dates safely
+        let firstOrderDate = null;
+        let lastOrderDate = null;
+        
+        if (orders.length > 0) {
+            // Sort orders by orderDate for first order
+            const sortedByOldest = [...orders].sort((a, b) => {
+                const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+                const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+                return dateA - dateB;
+            });
+            
+            // Sort orders by orderDate for last order
+            const sortedByNewest = [...orders].sort((a, b) => {
+                const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+                const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+                return dateB - dateA;
+            });
+            
+            firstOrderDate = sortedByOldest[0].orderDate;
+            lastOrderDate = sortedByNewest[0].orderDate;
+        }
+
+        // Calculate most ordered items
+        const itemCounts: Record<string, number> = {};
+        orders.forEach(order => {
+            if (order.orderItems && Array.isArray(order.orderItems)) {
+                order.orderItems.forEach(item => {
+                    if (item.itemName) {
+                        itemCounts[item.itemName] = (itemCounts[item.itemName] || 0) + (item.itemQuantity || 1);
+                    }
+                });
+            }
+        });
+
+        const topItems = Object.entries(itemCounts)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+        
+        // Create the summary object
+        const summary = {
+            userId,
+            totalOrders,
+            totalSpent,
+            averageOrderValue,
+            statusDistribution: statusCounts,
+            topRestaurants,
+            topItems,
+            ordersByMonth,
+            recentOrders,
+            firstOrderDate,
+            lastOrderDate
+        };
+        
+        res.status(200).json({ 
+            message: 'Order summary fetched successfully',
+            summary
+        });
+    } catch (error) {
+        console.error('Error in getUserOrderSummary:', error);
+        next(error);
+    }
+};
+
 export default {
     placeOrder,
     getAllOrders,
@@ -222,5 +419,6 @@ export default {
     getOrderById,
     getOrdersByUserId,
     updateOrderStatus,
-    removeOrder
+    removeOrder,
+    getUserOrderSummary
 };

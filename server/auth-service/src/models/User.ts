@@ -13,6 +13,8 @@ export interface IUser extends Document {
   isVerified: boolean;
   otp: string | null;
   otpExpires: Date | null;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: number;
   currentLocation?: {
     type: string;
     coordinates: [number, number]; // [longitude, latitude]
@@ -35,6 +37,8 @@ const userSchema: Schema = new Schema(
     isVerified: { type: Boolean, default: false },
     otp: { type: String, default: null },
     otpExpires: { type: Date, default: null },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Number, default: null },
     currentLocation: {
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number], default: [0, 0] }

@@ -171,6 +171,8 @@ function RestaurantCard({ restaurant, isActive }) {
     </div>
 
         <p className="text-sm text-gray-600 mb-4">{restaurant.cuisine}</p>
+        <p className="text-sm text-gray-500 mb-4">{restaurant.address || "No address provided"}</p>
+
         <div className="flex items-center justify-between gap-4">
         <span className="text-xs font-medium bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full">
           {restaurant.deliveryTime || "30-40 min"}

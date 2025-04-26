@@ -52,7 +52,7 @@ const CustomerMenuList = () => {
         placeholder="Search food items..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full pl-11 pr-4 py-3 border-2 border-orange-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-400 text-gray-700 placeholder-gray-400 transition"
+        className="w-full pl-11 pr-4 py-2 border-2 border-orange-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-400 text-gray-700 placeholder-gray-400 transition"
       />
     </div>
       </div>

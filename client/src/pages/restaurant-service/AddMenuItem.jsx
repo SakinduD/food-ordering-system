@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/userContext'; // ✅ import your context
+import { ArrowLeft } from 'lucide-react';
 
 const AddMenuItem = () => {
   const { user } = useContext(UserContext); // ✅ useContext here
@@ -56,6 +57,13 @@ const AddMenuItem = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 bg-white p-6 rounded shadow">
+      <button
+        onClick={() => navigate('/admin/menu')}
+        className="flex items-center gap-2 text-orange-600 font-medium hover:underline mb-4"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        Back
+      </button>
       <h2 className="text-xl font-semibold mb-4">Add Menu Item</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input

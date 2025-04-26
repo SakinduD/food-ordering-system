@@ -17,7 +17,7 @@ const EditMenuItem = () => {
     try {
       await updateMenuItem(item._id, { ...form, image }, token);
       alert('✅ Menu item updated!');
-      navigate('/admin/menu');
+      navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
     } catch (err) {
       console.error(err);
       alert('Failed to update item');
@@ -102,7 +102,7 @@ const EditMenuItem = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/admin/menu')}
+            onClick={() => navigate('/restaurant-profile', { state: { activeTab: 'menu' } })}
             className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
           >
             Cancel

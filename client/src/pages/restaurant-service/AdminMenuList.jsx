@@ -57,13 +57,13 @@ const AdminMenuList = () => {
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
-      <button
+      {/* <button
         onClick={() => navigate('/restaurant-profile')}
         className="flex items-center gap-2 text-orange-600 font-medium hover:underline mb-4"
       >
         <ArrowLeft className="h-5 w-5" />
         Back to Profile
-      </button>
+      </button> */}
 
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold text-orange-600">🍽️ All Menu Items</h2>

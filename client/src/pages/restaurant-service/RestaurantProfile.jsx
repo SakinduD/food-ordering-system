@@ -6,6 +6,7 @@ import { UserContext } from "../../context/userContext";
 import Spinner from "../../components/Spinner";
 import { toast } from "react-hot-toast";
 import { Shield, ShieldCheck, ShieldAlert } from "lucide-react";
+import AdminMenuList from "./AdminMenuList";
 
 const RestaurantProfile = () => {
   const [restaurant, setRestaurant] = useState(null);
@@ -13,6 +14,7 @@ const RestaurantProfile = () => {
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('orders');
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
 
@@ -296,14 +298,27 @@ const RestaurantProfile = () => {
 
         {/* Orders Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden">
-          <div className="flex border-b border-orange-100">
-            <button className="px-6 py-4 font-semibold text-orange-600 border-b-2 border-orange-500">Orders</button>
-            <Link to="/admin/menu" className="px-6 py-4 font-semibold text-gray-500 hover:text-orange-600 transition-colors">Menu Items</Link>
-          </div>
+        <div className="flex border-b border-orange-100">
+  <button
+    onClick={() => setActiveTab('orders')}
+    className={`px-6 py-4 font-semibold ${activeTab === 'orders' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
+  >
+    Orders
+  </button>
+  <button
+    onClick={() => setActiveTab('menu')}
+    className={`px-6 py-4 font-semibold ${activeTab === 'menu' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
+  >
+    Menu Items
+  </button>
+</div>
+
 
           <div className="p-6">
+          {activeTab === 'orders' ? (
+              <>
             <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h3 className="text-xl font-semibold">Recent Orders</h3>
+            <h2 className="text-3xl font-bold text-orange-600">Recent Orders</h2>
 
               {/* Search bar */}
               <div className="relative w-full md:w-72">
@@ -323,14 +338,23 @@ const RestaurantProfile = () => {
             {ordersLoading ? (
               <Spinner />
             ) : orders.length === 0 ? (
+              <>
               <div className="text-center py-12 bg-gray-50 rounded-xl">
                 <p className="text-xl text-gray-600 mb-2">No orders yet</p>
                 <p className="text-gray-500">Orders will appear here when customers place them.</p>
               </div>
+              </>
             ) : (
               <>
                 <OrderCategory title="🔵 Pending Orders" orders={pendingOrders} searchTerm={searchTerm} />
                 <OrderCategory title="🔶 Other Orders" orders={otherOrders} searchTerm={searchTerm} />
+              </>
+            )}
+            </>
+            ): (
+              <>
+                {/* Menu Items Section */}
+                <AdminMenuList setActiveTab={setActiveTab} />
               </>
             )}
           </div>

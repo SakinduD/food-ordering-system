@@ -6,6 +6,7 @@ export interface IMenuItem extends Document {
   description?: string;
   imageUrl?: String,
   price: number;
+  category: string;
   available: boolean;
   restaurantId: mongoose.Types.ObjectId;
 }
@@ -17,6 +18,7 @@ const menuItemSchema = new Schema<IMenuItem>(
     description: { type: String },
     imageUrl: { type: String },
     price: { type: Number, required: true },
+    category: { type: String, required: true },
     available: { type: Boolean, default: true },
     restaurantId: {
       type: mongoose.Schema.Types.ObjectId,

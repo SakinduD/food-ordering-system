@@ -74,12 +74,22 @@ const EditMenuItem = () => {
           <span className="text-sm text-gray-700">Available</span>
         </label>
 
-        <button
-          className="bg-yellow-600 text-white px-4 py-2 rounded"
-          type="submit"
-        >
-          Update
-        </button>
+        <div className="flex gap-30">
+          <button
+            type="submit"
+            className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
+          >
+            Update
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/menu')}
+            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+          >
+            Cancel
+          </button>
+        </div>
+
       </form>
     </div>
   );

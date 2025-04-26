@@ -299,19 +299,19 @@ const RestaurantProfile = () => {
         {/* Orders Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden">
         <div className="flex border-b border-orange-100">
-  <button
-    onClick={() => setActiveTab('orders')}
-    className={`px-6 py-4 font-semibold ${activeTab === 'orders' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
-  >
-    Orders
-  </button>
-  <button
-    onClick={() => setActiveTab('menu')}
-    className={`px-6 py-4 font-semibold ${activeTab === 'menu' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
-  >
-    Menu Items
-  </button>
-</div>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`px-6 py-4 font-semibold ${activeTab === 'orders' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
+          >
+            Orders
+          </button>
+          <button
+            onClick={() => setActiveTab('menu')}
+            className={`px-6 py-4 font-semibold ${activeTab === 'menu' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-600'}`}
+          >
+            Menu Items
+          </button>
+        </div>
 
 
           <div className="p-6">
@@ -380,6 +380,7 @@ const RestaurantProfile = () => {
               <tr>
                 <th className="p-4 text-sm font-semibold text-gray-600">Order ID</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Customer</th>
+                <th className="p-4 text-sm font-semibold text-gray-600">Items Ordered</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Date</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Amount</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Status</th>
@@ -391,6 +392,17 @@ const RestaurantProfile = () => {
                 <tr key={order._id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">{order.invoiceId}</td>
                   <td className="p-4">{order.userName}</td>
+                  <td className="p-4 space-y-1 text-sm text-gray-700">
+                    {order.orderItems?.length > 0 ? (
+                      order.orderItems.map((item, index) => (
+                        <div key={index}>
+                          {item.itemName} <span className="text-gray-400">(x{item.itemQuantity})</span>
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-gray-400 italic">No items</span>
+                    )}
+                  </td>
                   <td className="p-4">{new Date(order.orderDate || order.createdAt).toLocaleString()}</td>
                   <td className="p-4 font-medium">Rs. {order.totalAmount?.toFixed(2)}</td>
                   <td className="p-4">

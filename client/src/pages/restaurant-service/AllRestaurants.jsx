@@ -52,16 +52,7 @@ const AllRestaurants = () => {
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
                     {restaurant.name}
-                  </h3>
-                  {restaurant.available ? (
-                    <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                      Open
-                    </span>
-                  ) : (
-                    <span className="text-xs font-medium bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
-                      Closed
-                    </span>
-                  )}
+                  </h3>          
                 </div>
 
                 {restaurant.rating && (
@@ -79,9 +70,15 @@ const AllRestaurants = () => {
                     <span className="text-xs font-medium bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full">
                       {restaurant.deliveryTime || "30-40 min"}
                     </span>
-                    <span className="text-xs font-medium bg-green-100 text-green-800 px-3 py-1.5 rounded-full animate-pulse">
-                      Free Delivery
-                    </span>
+                    {restaurant.available ? (
+                      <span className="text-xs font-medium bg-green-100 text-green-800 px-3 py-1.5 rounded-full">
+                        Open
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium bg-red-100 text-red-800 px-3 py-1.5 rounded-full">
+                        Closed
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

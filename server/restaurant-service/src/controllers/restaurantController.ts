@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
-import Restaurant from '../models/Restaurant';
+import Restaurant, { IRestaurant } from '../models/Restaurant';
 import { getOrdersByRestaurantId, updateOrderStatus, deleteOrder } from '../services/orderService';
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-// Create a new restaurant for the logged-in user
+/**
+ * Create a new restaurant for the logged-in user
+ * Ensures all model fields are properly handled
+ */
 export const createRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user._id;
@@ -15,34 +18,81 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       return;
     }
 
+    // Check if user already has a restaurant
     const existing = await Restaurant.findOne({ userId });
     if (existing) {
       res.status(400).json({ message: 'Restaurant already exists for this user' });
       return;
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
-    const restaurant = await Restaurant.create({ ...req.body, userId, imageUrl });
+    // Prepare restaurant data with all possible fields from the model
+    const restaurantData: Partial<IRestaurant> = {
+      name: req.body.name,
+      address: req.body.address || '',
+      phone: req.body.phone || '',
+      available: req.body.available !== undefined ? req.body.available : true,
+      isVerified: req.body.isVerified !== undefined ? req.body.isVerified : false,
+      userId: userId
+    };
 
-    res.status(201).json({ message: 'Restaurant created successfully!', data: restaurant });
+    // Handle image if uploaded
+    if (req.file) {
+      restaurantData.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    // Handle location if provided
+    if (req.body.latitude && req.body.longitude) {
+      restaurantData.location = {
+        type: 'Point',
+        coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
+      };
+    }
+
+    // Create restaurant with properly structured data
+    const restaurant = await Restaurant.create(restaurantData);
+
+    res.status(201).json({ 
+      message: 'Restaurant created successfully!', 
+      data: restaurant 
+    });
   } catch (err: any) {
+    console.error('Error creating restaurant:', err);
     res.status(400).json({ error: err.message });
   }
 };
 
-
-
-// Get all restaurants
-export const getRestaurants = async (_req: Request, res: Response): Promise<void> => {
+/**
+ * Get all restaurants
+ * Can filter by availability and verification status
+ */
+export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
-    const restaurants = await Restaurant.find();
-    res.json({ message: 'Restaurants fetched!', data: restaurants });
+    const filter: any = {};
+    
+    // Add filters if provided as query params
+    if (req.query.available !== undefined) {
+      filter.available = req.query.available === 'true';
+    }
+    
+    if (req.query.isVerified !== undefined) {
+      filter.isVerified = req.query.isVerified === 'true';
+    }
+
+    const restaurants = await Restaurant.find(filter);
+    res.json({ 
+      message: 'Restaurants fetched!', 
+      count: restaurants.length,
+      data: restaurants 
+    });
   } catch (err: any) {
+    console.error('Error fetching restaurants:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// Get a single restaurant by ID
+/**
+ * Get a single restaurant by ID
+ */
 export const getRestaurantById = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -52,11 +102,14 @@ export const getRestaurantById = async (req: Request, res: Response): Promise<vo
       res.status(404).json({ message: 'Restaurant not found' });
     }
   } catch (err: any) {
+    console.error('Error fetching restaurant by ID:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// Get a restaurant by user ID
+/**
+ * Get a restaurant by user ID
+ */
 export const getRestaurantByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurant = await Restaurant.findOne({ userId: req.params.userId });
@@ -66,32 +119,63 @@ export const getRestaurantByUserId = async (req: Request, res: Response): Promis
       res.status(404).json({ message: 'Restaurant not found for this user' });
     }
   } catch (err: any) {
+    console.error('Error fetching restaurant by user ID:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// Update a restaurant by ID
+/**
+ * Update a restaurant by ID
+ * Properly handles all model fields
+ */
 export const updateRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const updateData = { ...req.body };
+    const updateData: Partial<IRestaurant> = {};
+
+    // Only update fields that are provided
+    if (req.body.name !== undefined) updateData.name = req.body.name;
+    if (req.body.address !== undefined) updateData.address = req.body.address;
+    if (req.body.phone !== undefined) updateData.phone = req.body.phone;
+    if (req.body.available !== undefined) updateData.available = req.body.available;
+    if (req.body.isVerified !== undefined) updateData.isVerified = req.body.isVerified;
+
+    // Handle image upload if provided
     if (req.file) {
       updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    const updated = await Restaurant.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    // Handle location update if provided
+    if (req.body.latitude && req.body.longitude) {
+      updateData.location = {
+        type: 'Point',
+        coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
+      };
+    }
+
+    const updated = await Restaurant.findByIdAndUpdate(
+      req.params.id, 
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     if (!updated) {
       res.status(404).json({ message: 'Restaurant not found' });
       return;
     }
 
-    res.status(200).json({ message: 'Restaurant updated successfully!', data: updated });
+    res.status(200).json({ 
+      message: 'Restaurant updated successfully!', 
+      data: updated 
+    });
   } catch (err: any) {
+    console.error('Error updating restaurant:', err);
     res.status(400).json({ error: err.message });
   }
 };
 
-
-// Delete a restaurant
+/**
+ * Delete a restaurant
+ */
 export const deleteRestaurant = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await Restaurant.findByIdAndDelete(req.params.id);
@@ -101,13 +185,21 @@ export const deleteRestaurant = async (req: Request, res: Response): Promise<voi
       res.status(404).json({ message: 'Restaurant not found' });
     }
   } catch (err: any) {
+    console.error('Error deleting restaurant:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// Set restaurant availability
+/**
+ * Set restaurant availability
+ */
 export const setAvailability = async (req: Request, res: Response): Promise<void> => {
   try {
+    if (req.body.available === undefined) {
+      res.status(400).json({ message: 'Available status is required' });
+      return;
+    }
+
     const restaurant = await Restaurant.findByIdAndUpdate(
       req.params.id,
       { available: req.body.available },
@@ -119,13 +211,92 @@ export const setAvailability = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    res.json({ message: 'Availability updated!', data: restaurant });
+    res.json({ 
+      message: `Restaurant is now ${req.body.available ? 'available' : 'unavailable'}`, 
+      data: restaurant 
+    });
   } catch (err: any) {
+    console.error('Error updating availability:', err);
     res.status(400).json({ error: err.message });
   }
 };
 
-// View incoming orders
+/**
+ * Set restaurant verification status
+ */
+export const setVerificationStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (req.body.isVerified === undefined) {
+      res.status(400).json({ message: 'Verification status is required' });
+      return;
+    }
+
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: req.body.isVerified },
+      { new: true }
+    );
+
+    if (!restaurant) {
+      res.status(404).json({ message: 'Restaurant not found!' });
+      return;
+    }
+
+    res.json({ 
+      message: `Restaurant is now ${req.body.isVerified ? 'verified' : 'unverified'}`, 
+      data: restaurant 
+    });
+  } catch (err: any) {
+    console.error('Error updating verification status:', err);
+    res.status(400).json({ error: err.message });
+  }
+};
+
+/**
+ * Find nearby restaurants based on coordinates
+ */
+export const findNearbyRestaurants = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { longitude, latitude, distance = 5000 } = req.query; // distance in meters, default 5km
+    
+    if (!longitude || !latitude) {
+      res.status(400).json({ message: 'Longitude and latitude are required' });
+      return;
+    }
+
+    const lng = parseFloat(longitude as string);
+    const lat = parseFloat(latitude as string);
+    
+    if (isNaN(lng) || isNaN(lat)) {
+      res.status(400).json({ message: 'Invalid coordinates format' });
+      return;
+    }
+
+    const restaurants = await Restaurant.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lng, lat]
+          },
+          $maxDistance: parseInt(distance as string) || 5000
+        }
+      },
+      available: true // Only show available restaurants
+    });
+
+    res.json({
+      message: 'Nearby restaurants fetched successfully',
+      count: restaurants.length,
+      data: restaurants
+    });
+  } catch (err: any) {
+    console.error('Error finding nearby restaurants:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Keep the order-related controller methods as they are
 export const fetchRestaurantOrders = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurantId = req.params.id;
@@ -147,7 +318,6 @@ export const fetchRestaurantOrders = async (req: Request, res: Response): Promis
   }
 };
 
-// Update order status
 export const handleUpdateOrderStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
@@ -172,7 +342,6 @@ export const handleUpdateOrderStatus = async (req: Request, res: Response): Prom
   }
 };
 
-// Delete order
 export const handleDeleteOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;

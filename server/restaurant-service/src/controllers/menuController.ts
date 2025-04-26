@@ -10,7 +10,7 @@ interface MulterRequest extends Request {
 // ✅ Create a new menu item
 export const addMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, price, available } = req.body;
+    const { name, description, price, category, available } = req.body;
     const userId = (req as any).user._id;
 
     if (!userId) {
@@ -31,6 +31,7 @@ export const addMenuItem = async (req: MulterRequest, res: Response): Promise<vo
       name,
       description,
       price,
+      category,
       available,
       restaurantId: restaurant._id,
       imageUrl,
@@ -81,12 +82,13 @@ export const getMenuItemsByRestaurantId = async (req: Request, res: Response) =>
 // ✅ Update menu item by ID
 export const updateMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, price, available, restaurantId } = req.body;
+    const { name, description, price, category, available, restaurantId } = req.body;
 
     const updateData: any = {
       name,
       description,
       price,
+      category,
       available,
       restaurantId,
     };

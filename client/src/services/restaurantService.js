@@ -39,6 +39,7 @@ export const updateMenuItem = async (id, data, token) => {
   formData.append('name', data.name);
   formData.append('description', data.description);
   formData.append('price', data.price);
+  formData.append('category', data.category); 
   formData.append('available', data.available);
   formData.append('restaurantId', data.restaurantId);
 

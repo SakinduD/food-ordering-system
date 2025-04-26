@@ -57,6 +57,25 @@ const EditMenuItem = () => {
           required
         />
 
+        <select
+          className="w-full p-2 border rounded"
+          value={form.category || ''}
+          onChange={(e) => setForm({ ...form, category: e.target.value })}
+          required
+        >
+          <option value="">Select Category</option>
+          <option value="Sri Lankan Traditional">Sri Lankan Traditional</option>
+          <option value="Rice & Curry">Rice & Curry</option>
+          <option value="Kottu & Roti">Kottu & Roti</option>
+          <option value="Seafood Special">Seafood Special</option>
+          <option value="Street Food">Street Food</option>
+          <option value="Desserts & Sweets">Desserts & Sweets</option>
+          <option value="Beverages">Beverages</option>
+          <option value="Contemporary Fusion">Contemporary Fusion</option>
+          <option value="Vegetarian & Vegan">Vegetarian & Vegan</option>
+          <option value="Snacks & Short Eats">Snacks & Short Eats</option>
+        </select>
+
         <input
           type="file"
           accept="image/*"

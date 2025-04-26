@@ -6,6 +6,7 @@ const CustomerMenuList = () => {
   const { id } = useParams(); // ✅ Get restaurant ID from URL
   const [items, setItems] = useState([]);
   const [restaurant, setRestaurant] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // ✅ Search input
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +28,11 @@ const CustomerMenuList = () => {
     fetchData();
   }, [id]);
 
+  // ✅ Filter items based on search
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="max-w-6xl mx-auto mt-6 px-4">
       {/* ✅ Show Restaurant Info */}
@@ -37,10 +43,28 @@ const CustomerMenuList = () => {
         </div>
       )}
 
+      {/* ✅ Search Bar */}
+      <div className="flex justify-center mb-8">
+        <input
+          type="text"
+          placeholder="Search food items..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full max-w-md px-5 py-3 border-2 border-orange-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-400 text-gray-700 placeholder-gray-400 transition"
+        />
+      </div>
+
+      {/* ✅ Menu Items */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {items.map((item) => (
-          <MenuItemCustomerCard key={item._id} item={item} />
-        ))}
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <MenuItemCustomerCard key={item._id} item={item} />
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500">
+            No items found.
+          </div>
+        )}
       </div>
     </div>
   );

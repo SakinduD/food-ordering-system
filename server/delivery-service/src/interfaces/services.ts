@@ -11,6 +11,10 @@ export interface IOrderResponse {
     restaurantId: string;
     orderLocation: [number, number]; // [longitude, latitude]
     orderStatus: string;
+    userName: string;
+    userPhone: string;
+    address: string;
+    roadDistance: number;
   };
 }
 

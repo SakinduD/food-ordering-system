@@ -13,13 +13,14 @@ import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 import Cart from "../components/Orders/cart";
-import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";
+
 import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 // New import for Delivery Tracking
 import DeliveryCreationPage from "../pages/delivery/DeliveryCreationPage";
 import DeliveryDriverAssignmentPage from "../pages/delivery/DeliveryDriverAssignmentPage";
 import DeliveryTrackingPage from "../pages/delivery/DeliveryTrackingPage";
+import DeliveryAgentDashboard from "../pages/delivery/DeliveryAgentDashboard";
 
 //Methush imports
 import LandingPage from "../pages/landing-page/LandingPage";
@@ -58,6 +59,17 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+// Delivery Agent Route Component
+const DeliveryAgentRoute = ({ children }) => {
+  const { user } = useContext(UserContext);
+
+  if (!user || user.role !== 'deliveryAgent') {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
@@ -86,7 +98,6 @@ function AppRoutes() {
       <Route path="/edit-restaurant" element={<EditRestaurant />} />
       <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
       <Route path="/create-delivery" element={<CreateDelivery />} />
-      <Route path="/location-tracker" element={<DriverLocationTracker />} />
 
       <Route
         path="/create-delivery/:orderId"
@@ -107,9 +118,9 @@ function AppRoutes() {
       <Route
         path="/delivery-tracking/:deliveryId"
         element={
-          <ProtectedRoute>
+
             <DeliveryTrackingPage />
-          </ProtectedRoute>
+
         }
       />
 
@@ -124,6 +135,15 @@ function AppRoutes() {
           <ProtectedRoute>
             <UserProfile />
           </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/delivery-agent"
+        element={
+          <DeliveryAgentRoute>
+            <DeliveryAgentDashboard />
+          </DeliveryAgentRoute>
         }
       />
     </Routes>

@@ -17,8 +17,8 @@ import {
   ArrowLeft 
 } from 'lucide-react';
 import Spinner from '../../components/Spinner';
-import EnhancedDeliveryMap from '../../components/Delivery/EnhancedDeliveryMap';
-import useDeliverySocket from '../../components/Delivery/useDeliverySocket';
+import GoogleDeliveryMap from '../../components/Delivery/GoogleDeliveryMap';
+
 
 const DeliveryState = ({ status, showLabel = true }) => {
   let bgColor, textColor, icon;
@@ -337,7 +337,9 @@ const DeliveryTrackingPage = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Tracking</h3>
                 
                 <div className="rounded-xl overflow-hidden border border-blue-100 h-[400px]">
-                  <EnhancedDeliveryMap 
+                  <GoogleDeliveryMap 
+                    apiKey="AIzaSyA-e1QNF2Q4yjhTieqegIgQWr51yUpIxms"
+                    deliveryId={deliveryId}
                     restaurant={restaurantLocation}
                     customer={customerLocation}
                     driver={driver?.location}

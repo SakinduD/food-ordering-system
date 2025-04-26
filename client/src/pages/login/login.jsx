@@ -40,7 +40,11 @@ const Login = () => {
                     navigate('/admin');
                 } else if(user.role === 'restaurant') {
                     navigate('/restaurant-profile');
-                } else {
+                    
+                } else if(user.role === 'deliveryAgent') {
+                    navigate('/delivery-agent');
+                }
+                else {
                     navigate('/');
                 }
             }

@@ -61,6 +61,23 @@ export class UserServiceAdapter {
       );
     }
   }
+
+  async getUserFromToken(token: string): Promise<IUserResponse> {
+    try {
+      if (!token) {
+        throw new ServiceError('UserService', 'Authentication failed: No token provided', 401);
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(`${this.baseUrl}/users/profile`, config);
+      return response.data;
+    } catch (error: any) {
+      throw new ServiceError('UserService',
+        error.response?.data?.message || 'Failed to fetch user profile',
+        error.response?.status || 500
+      );
+    }
+  }
 }
 
 export class OrderServiceAdapter {
@@ -70,9 +87,10 @@ export class OrderServiceAdapter {
     this.baseUrl = process.env.ORDER_SERVICE_URL || 'http://localhost:5001/api/order';
   }
 
-  async getOrderById(orderId: string): Promise<IOrderResponse> {
+  async getOrderById(orderId: string, token?: string): Promise<IOrderResponse> {
     try {
-      const response = await axios.get(`${this.baseUrl}/getOrderById/${orderId}`);
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.get(`${this.baseUrl}/getOrderById/${orderId}`, config);
       
       if (!response.data || !response.data.order) {
         throw new ServiceError('OrderService', 'Invalid order response', 404);
@@ -100,9 +118,10 @@ export class RestaurantServiceAdapter {
     this.baseUrl = process.env.RESTAURANT_SERVICE_URL || 'http://localhost:5000/api/restaurants';
   }
 
-  async getRestaurantById(restaurantId: string): Promise<IRestaurantResponse> {
+  async getRestaurantById(restaurantId: string, token?: string): Promise<IRestaurantResponse> {
     try {
-      const response = await axios.get(`${this.baseUrl}/${restaurantId}`);
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.get(`${this.baseUrl}/${restaurantId}`, config);
       
       if (!response.data || !response.data.data) {
         throw new ServiceError('RestaurantService', 'Invalid restaurant response', 404);

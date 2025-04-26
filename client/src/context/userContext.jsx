@@ -26,7 +26,8 @@ const UserContextProvider = ({ children }) => {
             console.log('Profile data:', data);
 
             const userData = {
-                userId: data.userId,
+                _id: data.userId, // Store as _id for consistency
+                userId: data.userId, // Keep userId for backward compatibility
                 name: data.name,
                 email: data.email,
                 isAdmin: Boolean(data.isAdmin),

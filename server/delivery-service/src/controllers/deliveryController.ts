@@ -258,7 +258,7 @@ export const getNearbyDrivers = async (req: Request, res: Response): Promise<voi
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const dLon = (lon1 - lon2) * Math.PI / 180;
   const a = 
     Math.sin(dLat/2) * Math.sin(dLat/2) +
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
@@ -287,6 +287,186 @@ export const getDeliveryById = async (req: Request, res: Response): Promise<void
     });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+
+// Get deliveries by driver ID (alternative to getDriverDeliveries)
+export const getDeliveriesByDriverId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { driverId } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!driverId) {
+      res.status(400).json({ message: 'Driver ID is required' });
+      return;
+    }
+    
+    // Find all deliveries assigned to this driver
+    const deliveries = await Delivery.find({ driverId: driverId });
+    
+    if (!deliveries.length) {
+      res.json({
+        success: true,
+        deliveries: []
+      });
+      return;
+    }
+    
+    // Enrich delivery data with customer and restaurant information
+    const enrichedDeliveries = await Promise.all(deliveries.map(async (delivery) => {
+      // Basic delivery object that will always be returned
+      const basicDelivery = {
+        _id: delivery._id,
+        orderId: delivery.orderId,
+        status: delivery.status,
+        createdAt: delivery.createdAt,
+        updatedAt: delivery.updatedAt,
+        restaurantLocation: delivery.restaurantLocation,
+        customerLocation: delivery.customerLocation,
+        currentLocation: delivery.currentLocation || { type: 'Point', coordinates: [0, 0] }
+      };
+      
+      try {
+        // Try to get order details for customer info
+        let customerInfo = {
+          customerName: 'Customer information unavailable',
+          customerPhone: 'N/A',
+          customerAddress: 'Address not available'
+        };
+        
+        let restaurantInfo = {
+          restaurantName: 'Restaurant information unavailable',
+          restaurantPhone: 'N/A'
+        };
+        
+        let distance = 0;
+        
+        try {
+          const orderResponse = await orderService.getOrderById(delivery.orderId.toString());
+          const order = orderResponse.order;
+          
+          customerInfo = {
+            customerName: order.userName || 'Customer',
+            customerPhone: order.userPhone || 'N/A',
+            customerAddress: order.address || 'Address not available'
+          };
+          
+          // Use road distance if available from order
+          if (order.roadDistance) {
+            distance = order.roadDistance;
+          }
+        } catch (error) {
+          console.error(`Error fetching order for delivery ${delivery._id}:`, error);
+          // Continue with default customer info
+        }
+        
+        // Try to get restaurant details
+        try {
+          const restaurantResponse = await restaurantService.getRestaurantById(
+            delivery.restaurantId.toString()
+          );
+          const restaurant = restaurantResponse.data;
+          
+          restaurantInfo = {
+            restaurantName: restaurant.name || 'Restaurant',
+            restaurantPhone: restaurant.phone || 'N/A'
+          };
+        } catch (error) {
+          console.error(`Error fetching restaurant for delivery ${delivery._id}:`, error);
+          // Continue with default restaurant info
+        }
+        
+        // Calculate distance if not already set from order
+        if (!distance && delivery.restaurantLocation?.coordinates && delivery.customerLocation?.coordinates) {
+          distance = calculateDistance(
+            delivery.restaurantLocation.coordinates[1],
+            delivery.restaurantLocation.coordinates[0],
+            delivery.customerLocation.coordinates[1],
+            delivery.customerLocation.coordinates[0]
+          );
+        }
+
+        // Return enriched delivery with all available info
+        return {
+          ...basicDelivery,
+          ...customerInfo,
+          ...restaurantInfo,
+          distance: Number(distance.toFixed(1)) // Round to 1 decimal place
+        };
+      } catch (error) {
+        console.error(`Error enriching delivery ${delivery._id}:`, error);
+        // Return basic delivery info if any part of enrichment fails
+        return basicDelivery;
+      }
+    }));
+
+    res.json({
+      success: true,
+      deliveries: enrichedDeliveries
+    });
+  } catch (error) {
+    console.error('Error fetching driver deliveries:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch driver deliveries',
+      error: (error as Error).message
+    });
+  }
+};
+
+// Update delivery driver location
+export const updateDeliveryLocation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { deliveryId } = req.params;
+    const { location } = req.body; // { latitude, longitude }
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      res.status(401).json({ message: 'Authentication required' });
+      return;
+    }
+
+    // Validate user is the assigned driver
+    const userResponse = await userService.getUserFromToken(token);
+    const userId = userResponse.user._id;
+
+    const delivery = await Delivery.findById(deliveryId);
+    if (!delivery) {
+      res.status(404).json({ message: 'Delivery not found' });
+      return;
+    }
+
+    // Ensure the user is the assigned driver
+    if (delivery.driverId?.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You are not authorized to update this delivery location' });
+      return;
+    }
+
+    // Update delivery current location
+    delivery.currentLocation = {
+      type: 'Point',
+      coordinates: [location.longitude, location.latitude] // GeoJSON format is [longitude, latitude]
+    };
+    
+    await delivery.save();
+
+    // Emit location update to clients tracking this delivery
+    getIo().to(deliveryId.toString()).emit('deliveryLocationUpdate', {
+      deliveryId,
+      location
+    });
+
+    res.json({
+      success: true,
+      message: 'Delivery location updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating delivery location:', error);
+    if (error instanceof ServiceError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: (error as Error).message });
   }
 };

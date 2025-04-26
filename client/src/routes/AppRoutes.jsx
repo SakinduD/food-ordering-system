@@ -13,7 +13,7 @@ import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 import Cart from "../components/Orders/cart";
-import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";   
+import DriverLocationTracker from "../components/Delivery/DriverLocationTracker";
 import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 // New import for Delivery Tracking
@@ -24,11 +24,12 @@ import DeliveryTrackingPage from "../pages/delivery/DeliveryTrackingPage";
 //Methush imports
 import LandingPage from "../pages/landing-page/LandingPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import UserProfile from '../pages/UserProfile';
-import VerifyOTP from '../pages/register/VerifyOTP';
+import UserProfile from "../pages/UserProfile";
+import VerifyOTP from "../pages/register/VerifyOTP";
 import Login from "../pages/login/login";
 import Register from "../pages/register/Register";
-
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -61,13 +62,13 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route 
-        path="/admin/*" 
+      <Route
+        path="/admin/*"
         element={
           <AdminRoute>
             <AdminDashboard />
           </AdminRoute>
-        } 
+        }
       />
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/add-menu" element={<AddMenuItem />} />
@@ -79,35 +80,37 @@ function AppRoutes() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/restaurant-profile" element={<RestaurantProfile />} />
       <Route path="/edit-restaurant" element={<EditRestaurant />} />
       <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
       <Route path="/create-delivery" element={<CreateDelivery />} />
       <Route path="/location-tracker" element={<DriverLocationTracker />} />
 
-      <Route 
-        path="/create-delivery/:orderId" 
+      <Route
+        path="/create-delivery/:orderId"
         element={
           <ProtectedRoute>
             <DeliveryCreationPage />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/delivery-driver-assignment/:deliveryId" 
+      <Route
+        path="/delivery-driver-assignment/:deliveryId"
         element={
           <ProtectedRoute>
             <DeliveryDriverAssignmentPage />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/delivery-tracking/:deliveryId" 
+      <Route
+        path="/delivery-tracking/:deliveryId"
         element={
           <ProtectedRoute>
             <DeliveryTrackingPage />
           </ProtectedRoute>
-        } 
+        }
       />
 
       <Route path="/orders" element={<UserOrderList />} />
@@ -115,13 +118,13 @@ function AppRoutes() {
       <Route path="/detailed-order/:orderId" element={<DetailedOrderPage />} />
 
       {/* Protected Routes */}
-      <Route 
-        path="/profile" 
+      <Route
+        path="/profile"
         element={
           <ProtectedRoute>
             <UserProfile />
           </ProtectedRoute>
-        } 
+        }
       />
     </Routes>
   );

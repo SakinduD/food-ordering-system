@@ -30,8 +30,8 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       name: req.body.name,
       address: req.body.address || '',
       phone: req.body.phone || '',
-      available: req.body.available !== undefined ? req.body.available : true,
-      isVerified: req.body.isVerified !== undefined ? req.body.isVerified : false,
+      available: req.body.available !== undefined ? req.body.available === 'true' || req.body.available === true : true,
+      isVerified: req.body.isVerified !== undefined ? req.body.isVerified === 'true' || req.body.isVerified === true : false,
       userId: userId
     };
 
@@ -40,12 +40,50 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       restaurantData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    // Handle location if provided
-    if (req.body.latitude && req.body.longitude) {
-      restaurantData.location = {
-        type: 'Point',
-        coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
-      };
+    // Handle location data
+    if (req.body.location) {
+      try {
+        // Try parsing location as JSON first (from direct JSON inputs)
+        const locationData = typeof req.body.location === 'string' 
+          ? JSON.parse(req.body.location) 
+          : req.body.location;
+          
+        if (locationData?.type && locationData?.coordinates?.length === 2) {
+          restaurantData.location = {
+            type: locationData.type,
+            coordinates: [
+              parseFloat(locationData.coordinates[0]), 
+              parseFloat(locationData.coordinates[1])
+            ]
+          };
+        }
+      } catch (e) {
+        console.error('Error parsing location JSON:', e);
+      }
+    }
+    
+    // If location wasn't set from the location object, try individual coordinates
+    if (!restaurantData.location || !restaurantData.location.coordinates) {
+      // Check for coordinates in form data format (from FormData submissions)
+      if (req.body['location[coordinates][]']) {
+        const coords = Array.isArray(req.body['location[coordinates][]']) 
+          ? req.body['location[coordinates][]'] 
+          : [req.body['location[coordinates][]'], req.body['location[coordinates][]']];
+          
+        if (coords.length >= 2) {
+          restaurantData.location = {
+            type: req.body['location[type]'] || 'Point',
+            coordinates: [parseFloat(coords[0]), parseFloat(coords[1])]
+          };
+        }
+      } 
+      // Also check for separate latitude/longitude fields
+      else if (req.body.longitude !== undefined && req.body.latitude !== undefined) {
+        restaurantData.location = {
+          type: 'Point',
+          coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
+        };
+      }
     }
 
     // Create restaurant with properly structured data
@@ -136,20 +174,62 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
     if (req.body.name !== undefined) updateData.name = req.body.name;
     if (req.body.address !== undefined) updateData.address = req.body.address;
     if (req.body.phone !== undefined) updateData.phone = req.body.phone;
-    if (req.body.available !== undefined) updateData.available = req.body.available;
-    if (req.body.isVerified !== undefined) updateData.isVerified = req.body.isVerified;
+    if (req.body.available !== undefined) {
+      updateData.available = req.body.available === 'true' || req.body.available === true;
+    }
+    if (req.body.isVerified !== undefined) {
+      updateData.isVerified = req.body.isVerified === 'true' || req.body.isVerified === true;
+    }
 
     // Handle image upload if provided
     if (req.file) {
       updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    // Handle location update if provided
-    if (req.body.latitude && req.body.longitude) {
-      updateData.location = {
-        type: 'Point',
-        coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
-      };
+    // Handle location data - try different ways the client might send coordinates
+    if (req.body.location) {
+      try {
+        // Try parsing location as JSON first
+        const locationData = typeof req.body.location === 'string' 
+          ? JSON.parse(req.body.location) 
+          : req.body.location;
+          
+        if (locationData?.type && locationData?.coordinates?.length === 2) {
+          updateData.location = {
+            type: locationData.type,
+            coordinates: [
+              parseFloat(locationData.coordinates[0]), 
+              parseFloat(locationData.coordinates[1])
+            ]
+          };
+        }
+      } catch (e) {
+        console.error('Error parsing location JSON:', e);
+      }
+    }
+    
+    // If location wasn't set from the location object, try individual coordinates
+    if (!updateData.location) {
+      // Check for coordinates in form data format
+      if (req.body['location[coordinates][]']) {
+        const coords = Array.isArray(req.body['location[coordinates][]']) 
+          ? req.body['location[coordinates][]'] 
+          : [req.body['location[coordinates][]'], req.body['location[coordinates][]']];
+          
+        if (coords.length >= 2) {
+          updateData.location = {
+            type: req.body['location[type]'] || 'Point',
+            coordinates: [parseFloat(coords[0]), parseFloat(coords[1])]
+          };
+        }
+      }
+      // Also check for separate latitude/longitude fields
+      else if (req.body.longitude !== undefined && req.body.latitude !== undefined) {
+        updateData.location = {
+          type: 'Point',
+          coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
+        };
+      }
     }
 
     const updated = await Restaurant.findByIdAndUpdate(

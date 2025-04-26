@@ -8,7 +8,8 @@ import {
   Settings, 
   ShoppingCart, 
   Package,
-  LayoutDashboard
+  LayoutDashboard,
+  Store
 } from "lucide-react"
 import { useState, useContext, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -27,6 +28,14 @@ function Header() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const { user, setUser } = useContext(UserContext)
+
+  // Helper function to get home page based on user role
+  const getHomePage = () => {
+    if (!user) return "/";
+    if (user.isAdmin) return "/admin";
+    if (user.role === "restaurant") return "/restaurant-profile";
+    return "/";
+  };
 
   const handleLogout = async () => {
     try {
@@ -67,7 +76,7 @@ function Header() {
     <div className="hidden md:flex items-center gap-6">
       {user ? (
         <>
-          {!user.isAdmin && (
+          {!user.isAdmin && user.role !== "restaurant" && (
             <Link
               to="/cart"
               className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
@@ -100,7 +109,21 @@ function Header() {
                   <User className="h-4 w-4" />
                   Profile
                 </Link>
-                {!user?.isAdmin && (
+                
+                {/* Restaurant role specific link */}
+                {user.role === "restaurant" && (
+                  <Link
+                    to="/restaurant-profile"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <Store className="h-4 w-4" />
+                    Restaurant Dashboard
+                  </Link>
+                )}
+                
+                {/* Regular user links */}
+                {!user.isAdmin && user.role !== "restaurant" && (
                   <Link
                     to="/orders"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
@@ -110,7 +133,9 @@ function Header() {
                     My Orders
                   </Link>
                 )}
-                {user?.isAdmin && (
+                
+                {/* Admin links */}
+                {user.isAdmin && (
                   <Link
                     to="/admin"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
@@ -120,6 +145,7 @@ function Header() {
                     Dashboard
                   </Link>
                 )}
+                
                 <Link
                   to="/settings"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50"
@@ -162,10 +188,10 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-orange-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-        {/* Logo */}
+        {/* Logo - Updated to use getHomePage function */}
         <div className="flex items-center gap-2">
           <Link 
-            to={user?.isAdmin ? "/admin" : "/"} 
+            to={getHomePage()} 
             className="flex items-center gap-2 font-bold text-xl group"
           >
             <div className="p-1.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
@@ -177,13 +203,13 @@ function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation - Updated Home link to use getHomePage */}
         <nav className="hidden md:flex gap-8">
           {["Home", "Features", "How It Works", "Restaurants", "Testimonials"].map((item) => (
             item === "Home" ? (
               <Link
                 key={item}
-                to={user?.isAdmin ? "/admin" : "/"}
+                to={getHomePage()}
                 className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
               >
                 {item}
@@ -215,9 +241,9 @@ function Header() {
         {/* Replace the existing desktop auth section with the new one */}
         {renderDesktopAuth()}
 
-        {/* Update the mobile menu section to match the new dropdown style */}
+        {/* Update the mobile menu section for restaurant role */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-orange-100">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-t border-orange-100 shadow-lg z-50">
             <div className="container mx-auto px-4 py-4 space-y-4">
               {/* Mobile Navigation */}
               <nav className="flex flex-col gap-4">
@@ -225,7 +251,8 @@ function Header() {
                   item === "Home" ? (
                     <Link
                       key={item}
-                      to={user?.isAdmin ? "/admin" : "/"}
+                      to={getHomePage()}
+                      onClick={() => setIsMenuOpen(false)}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       {item}
@@ -234,6 +261,7 @@ function Header() {
                     <a
                       key={item}
                       href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                      onClick={() => setIsMenuOpen(false)}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       {item}
@@ -241,10 +269,23 @@ function Header() {
                   )
                 ))}
               </nav>
-              <div className="flex flex-col gap-4 pt-4 border-t border-orange-100 bg-orange-200 rounded-lg p-4">
+              <div className="flex flex-col gap-4 pt-4 border-t border-orange-100">
                 {user ? (
                   <>
-                    {!user.isAdmin && (
+                    {/* Restaurant role specific link for mobile */}
+                    {user.role === "restaurant" && (
+                      <Link
+                        to="/restaurant-profile"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
+                      >
+                        <Store className="h-4 w-4" />
+                        Restaurant Dashboard
+                      </Link>
+                    )}
+                    
+                    {/* Regular customer links */}
+                    {!user.isAdmin && user.role !== "restaurant" && (
                       <>
                         <Link
                           to="/cart"
@@ -264,8 +305,10 @@ function Header() {
                         </Link>
                       </>
                     )}
+                    
                     <Link
                       to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
                     >
                       <User className="h-4 w-4" />
@@ -274,6 +317,7 @@ function Header() {
                     {user?.isAdmin && (
                       <Link
                         to="/admin"
+                        onClick={() => setIsMenuOpen(false)}
                         className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
                       >
                         <LayoutDashboard className="h-4 w-4" />
@@ -282,13 +326,17 @@ function Header() {
                     )}
                     <Link
                       to="/settings"
+                      onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg"
                     >
                       <Settings className="h-4 w-4" />
                       Settings
                     </Link>
                     <button
-                      onClick={handleLogout}
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
                       className="flex items-center gap-2 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg w-full"
                     >
                       <LogOut className="h-4 w-4" />
@@ -299,12 +347,14 @@ function Header() {
                   <>
                     <Link
                       to="/login"
+                      onClick={() => setIsMenuOpen(false)}
                       className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
                     >
                       Sign In
                     </Link>
                     <Link
                       to="/register"
+                      onClick={() => setIsMenuOpen(false)}
                       className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-2 text-sm font-semibold text-white shadow-lg"
                     >
                       Get Started

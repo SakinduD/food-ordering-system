@@ -71,7 +71,7 @@ const AddMenuItem = () => {
 
       toast.dismiss();
       toast.success('Menu item added successfully!');
-      navigate('/admin/menu');
+      navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
     } catch (err) {
       toast.dismiss();
       console.error(err);
@@ -88,7 +88,7 @@ const AddMenuItem = () => {
           {/* Back navigation */}
           <div className="mb-6">
             <button
-              onClick={() => navigate('/admin/menu')}
+              onClick={() => navigate('/restaurant-profile')}
               className="flex items-center gap-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />

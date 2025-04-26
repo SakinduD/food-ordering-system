@@ -13,7 +13,7 @@ export interface IRestaurant extends Document {
       type: string;
       coordinates: [number, number];
     };
-  }
+}
 
 export interface RestaurantServiceInterface {
     getAllRestaurants(): Promise<IRestaurant[]>;

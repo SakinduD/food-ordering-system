@@ -16,6 +16,7 @@ export interface OrderDetail {
     userName: string;
     userPhone: string;
     orderDate: Date;
+    address: string;
     orderStatus: OrderStatus;
     orderItems: {
         itemName: string;

@@ -56,7 +56,7 @@ const placeOrder = async (
 
         const totalAmount: number = deliveryFeeAmount + foodTotalPrice;
 
-        const order:OrderDetail = await Order.create({
+        const order = await Order.create({
             invoiceId,
             userId,
             restaurantId,
@@ -72,7 +72,7 @@ const placeOrder = async (
             totalAmount
         });
 
-        res.status(201).json({ message: order.invoiceId+' Order placed successfully!' });
+        res.status(201).json({ message: order.invoiceId+' Order placed successfully!', orderId: order._id });
     } catch (error) {
         next(error);
     }

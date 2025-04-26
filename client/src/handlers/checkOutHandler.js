@@ -4,7 +4,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import toast from "react-hot-toast";
 import { totalPrice } from '../reducers/cartReducer';
 
-const handleCheckout = async (formData, location, cart, dispatch, userId) => {
+const handleCheckout = async (formData, location, cart, dispatch, userId, user) => {
 
     try {
         console.log('Form Data:', formData);
@@ -75,6 +75,8 @@ const handleCheckout = async (formData, location, cart, dispatch, userId) => {
                                 }),
                             });
 
+                            const data = await response.json();
+
                             if(!response.ok) {
                                 const errorData = await response.json();
                                 toast.error("Order Failed "+errorData.message || 'Failed to place order');
@@ -82,6 +84,23 @@ const handleCheckout = async (formData, location, cart, dispatch, userId) => {
                             }
                     
                             if (response.ok) {
+                                try {
+                                    await axios.post('http://localhost:5020/api/email/orderConfirmationEmail', 
+                                        {
+                                            orderId: data.orderId,
+                                            user: user
+                                        },
+                                        {
+                                            headers: {
+                                                Authorization: `Bearer ${token}`
+                                            }
+                                        }
+                                    );
+                                    console.log("Email sent successfully");
+                                } catch (error) {
+                                    console.error("Error sending email:", error);
+                                }
+
                                 Swal.fire({
                                     position: "center",
                                     icon: "success",
@@ -95,7 +114,7 @@ const handleCheckout = async (formData, location, cart, dispatch, userId) => {
                                     userId,
                                 });
                                 setTimeout(() => {
-                                    window.location.href = '/menu';
+                                    window.location.href = 'http://localhost:3000/detailed-order/' + data.orderId;
                                 }, 500);
                     
                             } else {

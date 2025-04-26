@@ -153,19 +153,32 @@ function RestaurantCard({ restaurant, isActive }) {
         )}
       </div>
       <div className="p-5">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
-            {restaurant.name}
-          </h3>
-          {restaurant.rating && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50">
-              <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
-              <span className="font-semibold text-orange-600">
-                {restaurant.rating}
-              </span>
-            </div>
-          )}
+      <div className="flex justify-between items-center mb-3">
+      <div className="flex items-center gap-2">
+        <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
+          {restaurant.name}
+        </h3>
+        {restaurant.available ? (
+          <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+            Open
+          </span>
+        ) : (
+          <span className="text-xs font-medium bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
+            Closed
+          </span>
+        )}
+      </div>
+
+      {restaurant.rating && (
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50">
+          <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
+          <span className="font-semibold text-orange-600">
+            {restaurant.rating}
+          </span>
         </div>
+      )}
+    </div>
+
         <p className="text-sm text-gray-600 mb-4">{restaurant.cuisine}</p>
         <div className="flex items-center justify-between gap-4">
           <span className="text-xs font-medium bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full">

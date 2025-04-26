@@ -311,101 +311,6 @@ const RestaurantProfile = () => {
 
     // Main restaurant dashboard UI (only shown if verified)
     return (
-<<<<<<< HEAD
-        <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-                    <div>
-                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                            Restaurant Dashboard
-                        </h2>
-                        <div className="flex items-center mt-2 gap-2">
-                            <ShieldCheck size={20} className="text-green-600" />
-                            <span className="text-green-700 font-medium">Verified Restaurant</span>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="px-6 py-2.5 rounded-xl border-2 border-orange-200 bg-white text-orange-600 font-semibold hover:bg-orange-50 hover:border-orange-300 transition-all duration-200"
-                            >
-                            ← Back
-                        </button>
-                        <button
-                            onClick={() => navigate('/edit-restaurant', { state: restaurant })}
-                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg hover:shadow-orange-500/30 hover:scale-105 transition-all duration-200"
-                            >
-                            ✏️ Edit Restaurant Profile
-                        </button>
-                    </div>
-                </div>
-
-                {/* Restaurant Details Card */}
-                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden mb-8">
-                    <div className="p-6">
-                        <div className="flex flex-col md:flex-row gap-6">
-                            {restaurant.imageUrl && (
-                                <div className="w-full md:w-1/3 h-64 rounded-xl overflow-hidden">
-                                    <img 
-                                        src={`http://localhost:5000${restaurant.imageUrl}`}
-                                        alt={restaurant.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            )}
-                            <div className="w-full md:w-2/3">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{restaurant.name}</h3>
-                                <p className="text-gray-600 mb-4">{restaurant.description}</p>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-gray-500">Address</h4>
-                                        <p className="text-gray-800">{restaurant.address}</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-gray-500">Phone</h4>
-                                        <p className="text-gray-800">{restaurant.phone}</p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 flex gap-4">
-                                    <span className={`px-4 py-1 rounded-full text-sm font-medium ${restaurant.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                        {restaurant.available ? 'Open' : 'Closed'}
-                                    </span>
-                                    <button 
-                                        onClick={async () => {
-                                            try {
-                                                const token = localStorage.getItem("token");
-                                                await axios.put(`http://localhost:5000/api/restaurants/${restaurant._id}/availability`, 
-                                                    { available: !restaurant.available },
-                                                    {
-                                                        headers: { Authorization: `Bearer ${token}` }
-                                                    }
-                                                );
-                                                // Update local state
-                                                setRestaurant({...restaurant, available: !restaurant.available});
-                                                toast.success(`Restaurant is now ${!restaurant.available ? 'open' : 'closed'}`);
-                                            } catch (error) {
-                                                console.error("Error updating availability:", error);
-                                                toast.error("Failed to update availability");
-                                            }
-                                        }}
-                                        className="px-4 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
-                                    >
-                                        Toggle Status
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Menu and Orders Tabs */}
-                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden">
-                    <div className="flex border-b border-orange-100">
-                        <button 
-                            className="px-6 py-4 font-semibold text-orange-600 border-b-2 border-orange-500"
-=======
       <div className="mb-12">
         <h4 className="text-lg font-bold mb-4">{title}</h4>
         <div className="overflow-auto">
@@ -449,7 +354,6 @@ const RestaurantProfile = () => {
                         <Link
                           to={`/create-delivery/${order._id}`}
                           className="inline-block px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
->>>>>>> ff5a77d030a11a933ade8eb84872865afdb92313
                         >
                           Create Delivery
                         </Link>

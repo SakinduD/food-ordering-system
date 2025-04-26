@@ -148,7 +148,7 @@ const Login = () => {
 
                     {/* Additional Links */}
                     <div className="text-center text-sm">
-                        <a href="#" className="text-orange-600 hover:text-orange-500">
+                        <a href="/forgot-password" className="text-orange-600 hover:text-orange-500">
                             Forgot your password?
                         </a>
                         <p className="mt-2 text-gray-600">

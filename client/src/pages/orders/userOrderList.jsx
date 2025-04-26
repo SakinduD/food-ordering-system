@@ -40,7 +40,6 @@ const UserOrderList = () => {
 
         fetchOrders();
     }, [user?.userId]);
-    console.log(orders);
 
     const filteredOrders = orders.filter(order => {
         const searchLower = searchTerm.toLowerCase();
@@ -57,19 +56,19 @@ const UserOrderList = () => {
     const getStatusIcon = (status) => {
         switch (status.toLowerCase()) {
             case 'pending':
-                return <ClockIcon className="h-5 w-5 text-yellow-500" />;
+                return <ClockIcon className="h-5 w-5" />;
             case 'accepted':
-                return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+                return <CheckCircleIcon className="h-5 w-5" />;
             case 'out_for_delivery':
-                return <TruckIcon className="h-5 w-5 text-orange-500" />;
+                return <TruckIcon className="h-5 w-5" />;
             case 'delivered':
-                return <TruckIcon className="h-5 w-5 text-green-500" />;
+                return <TruckIcon className="h-5 w-5" />;
             case 'completed':
-                return <ClipboardCheck className="h-5 w-5 text-teal-500" />;
+                return <ClipboardCheck className="h-5 w-5" />;
             case 'cancelled':
-                return <XCircleIcon className="h-5 w-5 text-red-500" />;
+                return <XCircleIcon className="h-5 w-5" />;
             default:
-                return <RefreshCw className="h-5 w-5 text-gray-500" />;
+                return <RefreshCw className="h-5 w-5" />;
         }
     };
 
@@ -78,114 +77,115 @@ const UserOrderList = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
             <div className="container mx-auto px-4 max-w-7xl">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
+                {/* Header Section */}
+                <div className="mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent mb-4">
                         Your Orders
                     </h2>
                     
-                    <div className="relative w-full md:w-96">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <SearchIcon className="h-5 w-5 text-orange-500" />
+                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <p className="text-gray-600">Track and manage your orders</p>
+                        <div className="relative w-full md:w-96">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <SearchIcon className="h-5 w-5 text-orange-500" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by order ID, restaurant, or items..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-11 pr-4 py-3.5 w-full rounded-xl border-2 border-orange-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 placeholder-gray-400 shadow-sm text-gray-600 text-base transition-all duration-200"
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search by invoice ID, restaurant, or item..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-11 pr-4 py-3 w-full rounded-xl border-2 border-orange-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 placeholder-gray-400 shadow-sm text-gray-600 text-base"
-                        />
                     </div>
                 </div>
 
                 {filteredOrders.length === 0 ? (
-                    <div className="text-center py-16">
-                        <h3 className="text-2xl font-semibold text-gray-600 mb-4">
-                            {searchTerm ? 'No matching orders found' : 'No orders found'}
+                    <div className="bg-white rounded-2xl shadow-sm border border-orange-100 p-12 text-center">
+                        <h3 className="text-2xl font-semibold text-gray-700 mb-3">
+                            {searchTerm ? 'No matching orders found' : 'No orders yet'}
                         </h3>
-                        <p className="text-gray-500">
-                            {searchTerm ? 'Try adjusting your search terms' : 'Your order history will appear here'}
+                        <p className="text-gray-500 max-w-md mx-auto">
+                            {searchTerm 
+                                ? 'Try searching with different keywords or check your order ID' 
+                                : 'When you place orders, they will appear here for you to track'}
                         </p>
                     </div>
                 ) : (
-                    <div className="grid gap-6">
-                        {/* Map through the filtered orders instead of all orders */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {filteredOrders.map(order => (
-                            <Link to={`/detailed-order/${order._id}`}>
-                                <div 
-                                    key={order._id}
-                                    className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300"
-                                >
-                                    <div className="p-6 space-y-6">
-                                        <div className="flex flex-wrap items-start justify-between gap-4">
-                                            <div>
-                                                <p className="text-sm text-gray-500 mb-1">Invoice ID</p>
-                                                <h3 className="text-lg font-semibold text-gray-900">{order.invoiceId}</h3>
-                                            </div>
-                                            <div className="flex flex-col items-end gap-2">
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl">
-                                                    {getStatusIcon(order.orderStatus)}
-                                                    <span className="text-sm font-medium text-gray-700">
-                                                        {order.orderStatus}
-                                                    </span>
-                                                </div>
-                                                <div className="text-sm text-gray-500">
-                                                    {new Date(order.createdAt).toLocaleString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="border-t border-orange-100 pt-6">
-                                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h4>
-                                            <div className="grid gap-4">
-                                                {order.orderItems.map(item => (
-                                                    <div 
-                                                        key={item._id}
-                                                        className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-orange-50/50 rounded-xl space-y-2 md:space-y-0"
-                                                    >
-                                                        <div className="flex-1">
-                                                            <span className="font-medium text-gray-700">{item.itemName}</span>
+                            <Link 
+                                key={order._id}
+                                to={`/detailed-order/${order._id}`}
+                                className="block transform transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-orange-500/20 rounded-2xl"
+                            >
+                                <div className="bg-white h-full rounded-2xl shadow-sm hover:shadow-xl border border-orange-100 overflow-hidden transition-all duration-300">
+                                    <div className="p-6">
+                                        {/* Order Header */}
+                                        <div className="flex flex-col gap-4 mb-6">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                                            {getStatusIcon(order.orderStatus)}
+                                                            <span>{order.orderStatus}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-6">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-sm text-gray-500">Qty:</span>
-                                                                <span className="px-3 py-1 bg-white rounded-lg text-sm font-medium text-gray-700">{item.itemQuantity}</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-sm text-gray-500">Price:</span>
-                                                                <span className="px-3 py-1 bg-white rounded-lg text-sm font-medium text-orange-600">
-                                                                    ${(item.itemPrice * item.itemQuantity).toFixed(2)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                        <span className="text-sm font-medium text-gray-500">
+                                                            {new Date(order.createdAt).toLocaleString('en-US', {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                year: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </span>
                                                     </div>
-                                                ))}
+                                                    <div className="text-xl font-bold text-orange-600">
+                                                        ${order.totalAmount.toFixed(2)}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-baseline gap-2">
+                                                        <span className="text-sm font-medium text-gray-500">Order ID:</span>
+                                                        <span className="font-semibold text-gray-900">{order.invoiceId}</span>
+                                                    </div>
+                                                    <div className="text-sm font-medium text-gray-500">
+                                                        {order.orderItems.reduce((total, item) => total + item.itemQuantity, 0)} items
+                                                    </div>
                                             </div>
+                                            <div className="border-t border-orange-100"></div>
                                         </div>
 
-                                        <div className="border-t border-orange-100 pt-6">
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-600">Delivery Fee</span>
-                                                    <span className="font-medium text-gray-900">${order.deliveryFee.toFixed(2)}</span>
+                                        {/* Order Items */}
+                                        <div className="space-y-3">
+                                            {order.orderItems.slice(0, 2).map((item, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className="flex items-center justify-between py-3 px-4 bg-orange-50/50 rounded-xl hover:bg-orange-50 transition-colors duration-200"
+                                                >
+                                                    <div className="flex-1 min-w-0">
+                                                        <span className="font-medium text-gray-800 block truncate">
+                                                            {item.itemName}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 ml-4">
+                                                        <span className="text-sm font-medium text-gray-500">×{item.itemQuantity}</span>
+                                                        <span className="font-semibold text-orange-600 min-w-[80px] text-right">
+                                                            ${(item.itemPrice * item.itemQuantity).toFixed(2)}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-900 font-semibold">Total Amount</span>
-                                                    <span className="text-lg font-bold text-orange-600">${order.totalAmount.toFixed(2)}</span>
+                                            ))}
+                                            {order.orderItems.length > 2 && (
+                                                <div className="text-center py-2 text-sm font-medium text-orange-600 hover:text-orange-700">
+                                                    +{order.orderItems.length - 2} more items
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
-                    
                 )}
             </div>
         </div>

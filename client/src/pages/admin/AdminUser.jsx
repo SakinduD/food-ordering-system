@@ -3,7 +3,9 @@ import { UserContext } from '../../context/userContext';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Trash2, UserCog, ShieldCheck, ShieldX, Eye, X, Save, Filter, RefreshCw } from 'lucide-react';
+import { Trash2, UserCog, ShieldCheck, ShieldX, Eye, X, Save, Filter, RefreshCw, Download, FileDown } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const AVAILABLE_ROLES = ['customer', 'restaurant', 'deliveryAgent'];
 
@@ -24,9 +26,10 @@ function AdminDashboard() {
     status: ''
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   
   const { user } = useContext(UserContext);
-
+  
   // Debug user state
   useEffect(() => {
     console.log('AdminDashboard state:', {
@@ -256,6 +259,245 @@ function AdminDashboard() {
     }
   };
 
+  // Generate PDF of user list
+  const handleExportPDF = async () => {
+    try {
+      setExportLoading(true);
+      const doc = new jsPDF('landscape', 'pt', 'a4');
+      
+      // Add header with title and date
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const currentDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      // Add header
+      doc.setFillColor(255, 165, 0); // Orange color
+      doc.rect(0, 0, pageWidth, 60, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('User Management Report', 40, 35);
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated: ${currentDate}`, 40, 55);
+      
+      // Add filter information
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(11);
+      let filterText = 'Filters: ';
+      filterText += filters.role ? `Role: ${filters.role}, ` : '';
+      filterText += filters.status ? `Status: ${filters.status}, ` : '';
+      filterText = filterText === 'Filters: ' ? 'Filters: None' : filterText.slice(0, -2);
+      doc.text(filterText, 40, 80);
+      
+      doc.setFontSize(10);
+      doc.text(`Total Users: ${filteredUsers.length} of ${users.length}`, 40, 100);
+      
+      // Create table
+      const tableData = [];
+      const tableColumns = [
+        { header: 'Name', dataKey: 'name', width: 150 },
+        { header: 'Email', dataKey: 'email', width: 200 },
+        { header: 'Role', dataKey: 'role', width: 100 },
+        { header: 'Status', dataKey: 'status', width: 80 }
+      ];
+      
+      // Add data
+      filteredUsers.forEach(user => {
+        tableData.push({
+          name: user.name,
+          email: user.email,
+          role: user.role || 'User',
+          status: user.isAdmin ? 'Admin' : 'User'
+        });
+      });
+      
+      // Create table with autoTable if installed or create custom table
+      if (doc.autoTable) {
+        // If using jspdf-autotable plugin
+        doc.autoTable({
+          startY: 120,
+          head: [tableColumns.map(col => col.header)],
+          body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
+          theme: 'striped',
+          headStyles: { 
+            fillColor: [255, 237, 213],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: { fillColor: [249, 250, 251] }
+        });
+      } else {
+        // Manual table creation
+        const startY = 120;
+        const rowHeight = 30;
+        const colX = [40, 190, 390, 490];
+        
+        // Draw table headers
+        doc.setFillColor(255, 237, 213);
+        doc.rect(40, startY, 520, rowHeight, 'F');
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0);
+        doc.text('Name', colX[0], startY + 20);
+        doc.text('Email', colX[1], startY + 20);
+        doc.text('Role', colX[2], startY + 20);
+        doc.text('Status', colX[3], startY + 20);
+        
+        // Draw rows
+        doc.setFont('helvetica', 'normal');
+        tableData.forEach((row, i) => {
+          const y = startY + (i + 1) * rowHeight;
+          
+          // Alternate row background
+          if (i % 2 === 0) {
+            doc.setFillColor(249, 250, 251);
+            doc.rect(40, y, 520, rowHeight, 'F');
+          }
+          
+          doc.text(row.name, colX[0], y + 20);
+          doc.text(row.email, colX[1], y + 20);
+          doc.text(row.role, colX[2], y + 20);
+          doc.text(row.status, colX[3], y + 20);
+          
+          // Add horizontal line
+          doc.setDrawColor(230, 230, 230);
+          doc.line(40, y, 560, y);
+        });
+      }
+      
+      // Add footer
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setTextColor(120, 120, 120);
+      doc.setFontSize(9);
+      doc.text('Generated from Food Ordering System Admin Panel', pageWidth / 2, pageHeight - 20, { align: 'center' });
+      
+      // Save the PDF
+      doc.save(`User_Management_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+      
+      toast.success('PDF exported successfully');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export PDF');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  // Export individual user details
+  const handleExportUserDetailsPDF = async (userData) => {
+    try {
+      setExportLoading(true);
+      const doc = new jsPDF('portrait', 'pt', 'a4');
+      
+      // Set up dimensions
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 40;
+      const contentWidth = pageWidth - (margin * 2);
+      
+      // Add header with title
+      doc.setFillColor(255, 165, 0); // Orange color
+      doc.rect(0, 0, pageWidth, 80, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('User Details', margin, 50);
+      
+      // Add date
+      const currentDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      doc.setFontSize(11);
+      doc.text(`Generated: ${currentDate}`, margin, 70);
+      
+      // Start content positioning
+      let yPos = 120;
+      
+      // Add user avatar placeholder
+      doc.setDrawColor(200, 200, 200);
+      doc.setFillColor(240, 240, 240);
+      doc.circle(pageWidth / 2, yPos + 50, 50, 'FD');
+      
+      // Add user initials in circle
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(40);
+      const initials = userData.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+      doc.text(initials, pageWidth / 2, yPos + 65, { align: 'center' });
+      
+      yPos += 120;
+      
+      // Add user information
+      // Helper function for adding a field
+      const addField = (label, value) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(label, margin, yPos);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.setTextColor(30, 30, 30);
+        doc.text(value || 'N/A', margin, yPos + 20);
+        
+        // Add separator line
+        doc.setDrawColor(230, 230, 230);
+        doc.line(margin, yPos + 30, pageWidth - margin, yPos + 30);
+        
+        yPos += 50;
+      };
+      
+      // Add user details fields
+      addField('Full Name', userData.name);
+      addField('Email Address', userData.email);
+      addField('Role', userData.role || 'User');
+      addField('Status', userData.isAdmin ? 'Administrator' : 'Regular User');
+      addField('User ID', userData._id);
+      
+      if (userData.createdAt) {
+        const joinDate = new Date(userData.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        addField('Joined', joinDate);
+      }
+      
+      // Add footer
+      doc.setTextColor(120, 120, 120);
+      doc.setFontSize(9);
+      doc.text('Generated from Food Ordering System Admin Panel', pageWidth / 2, pageHeight - 20, { align: 'center' });
+      
+      // Save the PDF
+      doc.save(`User_Details_${userData.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
+      
+      toast.success('User details exported successfully');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export user details');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -272,6 +514,22 @@ function AdminDashboard() {
           <p className="text-sm text-gray-600">Manage user accounts and permissions</p>
         </div>
         <div className="flex gap-3 items-center">
+          <button
+            onClick={handleExportPDF}
+            disabled={exportLoading || filteredUsers.length === 0}
+            className={`flex items-center gap-2 px-4 py-2 ${
+              exportLoading || filteredUsers.length === 0
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                : 'bg-orange-500 text-white hover:bg-orange-600'
+            } rounded-lg shadow-sm transition-colors`}
+            title="Export users to PDF"
+          >
+            {exportLoading ? (
+              <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div> Exporting...</>
+            ) : (
+              <><FileDown className="h-4 w-4" /> Export PDF</>
+            )}
+          </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
@@ -410,7 +668,6 @@ function AdminDashboard() {
 
       {/* User Details Modal - keep as is */}
       {selectedUser && (
-        /* Existing modal code */
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6 relative shadow-xl">
             <button
@@ -507,13 +764,31 @@ function AdminDashboard() {
                     {selectedUser.isAdmin ? 'Admin' : 'User'}
                   </span>
                 </div>
-                <button
-                  onClick={() => handleEditClick(selectedUser)}
-                  className="mt-4 w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center justify-center gap-2"
-                >
-                  <UserCog className="h-4 w-4" />
-                  Edit User
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEditClick(selectedUser)}
+                    className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center justify-center gap-2"
+                  >
+                    <UserCog className="h-4 w-4" />
+                    Edit User
+                  </button>
+                  <button
+                    onClick={() => handleExportUserDetailsPDF(selectedUser)}
+                    disabled={exportLoading}
+                    className={`flex-1 px-4 py-2 ${
+                      exportLoading
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                    } rounded-lg flex items-center justify-center gap-2`}
+                  >
+                    {exportLoading ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                      <FileDown className="h-4 w-4" />
+                    )}
+                    Export PDF
+                  </button>
+                </div>
               </div>
             )}
           </div>

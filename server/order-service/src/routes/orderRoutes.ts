@@ -10,6 +10,7 @@ const router = Router();
 
 router.post('/placeOrder',authMiddleware, customerMiddleware, orderController.placeOrder); //only logged customer
 router.get('/getOrdersByUserId',authMiddleware, customerMiddleware, orderController.getOrdersByUserId); //only logged customer
+router.get('/getUserOrderSummary', authMiddleware, orderController.getUserOrderSummary); //any logged user (admin can specify userId)
 
 //router.get('/getOrderById/:id',authMiddleware, orderController.getOrderById); //any logged user
 router.get('/getOrderById/:id', orderController.getOrderById);

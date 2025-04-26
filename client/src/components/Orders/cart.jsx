@@ -5,7 +5,7 @@ import { totalItems } from '../../reducers/cartReducer';
 import { totalPrice } from '../../reducers/cartReducer';
 import { loadCartFromLocalStorage } from '../../reducers/cartReducer';
 import 'sweetalert2/dist/sweetalert2.min.css';
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import axios from 'axios';
 import LocationPicker from './LocationPicker';
 import handleCheckout from '../../handlers/checkOutHandler';
@@ -21,6 +21,7 @@ const Cart = () => {
         longitude: null,
     });
     const [showMap, setShowMap] = useState(false);
+    const [error, setError] = useState(null);
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -102,16 +103,59 @@ const Cart = () => {
         try {
             const token = localStorage.getItem("token");
 
-            const response = await axios.post("http://localhost:5008/api/payment/createPayment", formData, {
+            const createOrder = await fetch('http://localhost:5001/api/order/placeOrder', {
+                method: 'POST',
                 headers: {
+                    'content-type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
+                body: JSON.stringify({
+                    customerLat: location.latitude,
+                    customerLon: location.longitude,
+                    address: formData.address,
+                    userName: formData.firstName + " " + formData.lastName,
+                    userPhone : formData.phone,
+                    comments: formData.comments,
+                    orderItems: cart.map((item) => ({
+                        itemName: item.name,
+                        itemPrice: item.price,
+                        itemQuantity: item.cartUsage,
+                        restaurantId: item.restaurantId,
+                    })),
+                    foodTotalPrice: totalPrice(cart),
+                }),
             });
-            
-            if (response.status === 200) {
-                handleCheckout(formData, location, cart, dispatch, userId, user);
+
+            const data = await createOrder.json();
+
+            if (createOrder.status == 201) {
+                const orderId = data.orderId;
+                const deletedOrder = await axios.delete('http://localhost:5001/api/order/deleteOrder/'+ orderId, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+
+                if (deletedOrder.status == 200) {
+                    const response = await axios.post("http://localhost:5008/api/payment/createPayment", formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (response.status === 200) {
+                        handleCheckout(formData, location, cart, dispatch, userId, user);
+                    } else {
+                        toast.error("Payment Gateway is not available.");
+                        console.error("Payment Gateway is not available.");
+                    }
+                } else {
+                    console.error("Failed to delete order");
+                }
+
             } else {
-                console.error("Payment gateway is not available.");
+                setError(data.message);
+                console.error("Failed to place order");
             }
 
         } catch (err) {
@@ -263,7 +307,8 @@ const Cart = () => {
                                             value={formData.email}
                                             onChange={handleChange}
                                             required
-                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                                            disabled
+                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 bg-gray-100"
                                         />
                                     </div>
 
@@ -332,6 +377,12 @@ const Cart = () => {
                                             <span>${(totalPrice(cart) + (deliveryFee || 0)).toFixed(2)}</span>
                                         </div>
                                     </div>
+
+                                    {error && (
+                                        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                                            <p className="text-red-600 text-sm">{error}</p>
+                                        </div>
+                                    )}
 
                                     <button
                                         type="submit"

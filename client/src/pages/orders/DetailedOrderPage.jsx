@@ -5,14 +5,7 @@ import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import Spinner from "../../components/Spinner";
 import { CalendarIcon, MapPinIcon, CreditCardIcon, StoreIcon, UserIcon, Navigation } from "lucide-react";
-import {
-    CheckCircleIcon,
-    ClockIcon,
-    TruckIcon,
-    XCircleIcon,
-    ArrowPathIcon,
-    ClipboardDocumentCheckIcon,
-  } from '@heroicons/react/24/solid';
+import { ClockIcon, TruckIcon, CheckCircleIcon, XCircleIcon, ClipboardCheck, RefreshCw } from "lucide-react";
 
 const DetailedOrderPage = () => {
     const { orderId } = useParams();
@@ -33,7 +26,6 @@ const DetailedOrderPage = () => {
             console.log("order data",response.data);
             setOrderLoading(false);
             
-            // Try to fetch delivery info if it exists
             fetchDeliveryInfo(response.data.order);
         } catch (error) {
             console.error("Error fetching order details:", error);
@@ -64,7 +56,7 @@ const DetailedOrderPage = () => {
     }, [orderId]);
 
     const getStatusIcon = (status) => {
-        switch (status?.toLowerCase()) {
+        switch (status.toLowerCase()) {
             case 'pending':
                 return <ClockIcon className="h-5 w-5 text-yellow-500" />;
             case 'accepted':
@@ -74,11 +66,11 @@ const DetailedOrderPage = () => {
             case 'delivered':
                 return <TruckIcon className="h-5 w-5 text-green-500" />;
             case 'completed':
-                return <ClipboardDocumentCheckIcon className="h-5 w-5 text-teal-500" />;
+                return <ClipboardCheck className="h-5 w-5 text-teal-500" />;
             case 'cancelled':
                 return <XCircleIcon className="h-5 w-5 text-red-500" />;
             default:
-                return <ArrowPathIcon className="h-5 w-5 text-gray-500" />;
+                return <RefreshCw className="h-5 w-5 text-gray-500" />;
         }
     };
 

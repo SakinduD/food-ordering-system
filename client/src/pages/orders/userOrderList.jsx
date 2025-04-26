@@ -3,13 +3,14 @@ import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import axios from "axios";
 import Spinner from "../../components/Spinner";
-import { ClockIcon, PackageIcon, TruckIcon, CheckCircleIcon } from "lucide-react";
+import { ClockIcon, TruckIcon, CheckCircleIcon, XCircleIcon, ClipboardCheck, RefreshCw, SearchIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const UserOrderList = () => {
     const { user, loading } = useContext(UserContext);
     const [orders, setOrders] = useState([]);
     const [itemLoading, setItemLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -25,7 +26,11 @@ const UserOrderList = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                setOrders(data.orders);
+                // Sort orders by createdAt date in descending order (newest first)
+                const sortedOrders = data.orders.sort((a, b) => 
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setOrders(sortedOrders);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
             } finally {
@@ -36,6 +41,18 @@ const UserOrderList = () => {
         fetchOrders();
     }, [user?.userId]);
     console.log(orders);
+
+    const filteredOrders = orders.filter(order => {
+        const searchLower = searchTerm.toLowerCase();
+        
+        if (order.invoiceId.toLowerCase().includes(searchLower)) return true;
+        if (order.restaurantName.toLowerCase().includes(searchLower)) return true;
+        if (order.orderItems.some(item => 
+            item.itemName.toLowerCase().includes(searchLower)
+        )) return true;
+        
+        return false;
+    });
 
     const getStatusIcon = (status) => {
         switch (status.toLowerCase()) {
@@ -48,11 +65,11 @@ const UserOrderList = () => {
             case 'delivered':
                 return <TruckIcon className="h-5 w-5 text-green-500" />;
             case 'completed':
-                return <ClipboardDocumentCheckIcon className="h-5 w-5 text-teal-500" />;
+                return <ClipboardCheck className="h-5 w-5 text-teal-500" />;
             case 'cancelled':
                 return <XCircleIcon className="h-5 w-5 text-red-500" />;
             default:
-                return <ArrowPathIcon className="h-5 w-5 text-gray-500" />;
+                return <RefreshCw className="h-5 w-5 text-gray-500" />;
         }
     };
 
@@ -61,18 +78,38 @@ const UserOrderList = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
             <div className="container mx-auto px-4 max-w-7xl">
-                <h2 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                    Your Orders
-                </h2>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
+                        Your Orders
+                    </h2>
+                    
+                    <div className="relative w-full md:w-96">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <SearchIcon className="h-5 w-5 text-orange-500" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search by invoice ID, restaurant, or item..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-11 pr-4 py-3 w-full rounded-xl border-2 border-orange-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 placeholder-gray-400 shadow-sm text-gray-600 text-base"
+                        />
+                    </div>
+                </div>
 
-                {orders.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                     <div className="text-center py-16">
-                        <h3 className="text-2xl font-semibold text-gray-600 mb-4">No orders found</h3>
-                        <p className="text-gray-500">Your order history will appear here</p>
+                        <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+                            {searchTerm ? 'No matching orders found' : 'No orders found'}
+                        </h3>
+                        <p className="text-gray-500">
+                            {searchTerm ? 'Try adjusting your search terms' : 'Your order history will appear here'}
+                        </p>
                     </div>
                 ) : (
                     <div className="grid gap-6">
-                        {orders.map(order => (
+                        {/* Map through the filtered orders instead of all orders */}
+                        {filteredOrders.map(order => (
                             <Link to={`/detailed-order/${order._id}`}>
                                 <div 
                                     key={order._id}
@@ -84,11 +121,22 @@ const UserOrderList = () => {
                                                 <p className="text-sm text-gray-500 mb-1">Invoice ID</p>
                                                 <h3 className="text-lg font-semibold text-gray-900">{order.invoiceId}</h3>
                                             </div>
-                                            <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl">
-                                                {getStatusIcon(order.orderStatus)}
-                                                <span className="text-sm font-medium text-gray-700">
-                                                    {order.orderStatus}
-                                                </span>
+                                            <div className="flex flex-col items-end gap-2">
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl">
+                                                    {getStatusIcon(order.orderStatus)}
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        {order.orderStatus}
+                                                    </span>
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {new Date(order.createdAt).toLocaleString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </div>
                                             </div>
                                         </div>
 

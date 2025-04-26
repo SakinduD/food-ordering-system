@@ -1,10 +1,11 @@
 import { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../../context/userContext';
 import { Navigate, Link, Routes, Route } from 'react-router-dom';
-import { Users, Store, LayoutDashboard, Coffee, ChefHat, ShoppingBag } from 'lucide-react';
+import { Users, Store, LayoutDashboard, Coffee, ChefHat, ShoppingBag, BarChart } from 'lucide-react';
 import AdminUser from './AdminUser';
 import AdminRestaurants from './AdminRestaurants';
 import AdminAllOrders from './AdminAllOrders';
+import AdminOrderSummary from './AdminUserOrderSummary';
 import axios from 'axios';
 import Spinner from '../../components/Spinner';
 
@@ -74,7 +75,7 @@ function AdminDashboard() {
                 Authorization: `Bearer ${token}`,
             },
         });
-        setOrders(response.data.orders);
+        setOrders(response.data.orders || []);
     } catch (error) {
         console.error("Error fetching orders:", error);
         toast.error("Failed to fetch orders");
@@ -114,6 +115,11 @@ function AdminDashboard() {
       title: 'Orders',
       icon: <ShoppingBag className="h-5 w-5" />,
       path: '/admin/orders'
+    },
+    {
+      title: 'Order Summary',
+      icon: <BarChart className="h-5 w-5" />,
+      path: '/admin/ordersummary'
     }
   ];
 
@@ -247,6 +253,7 @@ function AdminDashboard() {
           <Route path="/users" element={<AdminUser />} />
           <Route path="/restaurants" element={<AdminRestaurants />} />
           <Route path="/orders" element={<AdminAllOrders />} />
+          <Route path="/ordersummary" element={<AdminOrderSummary />} />
         </Routes>
       </div>
     </div>

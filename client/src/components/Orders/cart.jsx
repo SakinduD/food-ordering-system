@@ -64,16 +64,13 @@ const Cart = () => {
         if (userId && cart.length === 0) {
             const savedCart = loadCartFromLocalStorage(userId);
             if (savedCart.length > 0) {
-                savedCart.forEach(item => {
-                    dispatch({
-                        type: 'Add',
-                        item,
-                        userId,
-                    });
+                dispatch({
+                    type: 'Init',
+                    payload: savedCart,
                 });
             }
         }
-    }, [userId, cart.length, dispatch]);
+    }, [userId]);
 
     const Increase = (id) => {
         const index = cart.findIndex((item) => item._id === id);
@@ -112,7 +109,7 @@ const Cart = () => {
             });
             
             if (response.status === 200) {
-                handleCheckout(formData, location, cart, dispatch, userId);
+                handleCheckout(formData, location, cart, dispatch, userId, user);
             } else {
                 console.error("Payment gateway is not available.");
             }
@@ -262,9 +259,11 @@ const Cart = () => {
                                         <label className="text-sm font-medium text-gray-700">Email</label>
                                         <input
                                             type="text"
-                                            value={user?.email || ""}
-                                            disabled
-                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 bg-gray-50 text-gray-500"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                            className="w-full h-11 px-4 rounded-xl border border-orange-100 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                         />
                                     </div>
 

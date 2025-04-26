@@ -26,16 +26,17 @@ const CartReducer = (state, action) => {
             }
 
             const existingItem = state.find(item => item._id === action.item._id);
+            
+            // If item exists, don't add cartUsage to existing cartUsage, just use the new value
             const updatedState = existingItem
                 ? state.map(item =>
                     item._id === action.item._id
-                        ? { ...item, cartUsage: item.cartUsage + (action.item.cartUsage || 1) }
+                        ? { ...item, cartUsage: action.item.cartUsage || 1 }
                         : item
                 )
                 : [...state, { ...action.item, cartUsage: action.item.cartUsage || 1 }];
 
             localStorage.setItem(`cart_${action.userId}`, JSON.stringify(updatedState));
-
             return updatedState;
 
         case "Remove":

@@ -7,6 +7,8 @@ import {
   updateRestaurant,
   deleteRestaurant,
   setAvailability,
+  setVerificationStatus,
+  findNearbyRestaurants,
   fetchRestaurantOrders,
   handleUpdateOrderStatus,
   handleDeleteOrder,
@@ -19,15 +21,24 @@ import { upload } from '../middleware/upload';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, restaurantMiddleware, upload.single('image'), createRestaurant);
+// Public routes (no authentication required)
 router.get('/', getRestaurants);
-router.get('/user/:userId', authMiddleware, restaurantMiddleware, getRestaurantByUserId); 
 router.get('/:id', getRestaurantById);
+router.get('/nearby', findNearbyRestaurants);
+
+// Authentication required routes
+router.post('/', authMiddleware, upload.single('image'), createRestaurant);
+router.get('/user/:userId', authMiddleware, getRestaurantByUserId);
+
+// Restaurant owner routes (auth + must be restaurant owner)
 router.put('/:id', authMiddleware, restaurantMiddleware, upload.single('image'), updateRestaurant);
-router.delete('/:id', adminMiddleware, deleteRestaurant);
 router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailability);
-router.get('/:id/orders', authMiddleware, fetchRestaurantOrders); // View all orders
-router.put('/orders/:id/status', authMiddleware, handleUpdateOrderStatus); // Update order
-router.delete('/orders/:id', authMiddleware, handleDeleteOrder); // Delete order
+router.get('/:id/orders', authMiddleware, restaurantMiddleware, fetchRestaurantOrders);
+router.put('/orders/:id/status', authMiddleware, restaurantMiddleware, handleUpdateOrderStatus);
+
+// Admin-only routes
+router.delete('/:id', authMiddleware, adminMiddleware, deleteRestaurant);
+router.put('/:id/verification', authMiddleware, adminMiddleware, setVerificationStatus);
+router.delete('/orders/:id', authMiddleware, adminMiddleware, handleDeleteOrder);
 
 export default router;

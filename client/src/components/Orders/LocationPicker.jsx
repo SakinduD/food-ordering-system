@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { GoogleMap, Marker, useLoadScript, Autocomplete } from "@react-google-maps/api";
 import Modal from 'react-modal';
+import LandingPage from '../../pages/landing-page/LandingPage';
 
 const libraries = ['places'];
 
@@ -15,17 +16,18 @@ const LocationPicker = ({ isOpen, onClose, onLocationSelect }) => {
 
     const handleMapClick = (e) => {
         setTempLocation({
-        lat: e.latLng.lat(),
-        lng: e.latLng.lng(),
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
         });
     };
 
     const handlePlaceChanged = () => {
         const place = autocompleteRef.current.getPlace();
         if (place && place.geometry && place.geometry.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        setTempLocation({ lat, lng });
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+
+            setTempLocation({ lat, lng });
         }
     };
 
@@ -34,7 +36,7 @@ const LocationPicker = ({ isOpen, onClose, onLocationSelect }) => {
         onClose();
     };
 
-    if (!isLoaded) return <div>Loading map...</div>;
+    if (!isLoaded) return <div> <LandingPage/> </div>;
 
     return (
         <Modal

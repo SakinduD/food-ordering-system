@@ -37,9 +37,19 @@ const placeOrder = async (
                 return
         }
 
+        if (!customerLat || !customerLon) {
+            res.status(400).json({ message: 'Customer location is required' });
+            return;
+        }
+
         const restaurant = await restaurantService.getRestaurantById(restaurantId);
         if (!restaurant) {
             res.status(404).json({ message: 'Restaurant not found' });
+            return;
+        }
+
+        if (!restaurant.available){
+            res.status(400).json({ message: 'Restaurant is not available right now' });
             return;
         }
 
@@ -189,7 +199,7 @@ const updateOrderStatus = async (
     }
 };
 
-// Remove order
+// Remove order by id
 const removeOrder = async (
     req: Request<{ id: string }>, 
     res: Response, next: NextFunction

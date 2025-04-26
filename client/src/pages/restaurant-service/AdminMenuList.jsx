@@ -4,6 +4,7 @@ import { UserContext } from '../../context/userContext';
 import MenuItemCard from '../../components/restaurant-service/MenuItemCard';
 import { deleteMenuItem } from '../../services/restaurantService';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const AdminMenuList = () => {
   const { user } = useContext(UserContext);
@@ -39,9 +40,23 @@ const AdminMenuList = () => {
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
-    await deleteMenuItem(id, token);
-    loadItems();
+  
+    try {
+      const loadingToastId = toast.loading('Deleting item...');
+  
+      await deleteMenuItem(id, token);
+      await loadItems();
+  
+      toast.dismiss(loadingToastId);
+      toast.success('Item deleted successfully!', { duration: 3000 });
+      
+    } catch (err) {
+      toast.dismiss();
+      console.error('Failed to delete menu item:', err);
+      toast.error('Failed to delete item.');
+    }
   };
+  
 
   const handleEdit = (item) => {
     navigate(`/edit-menu/${item._id}`, { state: item });

@@ -4,12 +4,14 @@ import AppRoutes from './routes/AppRoutes';
 import UserContextProvider from './context/userContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <UserContextProvider>
       <Router>
         <div className="min-h-screen flex flex-col">
+        <Toaster position="top-center" reverseOrder={false} />
           <Header />
           <main className="flex-grow">
             <AppRoutes />

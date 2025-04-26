@@ -1,7 +1,6 @@
 const MenuItemCard = ({ item, onEdit, onDelete }) => {
     return (
       <div className="bg-white p-4 rounded shadow mb-4">
-        {/* ✅ Image preview */}
         {item.imageUrl && (
           <img
             src={`http://localhost:5000${item.imageUrl}`}

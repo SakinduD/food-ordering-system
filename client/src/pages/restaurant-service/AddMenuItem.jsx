@@ -35,8 +35,7 @@ const AddMenuItem = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setImage(selectedFile);
-      
-      // Create preview URL
+           
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -49,43 +48,49 @@ const AddMenuItem = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     const formData = new FormData();
-
+  
     formData.append('name', form.name);
     formData.append('description', form.description);
     formData.append('price', form.price);
-    formData.append('category', form.category); 
+    formData.append('category', form.category);
     formData.append('available', form.available);
     formData.append('restaurantId', form.restaurantId);
     if (image) formData.append('image', image);
-
+  
+    let loadingToastId; 
+  
     try {
       setLoading(true);
-      toast.loading('Adding menu item...');
-      
+      loadingToastId = toast.loading('Adding menu item...'); 
+  
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/menu`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      toast.dismiss();
-      toast.success('Menu item added successfully!');
-      navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
+  
+      toast.dismiss(loadingToastId); 
+      toast.success('Item successfully added! 🎉', { duration: 3000 });
+  
+      setTimeout(() => {
+        navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
+      }, 1000);
+  
     } catch (err) {
-      toast.dismiss();
+      toast.dismiss(loadingToastId); 
       console.error(err);
       toast.error('Failed to add menu item');
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
-          {/* Back navigation */}
+          
           <div className="mb-6">
             <button
               onClick={() => navigate('/restaurant-profile')}
@@ -95,8 +100,7 @@ const AddMenuItem = () => {
               <span>Back to Menu</span>
             </button>
           </div>
-          
-          {/* Main card */}
+                    
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-2xl font-bold text-gray-800">Add Menu Item</h2>
@@ -105,7 +109,7 @@ const AddMenuItem = () => {
             
             <div className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Item Name */}
+                
                 <div className="space-y-2">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                     Item Name
@@ -124,7 +128,7 @@ const AddMenuItem = () => {
                   </div>
                 </div>
                 
-                {/* Description */}
+                
                 <div className="space-y-2">
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                     Description
@@ -139,7 +143,7 @@ const AddMenuItem = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Price */}
+                  
                   <div className="space-y-2">
                     <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                       Price
@@ -158,7 +162,7 @@ const AddMenuItem = () => {
                     </div>
                   </div>
                   
-                  {/* Category */}
+                  
                   <div className="space-y-2">
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                       Category
@@ -195,7 +199,7 @@ const AddMenuItem = () => {
                   </div>
                 </div>
                 
-                {/* Restaurant ID - kept hidden but still functional */}
+                
                 <div className="space-y-2">
                   <label htmlFor="restaurantId" className="block text-sm font-medium text-gray-700">
                     Restaurant ID
@@ -211,7 +215,7 @@ const AddMenuItem = () => {
                   />
                 </div>
                 
-                {/* Image Upload */}
+                
                 <div className="space-y-2">
                   <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                     Item Image
@@ -258,7 +262,7 @@ const AddMenuItem = () => {
                   )}
                 </div>
                 
-                {/* Availability Toggle */}
+                
                 <div className="flex items-center p-4 bg-green-50 rounded-lg">
                   <input
                     id="available"
@@ -272,7 +276,7 @@ const AddMenuItem = () => {
                   </label>
                 </div>
                 
-                {/* Submit Button */}
+                
                 <div className="pt-4">
                   <button
                     className={`w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-semibold text-white ${

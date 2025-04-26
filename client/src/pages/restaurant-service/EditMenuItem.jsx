@@ -17,17 +17,23 @@ const EditMenuItem = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
+    let loadingToastId;
+
     try {
       setLoading(true);
-      toast.loading('Updating menu item...');
+      loadingToastId = toast.loading('Updating menu item...');
 
       await updateMenuItem(item._id, { ...form, image }, token);
 
-      toast.dismiss();
-      toast.success('Menu item updated!');
-      navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
+      toast.dismiss(loadingToastId);
+      toast.success('Menu item updated successfully! 🎉', { duration: 3000 });
+      
+      setTimeout(() => {
+        navigate('/restaurant-profile', { state: { activeTab: 'menu' } });
+      }, 1000);
+
     } catch (err) {
-      toast.dismiss();
+      toast.dismiss(loadingToastId);
       console.error(err);
       toast.error('Failed to update item');
     } finally {
@@ -40,7 +46,6 @@ const EditMenuItem = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           
-          {/* Back navigation */}
           <div className="mb-6">
             <button
               onClick={() => navigate('/restaurant-profile', { state: { activeTab: 'menu' } })}
@@ -51,7 +56,6 @@ const EditMenuItem = () => {
             </button>
           </div>
 
-          {/* Main card */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-2xl font-bold text-gray-800">Edit Menu Item</h2>
@@ -61,7 +65,6 @@ const EditMenuItem = () => {
             <div className="p-6">
               <form onSubmit={handleUpdate} className="space-y-6">
 
-                {/* Image Preview */}
                 {form.imageUrl && (
                   <div className="mb-6">
                     <img
@@ -72,7 +75,6 @@ const EditMenuItem = () => {
                   </div>
                 )}
 
-                {/* Name */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Item Name</label>
                   <input
@@ -84,7 +86,6 @@ const EditMenuItem = () => {
                   />
                 </div>
 
-                {/* Description */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Description</label>
                   <textarea
@@ -95,7 +96,6 @@ const EditMenuItem = () => {
                   />
                 </div>
 
-                {/* Price and Category */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
                   <div className="space-y-2">
@@ -133,7 +133,6 @@ const EditMenuItem = () => {
 
                 </div>
 
-                {/* Image upload */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Change Image (optional)</label>
                   <input
@@ -144,7 +143,6 @@ const EditMenuItem = () => {
                   />
                 </div>
 
-                {/* Availability Toggle */}
                 <div className="flex items-center p-4 bg-green-50 rounded-lg">
                   <input
                     id="available"
@@ -158,7 +156,6 @@ const EditMenuItem = () => {
                   </label>
                 </div>
 
-                {/* Submit Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"

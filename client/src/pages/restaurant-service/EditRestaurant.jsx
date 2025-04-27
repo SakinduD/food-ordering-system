@@ -16,6 +16,7 @@ const EditRestaurant = () => {
   const [showMap, setShowMap] = useState(false);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [errors, setErrors] = useState({});
 
   // Fetch restaurant data or use state passed from navigation
   useEffect(() => {
@@ -69,6 +70,20 @@ const EditRestaurant = () => {
     fetchRestaurantData();
   }, [state, navigate]);
 
+  // ⭐ Universal input change with validation
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  if (name === 'phone') {
+    const onlyNums = value.replace(/\D/g, '').slice(0, 10);
+    setForm((prev) => ({ ...prev, [name]: onlyNums }));
+    validateField(name, onlyNums);
+  } else {
+    setForm((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  }
+};
+
   // Handle location selection from map
   const handleLocationSelect = (loc) => {
     setForm((prev) => ({
@@ -97,17 +112,80 @@ const EditRestaurant = () => {
     }
   };
 
+  // ⭐ Validate individual fields while typing
+    const validateField = (fieldName, value) => {
+      let message = '';
+
+      if (fieldName === 'name') {
+        if (!value.trim()) {
+          message = 'Restaurant name is required';
+        } else if (!/^[A-Za-z& ]+$/.test(value)) {
+          message = 'Name can only contain letters and &';
+        }
+      }
+
+      if (fieldName === 'phone') {
+        if (!value.trim()) {
+          message = 'Phone number is required';
+        } else if (!/^\d{10}$/.test(value)) {
+          message = 'Phone number must be exactly 10 digits';
+        }
+      }
+
+      if (fieldName === 'address') {
+        if (!value.trim()) {
+          message = 'Address is required';
+        }
+      }
+
+      if (fieldName === 'category') {
+        if (!value) {
+          message = 'Category is required';
+        }
+      }
+
+      setErrors((prev) => ({
+        ...prev,
+        [fieldName]: message,
+      }));
+    };
+
+    // ⭐ Validate whole form before submit
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name.trim() || !/^[A-Za-z& ]+$/.test(form.name)) {
+      newErrors.name = 'Name can only contain letters and &';
+    }
+    if (!form.phone.trim() || !/^\d{10}$/.test(form.phone)) {
+      newErrors.phone = 'Phone number must be exactly 10 digits';
+    }
+    if (!form.address.trim()) {
+      newErrors.address = 'Address is required';
+    }
+    if (!form.category) {
+      newErrors.category = 'Category is required';
+    }
+    if (!form.location?.coordinates || form.location.coordinates.length !== 2) {
+      newErrors.location = 'Location must be selected';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+
   // Handle form submission 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
     // Validate form
-    if (!form.name) {
-      setError('Restaurant name is required');
+    if (!validateForm()) {
+      toast.error('Please fix the form errors.');
       return;
     }
-    
+
     try {
       toast.loading('Updating restaurant profile...');
       const token = localStorage.getItem('token');
@@ -262,12 +340,14 @@ const EditRestaurant = () => {
                 Restaurant Name *
               </label>
               <input
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:outline-none transition"
+                className={`w-full p-3 border ${errors.name ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:ring-2 ${errors.name ? 'focus:ring-red-300' : 'focus:ring-orange-300'} focus:outline-none transition`}
+                name="name"
                 placeholder="Enter restaurant name"
                 value={form.name || ''}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={handleInputChange}
                 required
               />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
             </div>
 
             {/* Address */}
@@ -276,11 +356,14 @@ const EditRestaurant = () => {
                 Address
               </label>
               <input
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:outline-none transition"
+                name="address"
+                className={`w-full p-3 border ${errors.address ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:ring-2 ${errors.address ? 'focus:ring-red-300' : 'focus:ring-orange-300'} focus:outline-none transition`}
                 placeholder="Enter address"
                 value={form.address || ''}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                onChange={handleInputChange}
+                required
               />
+              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
             </div>
 
             {/* Phone */}
@@ -289,11 +372,14 @@ const EditRestaurant = () => {
                 Phone Number
               </label>
               <input
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:outline-none transition"
+                name="phone"
+                className={`w-full p-3 border ${errors.phone ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:ring-2 ${errors.phone ? 'focus:ring-red-300' : 'focus:ring-orange-300'} focus:outline-none transition`}
                 placeholder="Enter phone number"
                 value={form.phone || ''}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={handleInputChange}
+                required
               />
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
             </div>
 
             {/* Categories */}
@@ -302,10 +388,11 @@ const EditRestaurant = () => {
                   Restaurant Category *
                 </label>
                 <select
+                  name="category"
                   id="category"
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                  value={form.category || ''}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 border ${errors.category ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:ring-2 ${errors.category ? 'focus:ring-red-300' : 'focus:ring-orange-300'} focus:outline-none transition`}
                   required
                 >
                   <option value="">Select Category</option>
@@ -318,6 +405,7 @@ const EditRestaurant = () => {
                   <option value="Bakery">Bakery</option>
                   <option value="Bar / Pub">Bar / Pub</option>
                 </select>
+                {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
               </div>
               
             {/* Location Picker */}
@@ -334,6 +422,8 @@ const EditRestaurant = () => {
                 {form.location?.coordinates ? 'Change Location on Map' : 'Select Location on Map'}
               </button>
 
+              {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+              
               {form.location?.coordinates && (
                 <div className="mt-2 bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
                   <p><span className="font-medium">Latitude:</span> {form.location.coordinates[1]}</p>

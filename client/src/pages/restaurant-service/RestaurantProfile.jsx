@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 import Spinner from "../../components/Spinner";
 import { toast } from "react-hot-toast";
-import { Shield, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, Trash  } from "lucide-react";
 import AdminMenuList from "./AdminMenuList";
 
 const RestaurantProfile = () => {
@@ -82,6 +82,50 @@ const RestaurantProfile = () => {
     }
   };
 
+  const handleDeleteOrder = (orderId) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-800">⚠️ Are you sure you want to delete this order?</span>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  const token = localStorage.getItem("token");
+                  await axios.delete(`http://localhost:5001/api/order/deleteOrder/${orderId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+  
+                  setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
+  
+                  toast.success("Order deleted successfully!");
+                } catch (error) {
+                  console.error("Error deleting order:", error);
+                  toast.error("Failed to delete order!");
+                } finally {
+                  toast.dismiss(t.id); // Close the toast
+                }
+              }}
+              className="px-4 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+            >
+              Yes, Delete
+            </button>
+  
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-4 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 8000,
+      }
+    );
+  };
+  
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'pending': return "bg-yellow-100 text-yellow-800";
@@ -439,6 +483,15 @@ const RestaurantProfile = () => {
                           Create Delivery
                         </Link>
                       )}
+
+                      {/* ✅ Delete Order Button */}
+                      <button
+                        onClick={() => handleDeleteOrder(order._id)}
+                        className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                        title="Delete Order"
+                      >
+                        <Trash className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>

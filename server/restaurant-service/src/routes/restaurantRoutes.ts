@@ -9,9 +9,6 @@ import {
   setAvailability,
   setVerificationStatus,
   findNearbyRestaurants,
-  fetchRestaurantOrders,
-  handleUpdateOrderStatus,
-  handleDeleteOrder,
 } from '../controllers/restaurantController';
 
 import authMiddleware from '../middleware/authMiddleware';
@@ -33,12 +30,10 @@ router.get('/user/:userId', authMiddleware, getRestaurantByUserId);
 // Restaurant owner routes (auth + must be restaurant owner)
 router.put('/:id', authMiddleware, restaurantMiddleware, upload.single('image'), updateRestaurant);
 router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailability);
-router.get('/:id/orders', authMiddleware, restaurantMiddleware, fetchRestaurantOrders);
-router.put('/orders/:id/status', authMiddleware, restaurantMiddleware, handleUpdateOrderStatus);
 
 // Admin-only routes
 router.delete('/:id', authMiddleware, adminMiddleware, deleteRestaurant);
 router.put('/:id/verification', authMiddleware, adminMiddleware, setVerificationStatus);
-router.delete('/orders/:id', authMiddleware, adminMiddleware, handleDeleteOrder);
+
 
 export default router;

@@ -285,7 +285,7 @@ const DeliveryCreationPage = () => {
               
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">
                 <span className="font-medium text-gray-700">Total</span>
-                <span className="font-medium text-gray-900">${order.totalAmount.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">LKR{order.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -381,7 +381,7 @@ const DeliveryCreationPage = () => {
                       Delivery distance: <span className="font-medium">{order.roadDistance?.toFixed(1) || '5.0'} km</span>
                     </p>
                     <p className="text-gray-700 mt-1">
-                      Delivery fee: <span className="font-medium">${order.deliveryFee?.toFixed(2) || '3.00'}</span>
+                      Delivery fee: <span className="font-medium">LKR{order.deliveryFee?.toFixed(2) || '3.00'}</span>
                     </p>
                   </div>
                   

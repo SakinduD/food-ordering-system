@@ -31,7 +31,7 @@ router.get('/by-order/:orderId', getDeliveryByOrderId);
 router.post('/:deliveryId/assign', assignDriver);
 router.post('/:deliveryId/update-location', updateDeliveryLocation);
 router.post('/:deliveryId/update-status', updateDeliveryStatus);
-router.put('/:deliveryId/status', updateDeliveryStatus);
+
 router.get('/:deliveryId/location', getDeliveryLocation);
 router.get('/:deliveryId/nearby-drivers', getNearbyDrivers);
 

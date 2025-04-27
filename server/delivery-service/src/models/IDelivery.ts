@@ -4,7 +4,7 @@ export interface IDelivery extends mongoose.Document {
   orderId: mongoose.Types.ObjectId;
   restaurantId: mongoose.Types.ObjectId;
   driverId?: mongoose.Types.ObjectId; // Make driverId optional since it will be assigned later
-  status: 'Pending' | 'Driver_Assigned' | 'Picked_Up' | 'On_the_Way' | 'Delivered' | 'Cancelled';
+  status: 'pending' | 'driver_assigned' | 'picked_up' | 'on_the_way' | 'delivered' | 'cancelled' | 'out_for_delivery';
   restaurantLocation: {
     type: 'Point';
     coordinates: [number, number];

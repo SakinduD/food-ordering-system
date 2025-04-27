@@ -29,6 +29,10 @@ function Header() {
   const navigate = useNavigate()
   const { user, setUser } = useContext(UserContext)
 
+  if (user && user.role === "deliveryAgent") {
+    return null;
+  }
+
   // Helper function to get home page based on user role
   const getHomePage = () => {
     if (!user) return "/";
@@ -198,7 +202,7 @@ function Header() {
               <Utensils className="h-6 w-6 text-orange-500" />
             </div>
             <span className="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-              FoodFast
+            HomePlate
             </span>
           </Link>
         </div>

@@ -9,8 +9,16 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
     driverId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     status: {
       type: String,
-      enum: ['Pending', 'Driver_Assigned', 'Picked_Up', 'On_the_Way', 'Delivered', 'Cancelled'],
-      default: 'Pending',
+      enum: [
+        'pending', 
+        'driver_assigned', 
+        'picked_up', 
+        'on_the_way', 
+        'out_for_delivery',
+        'delivered', 
+        'cancelled'
+      ],
+      default: 'pending',
     },
     restaurantLocation: {
       type: { type: String, enum: ['Point'], required: true },

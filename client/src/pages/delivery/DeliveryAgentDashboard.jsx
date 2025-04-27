@@ -36,6 +36,10 @@ const DeliveryAgentDashboard = () => {
   const [locationWatching, setLocationWatching] = useState(false);
   const [watchId, setWatchId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastKnownLocation, setLastKnownLocation] = useState(null);
+  const [locationAccuracy, setLocationAccuracy] = useState('high');
+  const [locationRetries, setLocationRetries] = useState(0);
+  const [manualRefreshRequired, setManualRefreshRequired] = useState(false);
   
   useEffect(() => {
     // First, check if we actually have a user
@@ -76,6 +80,32 @@ const DeliveryAgentDashboard = () => {
       }
     };
   }, [user, locationWatching]);
+  
+  // Add new useEffect for database updates at regular intervals
+  useEffect(() => {
+    // Set up a timer to update location in delivery service every 10 seconds
+    let locationUpdateTimer = null;
+    
+    if (driverLocation && currentDelivery) {
+      // Update location immediately on first load
+      updateDeliveryLocation(currentDelivery._id, driverLocation);
+      
+      // Then set up interval for regular updates
+      locationUpdateTimer = setInterval(() => {
+        if (driverLocation && currentDelivery) {
+          console.log('Sending periodic location update to delivery service');
+          updateDeliveryLocation(currentDelivery._id, driverLocation);
+        }
+      }, 10000); // Update every 10 seconds
+    }
+    
+    // Clean up timer on unmount
+    return () => {
+      if (locationUpdateTimer) {
+        clearInterval(locationUpdateTimer);
+      }
+    };
+  }, [driverLocation, currentDelivery]);
   
   const fetchDriverDeliveries = async () => {
     try {
@@ -158,45 +188,188 @@ const DeliveryAgentDashboard = () => {
     );
   };
   
+  // Function to get location with progressive accuracy levels
+  const getLocationWithProgressiveAccuracy = () => {
+    // Options for different accuracy levels
+    const accuracyOptions = {
+      high: {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 30000
+      },
+      medium: {
+        enableHighAccuracy: true,
+        maximumAge: 60000, // 1 minute
+        timeout: 20000
+      },
+      low: {
+        enableHighAccuracy: false,
+        maximumAge: 300000, // 5 minutes
+        timeout: 15000
+      },
+      fallback: {
+        enableHighAccuracy: false,
+        maximumAge: 600000, // 10 minutes
+        timeout: 10000
+      }
+    };
+    
+    return accuracyOptions[locationAccuracy];
+  };
+
   const startLocationTracking = () => {
-    if (!navigator.geolocation || locationWatching) {
-      console.log('Geolocation not available or already tracking');
-      return; // Already tracking or geolocation not available
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
     }
     
-    console.log('Starting location tracking');
+    if (locationWatching) {
+      console.log('Already tracking location');
+      return;
+    }
+    
+    console.log('Starting location tracking with accuracy level:', locationAccuracy);
     
     // Clear any existing watchers
     stopLocationTracking();
     
-    // Start watching location
-    const id = navigator.geolocation.watchPosition(
-      (position) => {
-        const newLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-        
-        setDriverLocation(newLocation);
-        setLocationWatching(true);
-        
-        // If there's a current delivery, update its location
-        if (currentDelivery) {
-          updateDeliveryLocation(currentDelivery._id, newLocation);
-        }
-      },
-      (error) => {
-        console.error('Error watching location:', error);
-        setLocationWatching(false);
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000, // 10 seconds
-        timeout: 10000 // 10 seconds
-      }
-    );
+    // Reset manual refresh flag
+    setManualRefreshRequired(false);
     
-    setWatchId(id);
+    // Notify user that tracking is starting
+    toast.success(`Starting location tracking (${locationAccuracy} accuracy)...`, { id: 'location-tracking' });
+    
+    try {
+      // Start watching location with current accuracy settings
+      const id = navigator.geolocation.watchPosition(
+        (position) => {
+          // Successfully got position
+          const newLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp
+          };
+          
+          console.log('Location updated:', newLocation);
+          
+          // Save this as the last known location
+          setLastKnownLocation(newLocation);
+          
+          // Update current location state
+          setDriverLocation(newLocation);
+          setLocationWatching(true);
+          
+          // Reset retry counter on successful location
+          setLocationRetries(0);
+          
+          // If we previously downgraded accuracy but now have a successful fix,
+          // try upgrading back to higher accuracy after a while
+          if (locationAccuracy !== 'high' && locationRetries === 0) {
+            setTimeout(() => {
+              console.log('Attempting to increase accuracy level');
+              const nextLevel = locationAccuracy === 'fallback' ? 'low' : 
+                               locationAccuracy === 'low' ? 'medium' : 'high';
+              setLocationAccuracy(nextLevel);
+              startLocationTracking();
+            }, 60000); // Try to upgrade after a minute of successful tracking
+          }
+          
+  
+          if (currentDelivery) {
+            updateDeliveryLocation(currentDelivery._id, newLocation);
+          }
+        },
+        (error) => {
+          console.error('Error watching location:', error);
+          setLocationWatching(false);
+          
+          // Increment retry counter
+          const newRetryCount = locationRetries + 1;
+          setLocationRetries(newRetryCount);
+          
+          // Handle different geolocation errors
+          let errorMessage = 'Failed to track your location';
+          let shouldRetry = true;
+          
+          switch (error.code) {
+            case 1: // PERMISSION_DENIED
+              errorMessage = 'Location permission denied. Please enable location services.';
+              shouldRetry = false; // No point retrying if permission denied
+              setManualRefreshRequired(true);
+              break;
+              
+            case 2: // POSITION_UNAVAILABLE
+              errorMessage = 'Your location is currently unavailable. Check your device settings.';
+              
+              // If we have multiple position unavailable errors, try downgrading accuracy
+              if (newRetryCount > 2) {
+                // Downgrade accuracy level
+                if (locationAccuracy === 'high') {
+                  setLocationAccuracy('medium');
+                  errorMessage += ' Trying with reduced accuracy.';
+                } else if (locationAccuracy === 'medium') {
+                  setLocationAccuracy('low');
+                  errorMessage += ' Trying with low accuracy.';
+                } else if (locationAccuracy === 'low') {
+                  setLocationAccuracy('fallback');
+                  errorMessage += ' Trying with minimal accuracy.';
+                } else {
+                  // At fallback level, we should try a manual refresh
+                  setManualRefreshRequired(true);
+                  errorMessage = 'Unable to get your location. Please tap "Refresh Location".';
+                  shouldRetry = false;
+                }
+              }
+              break;
+              
+            case 3: // TIMEOUT
+              errorMessage = 'Location request timed out.';
+              
+              // If we have multiple timeouts, try downgrading accuracy
+              if (newRetryCount > 2) {
+                // Downgrade accuracy level
+                if (locationAccuracy === 'high') {
+                  setLocationAccuracy('medium');
+                  errorMessage += ' Trying with reduced accuracy.';
+                } else if (locationAccuracy === 'medium') {
+                  setLocationAccuracy('low');
+                  errorMessage += ' Trying with low accuracy.';
+                } else if (locationAccuracy === 'low') {
+                  setLocationAccuracy('fallback');
+                  errorMessage += ' Trying with minimal accuracy.';
+                } else {
+                  // At fallback level and still timing out
+                  setManualRefreshRequired(true);
+                  errorMessage = 'Location tracking is timing out. Please try "Refresh Location".';
+                }
+              } else {
+                errorMessage += ' Will retry automatically.';
+              }
+              break;
+          }
+          
+          toast.error(errorMessage, { id: 'location-tracking' });
+          
+          // Try again with updated settings after a delay if we should retry
+          if (shouldRetry) {
+            setTimeout(() => {
+              if (!locationWatching) {
+                console.log(`Retrying location tracking (attempt ${newRetryCount}) with ${locationAccuracy} accuracy`);
+                startLocationTracking();
+              }
+            }, 5000);
+          }
+        },
+        getLocationWithProgressiveAccuracy()
+      );
+      
+      setWatchId(id);
+    } catch (e) {
+      console.error('Exception in startLocationTracking:', e);
+      toast.error('Failed to start location tracking');
+      setManualRefreshRequired(true);
+    }
   };
   
   const stopLocationTracking = () => {
@@ -209,19 +382,40 @@ const DeliveryAgentDashboard = () => {
   };
   
   const updateDeliveryLocation = async (deliveryId, location) => {
-    if (!deliveryId || !location) return;
+    if (!deliveryId || !location || !location.latitude || !location.longitude) {
+      console.error('Invalid delivery ID or location data:', { deliveryId, location });
+      return;
+    }
     
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Authentication token not available');
+        return;
+      }
       
-      await axios.post(
+      console.log(`Sending location update for delivery ${deliveryId}:`, location);
+      
+      // Send location update to the delivery service
+      const response = await axios.post(
         `http://localhost:5005/api/deliveries/${deliveryId}/update-location`,
         { location },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      console.log('Delivery location updated successfully:', response.data);
     } catch (error) {
-      console.error('Error updating location:', error);
-      // Don't show error toast to avoid spamming the user
+      console.error('Error updating delivery location:', error);
+      if (error.response) {
+        console.error('Error status:', error.response.status);
+        console.error('Error data:', error.response.data);
+        
+        if (error.response.status === 401) {
+          // Token may have expired
+          toast.error('Your session has expired. Please log in again.');
+          setTimeout(() => logout(), 2000); // Call the logout function after 2 seconds
+        }
+      }
     }
   };
   
@@ -230,17 +424,40 @@ const DeliveryAgentDashboard = () => {
       setStatusUpdating(true);
       const token = localStorage.getItem('token');
       
-      await axios.post(
+      // Format the status to ensure consistency with backend
+      const formattedStatus = status.toLowerCase().replace(/ /g, '_');
+      
+      console.log(`Updating delivery ${deliveryId} status to ${formattedStatus}`);
+      
+      const response = await axios.post(
         `http://localhost:5005/api/deliveries/${deliveryId}/update-status`,
-        { status },
+        { status: formattedStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
+      console.log('Status update response:', response.data);
+      
       toast.success(`Delivery status updated to ${status}`);
-      fetchDriverDeliveries(); // Refresh data
+      
+      // Update the current delivery object immediately for better UX
+      if (currentDelivery && currentDelivery._id === deliveryId) {
+        setCurrentDelivery(prev => ({
+          ...prev,
+          status: formattedStatus
+        }));
+      }
+      
+      // Then refresh all deliveries to get latest data from server
+      fetchDriverDeliveries(); 
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error('Failed to update delivery status');
+      let errorMsg = 'Failed to update delivery status';
+      
+      if (error.response?.data?.message) {
+        errorMsg += `: ${error.response.data.message}`;
+      }
+      
+      toast.error(errorMsg);
     } finally {
       setStatusUpdating(false);
     }
@@ -341,7 +558,10 @@ const DeliveryAgentDashboard = () => {
                 </button>
                 
                 <button 
-                  onClick={logout}
+                  onClick={async () => { 
+                    await logout(); 
+                    navigate('/login');
+                  }}
                   className="flex items-center px-4 py-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
@@ -357,11 +577,34 @@ const DeliveryAgentDashboard = () => {
                   <span className="text-sm text-gray-600">
                     {locationWatching ? 'Location tracking active' : 'Location tracking inactive'}
                   </span>
+                  
+                  {/* Manual location refresh button */}
+                  <button
+                    onClick={() => {
+                      // Reset accuracy to high on manual refresh
+                      setLocationAccuracy('high');
+                      setLocationRetries(0);
+                      stopLocationTracking();
+                      startLocationTracking();
+                      toast.success('Manually refreshing location...');
+                    }}
+                    className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md hover:bg-blue-200 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      <RefreshCw className="h-3 w-3" />
+                      <span>Refresh Location</span>
+                    </div>
+                  </button>
                 </div>
                 
                 {driverLocation && (
                   <div className="text-sm text-gray-600">
                     Current location: {driverLocation.latitude.toFixed(6)}, {driverLocation.longitude.toFixed(6)}
+                    {locationAccuracy !== 'high' && (
+                      <span className="ml-2 text-xs text-orange-500">
+                        (Using {locationAccuracy} accuracy)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -424,16 +667,7 @@ const DeliveryAgentDashboard = () => {
                           </div>
                         </div>
                         
-                        <button
-                          className="w-full mt-3 flex items-center justify-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToDeliveryDetails(delivery._id);
-                          }}
-                        >
-                          <MapIcon className="h-4 w-4" />
-                          <span>Track Details</span>
-                        </button>
+                       
                       </motion.div>
                     ))}
                   </div>
@@ -537,6 +771,22 @@ const DeliveryAgentDashboard = () => {
                           Mark as Delivered
                         </button>
                       )}
+
+                      {/* Cancel Delivery button - available for active deliveries */}
+                      {['driver_assigned', 'out_for_delivery', 'on_the_way'].includes(currentDelivery.status?.toLowerCase().replace(/ /g, '_')) && (
+                        <button
+                          onClick={() => updateDeliveryStatus(currentDelivery._id, 'cancelled')}
+                          disabled={statusUpdating}
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors"
+                        >
+                          {statusUpdating ? (
+                            <RefreshCw className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <XCircle className="h-5 w-5" />
+                          )}
+                          Cancel Delivery
+                        </button>
+                      )}
                       
                       {/* Call Customer Button */}
                       {currentDelivery.customerPhone && (
@@ -548,15 +798,7 @@ const DeliveryAgentDashboard = () => {
                           Call Customer
                         </a>
                       )}
-                      
-                      {/* Report Issue Button */}
-                      <button
-                        onClick={() => toast.error('This feature is coming soon!')}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 text-red-700 font-medium rounded-xl hover:bg-red-200 transition-colors"
-                      >
-                        <AlertTriangle className="h-5 w-5" />
-                        Report Issue
-                      </button>
+
                     </div>
                   </div>
                 </div>
@@ -588,11 +830,11 @@ const DeliveryAgentDashboard = () => {
                         <span className="text-xs text-gray-700">Restaurant</span>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg">
-                        <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
+                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
                         <span className="text-xs text-gray-700">Your Location</span>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg">
-                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
+                        <div className="h-3 w-3 bg-orange-300 rounded-full"></div>
                         <span className="text-xs text-gray-700">Customer</span>
                       </div>
                     </div>

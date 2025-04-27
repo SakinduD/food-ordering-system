@@ -196,6 +196,8 @@ export const getUserById = asyncHandler(async (req: Request, res: Response): Pro
   }
 });
 
+
+
 // Get All Users
 export const getAllUsers = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   try {
@@ -314,3 +316,4 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response): 
     return;
   }
 });
+

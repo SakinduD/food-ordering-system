@@ -20,6 +20,7 @@ export interface IUser extends Document {
     coordinates: [number, number]; // [longitude, latitude]
   };
   isAvailable?: boolean; // For delivery agents to mark themselves as available
+  profilePicture?: string; // Add this line to explicitly define profilePicture
 }
 
 // Define the schema for the User model
@@ -43,7 +44,8 @@ const userSchema: Schema = new Schema(
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number], default: [0, 0] }
     },
-    isAvailable: { type: Boolean, default: false }
+    isAvailable: { type: Boolean, default: false },
+    profilePicture: { type: String }
   },
   { timestamps: true }
 );

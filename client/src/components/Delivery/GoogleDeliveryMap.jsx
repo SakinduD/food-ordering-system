@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+import deliveryIcon from '../../assets/delivery-icon.png';
+import restaurantIcon from '../../assets/restaurant-icon.png'; // Add this import
+import customerIcon from '../../assets/customer-icon.png'; // Example icon, replace with your own
 
 const GoogleDeliveryMap = ({ 
   apiKey, 
@@ -95,8 +98,9 @@ const GoogleDeliveryMap = ({
           position,
           map,
           icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-            scaledSize: new window.google.maps.Size(40, 40)
+            url: restaurantIcon, // Use imported restaurant icon
+            scaledSize: new window.google.maps.Size(40, 40),
+            anchor: new window.google.maps.Point(20, 40)
           },
           title: 'Restaurant'
         });
@@ -115,8 +119,9 @@ const GoogleDeliveryMap = ({
           position,
           map,
           icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            scaledSize: new window.google.maps.Size(40, 40)
+            url: customerIcon, // Use imported customer icon
+            scaledSize: new window.google.maps.Size(30, 30),
+            anchor: new window.google.maps.Point(20, 40)
           },
           title: 'Customer'
         });
@@ -135,8 +140,9 @@ const GoogleDeliveryMap = ({
           position,
           map,
           icon: {
-            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            scaledSize: new window.google.maps.Size(40, 40)
+            url: deliveryIcon, // Use the imported delivery icon
+            scaledSize: new window.google.maps.Size(45, 45), // Slightly larger for visibility
+            anchor: new window.google.maps.Point(22.5, 45)
           },
           title: 'Driver',
           animation: window.google.maps.Animation.DROP

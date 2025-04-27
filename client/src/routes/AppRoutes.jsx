@@ -18,8 +18,6 @@ import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 // New import for Delivery Tracking
 import DeliveryCreationPage from "../pages/delivery/DeliveryCreationPage";
-import DeliveryDriverAssignmentPage from "../pages/delivery/DeliveryDriverAssignmentPage";
-import DeliveryTrackingPage from "../pages/delivery/DeliveryTrackingPage";
 import DeliveryAgentDashboard from "../pages/delivery/DeliveryAgentDashboard";
 
 //Methush imports
@@ -105,22 +103,6 @@ function AppRoutes() {
           <ProtectedRoute>
             <DeliveryCreationPage />
           </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/delivery-driver-assignment/:deliveryId"
-        element={
-          <ProtectedRoute>
-            <DeliveryDriverAssignmentPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/delivery-tracking/:deliveryId"
-        element={
-
-            <DeliveryTrackingPage />
-
         }
       />
 

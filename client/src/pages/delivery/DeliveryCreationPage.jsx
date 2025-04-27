@@ -143,7 +143,7 @@ const DeliveryCreationPage = () => {
     //   );
       
       toast.success('Delivery created and driver assigned successfully!');
-      navigate(`/delivery-tracking/${deliveryId}`);
+      navigate(`/restaurant-profile`);
       
     } catch (error) {
       console.error('Error:', error);

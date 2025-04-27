@@ -9,7 +9,8 @@ import {
   getNearbyDrivers,
   getDeliveryById,
   updateDeliveryLocation,
-  getDeliveriesByDriverId
+  getDeliveriesByDriverId,
+  getDeliveryByOrderId
 } from '../controllers/deliveryController';
 import { authenticate, authorize } from '../middleware/authMiddleware';
 
@@ -21,7 +22,8 @@ router.get('/', getAllDeliveries);
 
 // Specific routes with fixed paths
 router.get('/active-drivers', getActiveDriversLocations);
-router.get('/driver/:driverId', getDeliveriesByDriverId); // New endpoint that uses driver ID parameter
+router.get('/driver/:driverId', getDeliveriesByDriverId); 
+router.get('/by-order/:orderId', getDeliveryByOrderId); 
 
 
 

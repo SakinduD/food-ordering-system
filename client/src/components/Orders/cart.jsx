@@ -226,7 +226,7 @@ const Cart = () => {
                                         className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                                     >
                                         <img 
-                                            src={`http://localhost:5000${item.imageUrl}`}
+                                            src={`http://localhost:5025${item.imageUrl}`}
                                             alt={item.itemName || "Item Image"} 
                                             className="w-full h-48 object-cover"
                                         />

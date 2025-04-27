@@ -3,7 +3,7 @@ const MenuItemCard = ({ item, onEdit, onDelete }) => {
       <div className="bg-white p-4 rounded shadow mb-4">
         {item.imageUrl && (
           <img
-            src={`http://localhost:5000${item.imageUrl}`}
+            src={`http://localhost:5025${item.imageUrl}`}
             alt={item.name}
             className="w-full h-40 object-cover rounded mb-4"
           />

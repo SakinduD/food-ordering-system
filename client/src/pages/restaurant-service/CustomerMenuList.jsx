@@ -19,7 +19,7 @@ const CustomerMenuList = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/menu/restaurant/${id}`);
+        const res = await fetch(`http://localhost:5025/api/menu/restaurant/${id}`);
         const data = await res.json();
         
         if (data.data) {

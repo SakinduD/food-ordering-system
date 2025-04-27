@@ -25,7 +25,8 @@ router.get('/nearby', findNearbyRestaurants);
 
 // Authentication required routes
 router.post('/', authMiddleware, upload.single('image'), createRestaurant);
-router.get('/user/:userId', authMiddleware, getRestaurantByUserId);
+//router.get('/user/:userId', authMiddleware, getRestaurantByUserId);
+router.get('/user/:userId', getRestaurantByUserId);
 
 // Restaurant owner routes (auth + must be restaurant owner)
 router.put('/:id', authMiddleware, restaurantMiddleware, upload.single('image'), updateRestaurant);

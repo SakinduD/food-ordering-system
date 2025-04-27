@@ -14,7 +14,7 @@ const MenuItemCustomerCard = ({ item }) => {
       {/* ✅ Show image if available */}
       {item.imageUrl && (
         <img
-          src={`http://localhost:5000${item.imageUrl}`}
+          src={`http://localhost:5025${item.imageUrl}`}
           alt={item.name}
           className="w-full h-40 object-cover rounded mb-4"
         />

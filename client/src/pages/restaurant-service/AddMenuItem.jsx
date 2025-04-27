@@ -63,7 +63,7 @@ const AddMenuItem = () => {
       setLoading(true);
       loadingToastId = toast.loading('Adding menu item...'); 
   
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/menu`, formData, {
+      await axios.post('http://localhost:5025/api/menu/', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -79,7 +79,7 @@ const AddMenuItem = () => {
   
     } catch (err) {
       toast.dismiss(loadingToastId); 
-      console.error(err);
+      console.error(err.response.data);
       toast.error('Failed to add menu item');
     } finally {
       setLoading(false);

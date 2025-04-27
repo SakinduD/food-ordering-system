@@ -26,7 +26,7 @@ const AdminMenuList = () => {
 
       if (!restaurantId) return setItems([]);
 
-      const menuRes = await fetch(`http://localhost:5000/api/menu/restaurant/${restaurantId}`);
+      const menuRes = await fetch(`http://localhost:5025/api/menu/restaurant/${restaurantId}`);
       const menuData = await menuRes.json();
       setItems(menuData.data || []);
     } catch (err) {

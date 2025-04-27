@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api/menu';
+const API_BASE = 'http://localhost:5025/api/menu';
 
 // ✅ Fetch all menu items
 export const fetchMenuItems = async () => {

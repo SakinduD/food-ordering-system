@@ -46,19 +46,12 @@ app.use('/api/restaurants', createProxyMiddleware({
 
 // Menu Service Proxy
 app.use('/api/menu', createProxyMiddleware({
-    target: process.env.RESTAURANT_SERVICE_URL,
+    target: process.env.MENU_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: {
         '^/api/menu': '/api/menu'
     },
 }));
-
-// Uploads (static files)
-app.use('/uploads', createProxyMiddleware({
-    target: process.env.RESTAURANT_SERVICE_URL,
-    changeOrigin: true,
-}));
-
 
 // Order Service Proxy (Port 5001)
 app.use('/api/order', createProxyMiddleware({

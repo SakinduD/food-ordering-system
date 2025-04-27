@@ -309,7 +309,7 @@ const DetailedOrderPage = () => {
                                         <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
                                             deliveryInfo.status.toLowerCase().includes('delivered') 
                                             ? 'bg-green-50 text-green-600'
-                                            : 'bg-blue-50 text-blue-600'
+                                            : 'bg-blue-50 text-red-600'
                                         }`}>
                                             {deliveryInfo.status.replace('_', ' ')}
                                         </span>

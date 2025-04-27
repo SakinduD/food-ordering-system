@@ -103,7 +103,7 @@ const AdminAllOrders = () => {
                                     <td className="px-6 py-4 text-sm text-gray-800">{order.invoiceId}</td>
                                     <td className="px-6 py-4 text-sm text-gray-800">{order.userName}</td>
                                     <td className="px-6 py-4 text-sm text-gray-800">{order.restaurantName}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">Rs. {order.totalAmount.toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-800">LKR {order.totalAmount.toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs flex items-center gap-2 w-fit ${getStatusColor(order.orderStatus)}`}>
                                             {getStatusIcon(order.orderStatus)}

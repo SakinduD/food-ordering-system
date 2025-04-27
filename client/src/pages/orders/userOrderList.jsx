@@ -3,8 +3,9 @@ import { UserContext } from "../../context/userContext";
 import { useContext } from "react";
 import axios from "axios";
 import Spinner from "../../components/Spinner";
-import { ClockIcon, TruckIcon, CheckCircleIcon, XCircleIcon, ClipboardCheck, RefreshCw, SearchIcon } from "lucide-react";
+import { ClockIcon, TruckIcon, CheckCircleIcon, XCircleIcon, ClipboardCheck, RefreshCw, SearchIcon, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 const UserOrderList = () => {
     const { user, loading } = useContext(UserContext);
@@ -53,6 +54,28 @@ const UserOrderList = () => {
         return false;
     });
 
+    const handleDeleteOrder = async (e, orderId) => {
+        e.preventDefault(); // Prevent navigation to order details
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            const response = await axios.delete(`http://localhost:5001/api/order/deleteOrder/${orderId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                setOrders(orders.filter(order => order._id !== orderId));
+                toast.success('Order deleted successfully');
+            }
+        } catch (error) {
+            console.error("Failed to delete order:", error);
+            toast.error('You cant delete this order [Status is not delivered pending or cancelled]');
+        }
+    };
+
     const getStatusIcon = (status) => {
         switch (status.toLowerCase()) {
             case 'pending':
@@ -76,6 +99,7 @@ const UserOrderList = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50/90 to-white py-12">
+            <Toaster />
             <div className="container mx-auto px-4 max-w-7xl">
                 {/* Header Section */}
                 <div className="mb-12">
@@ -114,76 +138,91 @@ const UserOrderList = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {filteredOrders.map(order => (
-                            <Link 
-                                key={order._id}
-                                to={`/detailed-order/${order._id}`}
-                                className="block transform transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-orange-500/20 rounded-2xl"
-                            >
-                                <div className="bg-white h-full rounded-2xl shadow-sm hover:shadow-xl border border-orange-100 overflow-hidden transition-all duration-300">
-                                    <div className="p-6">
-                                        {/* Order Header */}
-                                        <div className="flex flex-col gap-4 mb-6">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">
-                                                            {getStatusIcon(order.orderStatus)}
-                                                            <span>{order.orderStatus}</span>
+                            <div key={order._id} className="relative">
+                                <Link 
+                                    to={`/detailed-order/${order._id}`}
+                                    className="block transform transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-orange-500/20 rounded-2xl"
+                                >
+                                    <div className="bg-white h-full rounded-2xl shadow-sm hover:shadow-xl border border-orange-100 overflow-hidden transition-all duration-300">
+                                        <div className="p-6">
+                                            {/* Order Header */}
+                                            <div className="flex flex-col gap-4 mb-6">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                                                {getStatusIcon(order.orderStatus)}
+                                                                <span>{order.orderStatus}</span>
+                                                            </div>
+                                                            <span className="text-sm font-medium text-gray-500">
+                                                                {new Date(order.createdAt).toLocaleString('en-US', {
+                                                                    month: 'short',
+                                                                    day: 'numeric',
+                                                                    year: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit'
+                                                                })}
+                                                            </span>
                                                         </div>
-                                                        <span className="text-sm font-medium text-gray-500">
-                                                            {new Date(order.createdAt).toLocaleString('en-US', {
-                                                                month: 'short',
-                                                                day: 'numeric',
-                                                                year: 'numeric',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit'
-                                                            })}
-                                                        </span>
+                                                        <div className="text-xl font-bold text-orange-600">
+                                                            LKR {order.totalAmount.toFixed(2)}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xl font-bold text-orange-600">
-                                                        ${order.totalAmount.toFixed(2)}
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="text-sm font-medium text-gray-500">Order ID:</span>
+                                                            <span className="font-semibold text-gray-900">{order.invoiceId}</span>
+                                                        </div>
+                                                        <div className="text-sm font-medium text-gray-500">
+                                                            {order.orderItems.reduce((total, item) => total + item.itemQuantity, 0)} items
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-baseline gap-2">
-                                                        <span className="text-sm font-medium text-gray-500">Order ID:</span>
-                                                        <span className="font-semibold text-gray-900">{order.invoiceId}</span>
-                                                    </div>
-                                                    <div className="text-sm font-medium text-gray-500">
-                                                        {order.orderItems.reduce((total, item) => total + item.itemQuantity, 0)} items
-                                                    </div>
+                                                <div className="border-t border-orange-100"></div>
                                             </div>
-                                            <div className="border-t border-orange-100"></div>
-                                        </div>
 
-                                        {/* Order Items */}
-                                        <div className="space-y-3">
-                                            {order.orderItems.slice(0, 2).map((item, index) => (
-                                                <div 
-                                                    key={index}
-                                                    className="flex items-center justify-between py-3 px-4 bg-orange-50/50 rounded-xl hover:bg-orange-50 transition-colors duration-200"
+                                            {/* Order Items */}
+                                            <div className="space-y-3">
+                                                {order.orderItems.slice(0, 2).map((item, index) => (
+                                                    <div 
+                                                        key={index}
+                                                        className="flex items-center justify-between py-3 px-4 bg-orange-50/50 rounded-xl hover:bg-orange-50 transition-colors duration-200"
+                                                    >
+                                                        <div className="flex-1 min-w-0">
+                                                            <span className="font-medium text-gray-800 block truncate">
+                                                                {item.itemName}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-4 ml-4">
+                                                            <span className="text-sm font-medium text-gray-500">×{item.itemQuantity}</span>
+                                                            <span className="font-semibold text-orange-600 min-w-[80px] text-right">
+                                                                LKR {(item.itemPrice * item.itemQuantity).toFixed(2)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {order.orderItems.length > 2 && (
+                                                    <div className="text-center py-2 text-sm font-medium text-orange-600 hover:text-orange-700">
+                                                        +{order.orderItems.length - 2} more items
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Delete Button Section */}
+                                            <div className="mt-4 pt-4 border-t border-orange-100">
+                                                <button
+                                                    onClick={(e) => handleDeleteOrder(e, order._id)}
+                                                    className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-red-50 hover:bg-red-100 border border-red-100 transition-colors duration-200 group"
+                                                    title="Delete Order"
                                                 >
-                                                    <div className="flex-1 min-w-0">
-                                                        <span className="font-medium text-gray-800 block truncate">
-                                                            {item.itemName}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-4 ml-4">
-                                                        <span className="text-sm font-medium text-gray-500">×{item.itemQuantity}</span>
-                                                        <span className="font-semibold text-orange-600 min-w-[80px] text-right">
-                                                            ${(item.itemPrice * item.itemQuantity).toFixed(2)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {order.orderItems.length > 2 && (
-                                                <div className="text-center py-2 text-sm font-medium text-orange-600 hover:text-orange-700">
-                                                    +{order.orderItems.length - 2} more items
-                                                </div>
-                                            )}
+                                                    <Trash2 className="w-5 h-5 text-red-500 group-hover:text-red-600" />
+                                                    <span className="text-sm font-medium text-red-600 group-hover:text-red-700">Delete Order</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
+                                </Link>
+                            </div>
                         ))}
                     </div>
                 )}

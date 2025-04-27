@@ -184,7 +184,7 @@ const DetailedOrderPage = () => {
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-sm text-gray-500">Price:</span>
                                                     <span className="px-3 py-1 bg-white rounded-lg text-sm font-medium text-orange-600">
-                                                        ${(item.itemPrice * item.itemQuantity).toFixed(2)}
+                                                        LKR {(item.itemPrice * item.itemQuantity).toFixed(2)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -199,13 +199,13 @@ const DetailedOrderPage = () => {
                                     <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Subtotal</span>
                                         <span className="font-medium text-gray-900">
-                                            ${(orderDetails.totalAmount - orderDetails.deliveryFee).toFixed(2)}
+                                            LKR {(orderDetails.totalAmount - orderDetails.deliveryFee).toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Delivery Fee</span>
                                         <span className="font-medium text-gray-900">
-                                            ${orderDetails.deliveryFee?.toFixed(2)}
+                                            LKR {orderDetails.deliveryFee?.toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center pt-3 border-t border-orange-100">
@@ -213,7 +213,7 @@ const DetailedOrderPage = () => {
                                         <div className="flex items-center gap-2">
                                             <CreditCardIcon className="h-5 w-5 text-orange-500" />
                                             <span className="text-lg font-bold text-orange-600">
-                                                ${orderDetails.totalAmount?.toFixed(2)}
+                                                LKR {orderDetails.totalAmount?.toFixed(2)}
                                             </span>
                                         </div>
                                     </div>

@@ -9,6 +9,7 @@ import {
   setAvailability,
   setVerificationStatus,
   findNearbyRestaurants,
+  updateRatingController
 } from '../controllers/restaurantController';
 
 import authMiddleware from '../middleware/authMiddleware';
@@ -20,8 +21,8 @@ const router = express.Router();
 
 // Public routes (no authentication required)
 router.get('/', getRestaurants);
+router.get('/nearby', findNearbyRestaurants); // This has to come BEFORE the /:id route
 router.get('/:id', getRestaurantById);
-router.get('/nearby', findNearbyRestaurants);
 
 // Authentication required routes
 router.post('/', authMiddleware, upload.single('image'), createRestaurant);
@@ -35,6 +36,9 @@ router.put('/:id/availability', authMiddleware, restaurantMiddleware, setAvailab
 // Admin-only routes
 router.delete('/:id', authMiddleware, adminMiddleware, deleteRestaurant);
 router.put('/:id/verification', authMiddleware, adminMiddleware, setVerificationStatus);
+
+// Add this route to your restaurant service
+router.post('/update-rating', updateRatingController);
 
 
 export default router;

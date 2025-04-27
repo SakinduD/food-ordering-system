@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Restaurant, { IRestaurant } from '../models/Restaurant';
-
+import axios from 'axios';
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -375,5 +375,81 @@ export const findNearbyRestaurants = async (req: Request, res: Response): Promis
   } catch (err: any) {
     console.error('Error finding nearby restaurants:', err);
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+/**
+ * Update rating controller to handle add, update, delete operations
+ */
+export const updateRatingController = async (req: Request, res: Response): Promise<void> => {
+  const { restaurantId, reviewId, rating, oldRating, operation } = req.body;
+
+  try {
+    // Validate input
+    if (!restaurantId || !operation) {
+      res.status(400).json({
+        success: false,
+        message: 'Restaurant ID and operation are required'
+      });
+      return;
+    }
+
+    // Find the restaurant
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      res.status(404).json({
+        success: false,
+        message: 'Restaurant not found'
+      });
+      return;
+    }
+
+    // Update the restaurant's rating based on operation
+    let updatedRating = restaurant.rating || 0;
+    let reviewCount = restaurant.reviewCount || 0;
+    
+    if (operation === 'add') {
+      // Add a new review's rating
+      const newTotal = (updatedRating * reviewCount) + Number(rating);
+      reviewCount++;
+      updatedRating = parseFloat((newTotal / reviewCount).toFixed(1));
+    } else if (operation === 'update' && oldRating) {
+      // Update an existing review's rating
+      const newTotal = (updatedRating * reviewCount) - Number(oldRating) + Number(rating);
+      updatedRating = parseFloat((newTotal / reviewCount).toFixed(1));
+    } else if (operation === 'delete') {
+      // Remove a review's rating
+      if (reviewCount <= 1) {
+        updatedRating = 0;
+        reviewCount = 0;
+      } else {
+        const newTotal = (updatedRating * reviewCount) - Number(rating);
+        reviewCount--;
+        updatedRating = parseFloat((newTotal / reviewCount).toFixed(1));
+      }
+    }
+
+    // Save the updated restaurant
+    restaurant.rating = updatedRating;
+    restaurant.reviewCount = reviewCount;
+    await restaurant.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Restaurant rating updated successfully',
+      data: {
+        rating: updatedRating,
+        reviewCount
+      }
+    });
+  } catch (error: any) {
+    console.error('Error updating restaurant rating:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update restaurant rating',
+      error: error.message
+    });
   }
 };

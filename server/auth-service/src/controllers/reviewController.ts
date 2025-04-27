@@ -5,38 +5,46 @@ import Review from '../models/Review';
 import User from '../models/User';
 
 async function notifyRestaurantService(data: any): Promise<boolean> {
-  // Try multiple possible endpoint variations
-  const endpoints = [
-    'http://localhost:5000/api/restaurants/update-rating'
-  ];
-
-  let lastError = null;
+  const endpoint = 'http://localhost:5000/api/restaurants/update-rating';
+  const maxRetries = 3;
+  let attempt = 0;
   
-  for (const endpoint of endpoints) {
+  while (attempt < maxRetries) {
     try {
-      console.log(`Attempting to notify restaurant service at: ${endpoint}`);
+      attempt++;
+      console.log(`Notifying restaurant service (attempt ${attempt}/${maxRetries}): ${endpoint}`);
+      
       const response = await axios.post(endpoint, data, { 
-        timeout: 5000,
+        timeout: 5000,  // 5 second timeout
         headers: { 'Content-Type': 'application/json' }
       });
       
       console.log('Restaurant service notification successful:', response.data);
       return true;
     } catch (err: any) {
-      console.error(`Failed with endpoint ${endpoint}:`, err.message);
-      lastError = err;
-      // Only continue to next endpoint if this was a 404
-      if (err.response && err.response.status === 404) {
-        continue;
-      } else {
-        // For other types of errors, stop and report it
-        throw err;
+      console.error(`Restaurant service notification failed (attempt ${attempt}/${maxRetries}):`, err.message);
+      
+      // Check if we should retry based on error type
+      if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || 
+          (err.response && (err.response.status >= 500 || err.response.status === 429))) {
+        // Server error or rate limiting - retry
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
+          console.log(`Retrying in ${delay/1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+      } else if (err.response && err.response.status === 404) {
+        // Endpoint not found - don't retry
+        throw new Error(`Restaurant service endpoint not found: ${endpoint}`);
       }
+      
+      // If we get here, we've either exhausted retries or hit a non-retryable error
+      throw err;
     }
   }
   
-  // If we get here, all endpoints returned 404
-  throw lastError || new Error('Failed to notify restaurant service: all endpoints returned 404');
+  throw new Error(`Failed to notify restaurant service after ${maxRetries} attempts`);
 }
 
 export const getAllReviews = asyncHandler(async (req: Request, res: Response): Promise<void> => {

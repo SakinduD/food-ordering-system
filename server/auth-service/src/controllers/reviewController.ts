@@ -7,10 +7,7 @@ import User from '../models/User';
 async function notifyRestaurantService(data: any): Promise<boolean> {
   // Try multiple possible endpoint variations
   const endpoints = [
-    'http://localhost:5000/api/restaurants/update-rating',
-    'http://localhost:5000/api/restaurants/updateRating',
-    'http://localhost:5000/api/restaurants/rating',
-    'http://localhost:5000/api/ratings'
+    'http://localhost:5000/api/restaurants/update-rating'
   ];
 
   let lastError = null;

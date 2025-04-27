@@ -1,8 +1,17 @@
-import { createContext, useEffect, useState, useReducer } from "react";
+import { createContext, useEffect, useState, useReducer, useContext } from "react";
 import axios from "axios";
 import cartReducer from "../reducers/cartReducer";
 
 export const UserContext = createContext();
+
+// Add this custom hook to export useUser
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserContextProvider");
+  }
+  return context;
+};
 
 const UserContextProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
@@ -13,13 +22,15 @@ const UserContextProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [cart, dispatch] = useReducer(cartReducer, []);
+    // Add token state
+    const [token, setToken] = useState(() => localStorage.getItem("token") || null);
 
     // Function to fetch user profile
-    const fetchUserProfile = async (token) => {
+    const fetchUserProfile = async (authToken) => {
         try {
             const { data } = await axios.get('http://localhost:5010/api/users/profile', {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${authToken}`,
                 },
             });
 
@@ -31,7 +42,8 @@ const UserContextProvider = ({ children }) => {
                 name: data.name,
                 email: data.email,
                 isAdmin: Boolean(data.isAdmin),
-                role: data.role
+                role: data.role,
+                profilePicture: data.profilePicture || null // Include profile picture
             };
 
             // Save user data to localStorage
@@ -42,29 +54,33 @@ const UserContextProvider = ({ children }) => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             setUser(null);
+            setToken(null); // Clear token on error
         }
     };
 
     // Check auth status on mount and token change
     useEffect(() => {
         const initializeAuth = async () => {
-            const token = localStorage.getItem("token");
+            const storedToken = localStorage.getItem("token");
             console.log('Initializing auth:', { 
-                hasToken: !!token,
+                hasToken: !!storedToken,
                 currentUser: user 
             });
 
-            if (token) {
+            if (storedToken) {
                 try {
-                    await fetchUserProfile(token);
+                    await fetchUserProfile(storedToken);
+                    setToken(storedToken); // Store token in state
                 } catch (error) {
                     console.error("Auth initialization error:", error);
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     setUser(null);
+                    setToken(null);
                 }
             } else {
                 setUser(null);
+                setToken(null);
             }
             setLoading(false);
         };
@@ -73,10 +89,11 @@ const UserContextProvider = ({ children }) => {
     }, []);
 
     // Login function
-    const login = async (token, userData) => {
+    const login = async (authToken, userData) => {
         try {
-            localStorage.setItem("token", token);
-            await fetchUserProfile(token);
+            localStorage.setItem("token", authToken);
+            setToken(authToken); // Set token in state
+            await fetchUserProfile(authToken);
             return true;
         } catch (error) {
             console.error("Login error:", error);
@@ -89,6 +106,7 @@ const UserContextProvider = ({ children }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
+        setToken(null); // Clear token on logout
         dispatch({ type: 'Clear' });
     };
 
@@ -97,9 +115,10 @@ const UserContextProvider = ({ children }) => {
         console.log('User state changed:', {
             isAuthenticated: !!user,
             userData: user,
+            hasToken: !!token,
             timestamp: new Date().toISOString()
         });
-    }, [user]);
+    }, [user, token]);
 
     return (
         <UserContext.Provider value={{
@@ -107,10 +126,13 @@ const UserContextProvider = ({ children }) => {
             setUser,
             loading,
             error,
+            token, // Include token in context
             cart,
             dispatch,
             login,
             logout,
+            fetchUserProfile,
+            isAuthenticated: !!user && !!token, // Add isAuthenticated flag
             isAdmin: !!user?.isAdmin
         }}>
             {children}

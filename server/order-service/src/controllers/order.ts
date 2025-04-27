@@ -213,7 +213,7 @@ const removeOrder = async (
 
         const status = order.orderStatus.toLowerCase();
 
-        if(status != 'cancelled') {
+        if(status != 'cancelled' && status != 'pending') {
             res.status(400).json({ message: 'The order cannot be removed unless its status is cancelled.' });
             return;
         }
@@ -221,6 +221,7 @@ const removeOrder = async (
         const deletedOrder = await Order.findByIdAndDelete(req.params.id);
          res.status(200).json({ message: 'Order removed successfully' , deletedOrder });
     } catch (error) {
+        console.error('Error in removeOrder:', error);
         next(error);
     }
 };

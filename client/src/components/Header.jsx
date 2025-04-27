@@ -202,7 +202,7 @@ function Header() {
               <Utensils className="h-6 w-6 text-orange-500" />
             </div>
             <span className="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-              FoodFast
+            HomePlate
             </span>
           </Link>
         </div>

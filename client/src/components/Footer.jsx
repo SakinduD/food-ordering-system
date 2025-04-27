@@ -11,7 +11,7 @@ function Footer() {
               <div className="p-2 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
                 <Utensils className="h-6 w-6 text-orange-500" />
               </div>
-              <span className="font-bold text-2xl text-white">FoodFast</span>
+              <span className="font-bold text-2xl text-white">HomePlate</span>
             </div>
             <p className="text-gray-400 leading-relaxed">
               The fastest and most reliable food delivery service in town.
@@ -53,13 +53,13 @@ function Footer() {
               <li className="flex items-start gap-3 group">
                 <MapPin className="h-5 w-5 text-orange-500 mt-1 group-hover:text-orange-400" />
                 <span className="text-gray-400 group-hover:text-gray-300 transition-colors">
-                  123 Food Street, Tasty City, FC 12345
+                  123 HomePlate, Colombo 03, Sri Lanka
                 </span>
               </li>
               <li className="flex items-center gap-3 group">
                 <Mail className="h-5 w-5 text-orange-500 group-hover:text-orange-400" />
                 <span className="text-gray-400 group-hover:text-gray-300 transition-colors">
-                  support@foodfast.com
+                  support@homeplate.com
                 </span>
               </li>
               <li className="flex items-center gap-3 group">
@@ -95,7 +95,7 @@ function Footer() {
 
         {/* Footer Bottom */}
         <div className="border-t border-gray-800/50 mt-16 pt-8 text-sm text-center">
-          <p className="text-gray-400">&copy; {new Date().getFullYear()} FoodFast. All rights reserved.</p>
+          <p className="text-gray-400">&copy; {new Date().getFullYear()} HomePlate. All rights reserved.</p>
           <div className="flex flex-wrap justify-center gap-6 mt-4">
             <FooterLink href="#" text="Privacy Policy" />
             <FooterLink href="#" text="Terms of Service" />

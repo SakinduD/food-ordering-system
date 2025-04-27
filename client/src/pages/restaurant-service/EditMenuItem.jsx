@@ -68,7 +68,7 @@ const EditMenuItem = () => {
                 {form.imageUrl && (
                   <div className="mb-6">
                     <img
-                      src={`http://localhost:5000${form.imageUrl}`}
+                      src={`http://localhost:5025${form.imageUrl}`}
                       alt={form.name}
                       className="w-full h-48 object-cover rounded-lg border border-gray-200"
                     />

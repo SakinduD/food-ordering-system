@@ -128,14 +128,14 @@ const sendOrderConfirmationEmail = async (req: Request, res: Response): Promise<
                             ${order.orderItems.map(item => `
                                 <div class="item">
                                     <p><strong>${item.itemName}</strong></p>
-                                    <p>Quantity: ${item.itemQuantity} × Rs. ${item.itemPrice.toFixed(2)}</p>
-                                    <p>Subtotal: Rs. ${(item.itemQuantity * item.itemPrice).toFixed(2)}</p>
+                                    <p>Quantity: ${item.itemQuantity} × LKR ${item.itemPrice.toFixed(2)}</p>
+                                    <p>Subtotal: LKR ${(item.itemQuantity * item.itemPrice).toFixed(2)}</p>
                                 </div>
                             `).join('')}
                             
                             <div class="total">
-                                <p>Delivery Fee: Rs. ${order.deliveryFee.toFixed(2)}</p>
-                                <p style="color: #f97316;">Total Amount: Rs. ${order.totalAmount.toFixed(2)}</p>
+                                <p>Delivery Fee: LKR ${order.deliveryFee.toFixed(2)}</p>
+                                <p style="color: #f97316;">Total Amount: LKR ${order.totalAmount.toFixed(2)}</p>
                             </div>
                         </div>
 

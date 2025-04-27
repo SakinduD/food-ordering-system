@@ -15,7 +15,8 @@ const OrderDetailSchema = new Schema({
     },
     restaurantId: {
         type: Schema.Types.ObjectId,
-        ref: 'Restaurant'
+        ref: 'Restaurant',
+        required: true
     },
     restaurantName: {
         type: String,

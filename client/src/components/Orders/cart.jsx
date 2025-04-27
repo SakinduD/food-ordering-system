@@ -39,9 +39,9 @@ const Cart = () => {
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
-            amount: totalPrice(cart),
+            amount: totalPrice(cart)+deliveryFee,
         }));
-    }, [cart]);
+    }, [cart, deliveryFee]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -315,8 +315,9 @@ const Cart = () => {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Phone Number</label>
                                         <input
-                                            type="tel"
+                                            type="number"
                                             name="phone"
+                                            min={0}
                                             value={formData.phone}
                                             onChange={handleChange}
                                             required

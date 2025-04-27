@@ -1,15 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../context/userContext";
+
+//Shanika imports
 import AddMenuItem from "../pages/restaurant-service/AddMenuItem";
 import EditMenuItem from "../pages/restaurant-service/EditMenuItem";
 import RegisterRestaurant from "../pages/restaurant-service/RegisterRestaurant";
 import AdminMenuList from "../pages/restaurant-service/AdminMenuList";
-import CustomerMenuList from "../pages/restaurant-service/CustomerMenuList";
-
 import RestaurantProfile from "../pages/restaurant-service/RestaurantProfile";
 import EditRestaurant from "../pages/restaurant-service/EditRestaurant";
+import CustomerMenuList from "../pages/restaurant-service/CustomerMenuList";
 import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
+
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
 
@@ -72,6 +74,16 @@ const DeliveryAgentRoute = ({ children }) => {
   return children;
 };
 
+const RestaurantOwnerRoute = ({ children }) => {
+  const { user } = useContext(UserContext);
+
+  if (!user || user.role !== 'restaurant') {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
@@ -85,19 +97,10 @@ function AppRoutes() {
         }
       />
       <Route path="/verify-otp" element={<VerifyOTP />} />
-      <Route path="/add-menu" element={<AddMenuItem />} />
-      <Route path="/edit-menu/:id" element={<EditMenuItem />} />
-      <Route path="/register-restaurant" element={<RegisterRestaurant />} />
-      <Route path="/admin/menu" element={<AdminMenuList />} />
-      <Route path="/restaurant/:id" element={<CustomerMenuList />} />
-      <Route path="/restaurants" element={<AllRestaurants />} />
-
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/restaurant-profile" element={<RestaurantProfile />} />
-      <Route path="/edit-restaurant" element={<EditRestaurant />} />
       <Route path="/assign-driver" element={<DeliveryDriverAssignment />} />
       <Route path="/create-delivery" element={<CreateDelivery />} />
 
@@ -149,8 +152,21 @@ function AppRoutes() {
           </DeliveryAgentRoute>
         }
       />
+
+      {/* Restaurant Owner Protected Routes-Shanika */}
+      <Route path="/add-menu" element={<RestaurantOwnerRoute> <AddMenuItem /> </RestaurantOwnerRoute>} />
+      <Route path="/edit-menu/:id" element={<RestaurantOwnerRoute> <EditMenuItem /> </RestaurantOwnerRoute>} />
+      <Route path="/register-restaurant" element={<RestaurantOwnerRoute> <RegisterRestaurant /> </RestaurantOwnerRoute>} />
+      <Route path="/admin/menu" element={<RestaurantOwnerRoute> <AdminMenuList /> </RestaurantOwnerRoute>} />
+      <Route path="/restaurant-profile" element={<RestaurantOwnerRoute> <RestaurantProfile /> </RestaurantOwnerRoute>} />
+      <Route path="/edit-restaurant" element={<RestaurantOwnerRoute> <EditRestaurant /> </RestaurantOwnerRoute>} />
+
+      {/* Customer Routes-Shanika */}
+      <Route path="/restaurants" element={<AllRestaurants />} />
+      <Route path="/restaurant/:id" element={<CustomerMenuList />} />
+
     </Routes>
-  );
+    );
 }
 
 export default AppRoutes;

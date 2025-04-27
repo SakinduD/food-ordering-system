@@ -33,6 +33,10 @@ import Login from "../pages/login/login";
 import Register from "../pages/register/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
+import CreateReview from "../pages/reviews/CreateReview";
+import EditReview from "../pages/reviews/EditReview";
+import UserReviews from "../pages/reviews/UserReviews";
+import ViewReview from "../pages/reviews/ViewReview";
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -146,6 +150,32 @@ function AppRoutes() {
       {/* Customer Routes-Shanika */}
       <Route path="/restaurants" element={<AllRestaurants />} />
       <Route path="/restaurant/:id" element={<CustomerMenuList />} />
+
+      <Route
+        path="/restaurant/:restaurantId/create-review"
+        element={
+          <ProtectedRoute>
+            <CreateReview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/restaurant/:restaurantId/edit-review"
+        element={
+          <ProtectedRoute>
+            <EditReview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/reviews"
+        element={
+          <ProtectedRoute>
+            <UserReviews />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/reviews" element={<ViewReview />} />
 
     </Routes>
     );

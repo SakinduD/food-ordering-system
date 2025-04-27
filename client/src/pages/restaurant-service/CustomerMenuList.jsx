@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt, FaPhoneAlt, FaClock, FaUtensils, FaTag, FaRegClock, FaRegCalendarAlt } from 'react-icons/fa';
 import MenuItemCustomerCard from '../../components/restaurant-service/MenuItemCustomerCard';
 import CategoryFilter from '../../components/restaurant-service/CategoryFilter';
+import ReviewSection from '../../components/reviews/ReviewSection';
 
 const CustomerMenuList = () => {
   const { id } = useParams();
@@ -110,13 +111,14 @@ const CustomerMenuList = () => {
       <div className="relative h-80 w-full overflow-hidden bg-gray-900">
         {restaurant.imageUrl ? (
           <img 
-            src={restaurant.imageUrl}
+            src={restaurant.imageUrl.startsWith('/') ? `http://localhost:5000${restaurant.imageUrl}` : restaurant.imageUrl}
             alt={restaurant.name}
             className="w-full h-full object-cover opacity-80"
             onError={(e) => {
-              console.error("Failed to load image:", restaurant.imageUrl);
+              console.log("Image failed to load, using fallback");
               e.target.onerror = null; 
-              e.target.src = 'https://via.placeholder.com/800x400?text=Restaurant+Image';
+              // Use data URI for fallback instead of external service
+              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGZpbGw9IiM5OTk5OTkiPlJlc3RhdXJhbnQgSW1hZ2U8L3RleHQ+PC9zdmc+';
             }}
           />
         ) : (
@@ -324,7 +326,15 @@ const CustomerMenuList = () => {
                         {items.slice(0, 4).map(item => (
                           <div key={item._id} className="flex items-center p-2 bg-orange-50 rounded-lg">
                             {item.imageUrl && (
-                              <img src={item.imageUrl} alt={item.name} className="w-12 h-12 object-cover rounded-md mr-3" />
+                              <img 
+                                src={item.imageUrl.startsWith('/') ? `http://localhost:5000${item.imageUrl}` : item.imageUrl}
+                                alt={item.name} 
+                                className="w-12 h-12 object-cover rounded-md mr-3" 
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjZjJmMmYyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzk5OTk5OSI+Rm9vZDwvdGV4dD48L3N2Zz4=';
+                                }}
+                              />
                             )}
                             <div>
                               <p className="font-medium text-gray-800">{item.name}</p>
@@ -379,26 +389,122 @@ const CustomerMenuList = () => {
 
         {activeSection === 'reviews' && (
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Customer Reviews</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2 sm:mb-0">Customer Reviews</h2>
               <div className="flex items-center">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <FaStar key={star} className="w-5 h-5 text-yellow-400" />
+                    <FaStar 
+                      key={star} 
+                      className={`w-5 h-5 ${
+                        star <= (restaurant?.rating || 0)
+                          ? "text-yellow-400"
+                          : "text-gray-300"
+                      }`} 
+                    />
                   ))}
                 </div>
-                <span className="ml-2 text-lg font-semibold">{restaurant.rating || '4.2'}/5</span>
+                <span className="ml-2 text-lg font-semibold">{restaurant?.rating?.toFixed(1) || '0'}/5</span>
+                <span className="ml-1 text-sm text-gray-500">
+                  ({restaurant?.reviewCount || '0'} {restaurant?.reviewCount === 1 ? 'review' : 'reviews'})
+                </span>
               </div>
             </div>
             
-            {/* Reviews coming soon message */}
-            <div className="py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">
-              <FaStar className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-              <h3 className="text-lg font-medium text-gray-700">Reviews Coming Soon</h3>
-              <p className="text-gray-500 mt-2">Customer reviews will be available in a future update.</p>
-            </div>
-            
-            {/* Would normally map through reviews here */}
+            {/* ReviewSection component with error handling */}
+            <ReviewSection 
+              key={`review-section-${id}`}
+              restaurantId={id} 
+              restaurantName={restaurant?.name}
+              onReviewsUpdated={() => {
+                // Refresh restaurant data when reviews are updated
+                const fetchRestaurantData = async () => {
+                  try {
+                    console.log("Refreshing restaurant data after review update for id:", id);
+                    // Check if ID is valid before making the request
+                    if (!id || typeof id !== 'string') {
+                      console.error("Invalid restaurant ID for refresh:", id);
+                      return;
+                    }
+                    
+                    setLoading(true); // Show loading state while refreshing
+                    
+                    // Use try-catch with timeout to prevent hanging requests
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second timeout
+                    
+                    try {
+                      const resRest = await fetch(`http://localhost:5000/api/restaurants/${id}`, {
+                        signal: controller.signal
+                      });
+                      
+                      clearTimeout(timeoutId); // Clear the timeout
+                      
+                      if (!resRest.ok) {
+                        throw new Error(`HTTP error! Status: ${resRest.status}`);
+                      }
+                      
+                      const restData = await resRest.json();
+                      if (restData.data) {
+                        console.log("Updated restaurant data received:", restData.data);
+                        setRestaurant(restData.data);
+                      } else {
+                        console.error("Failed to refresh restaurant data, unexpected format:", restData);
+                      }
+                    } catch (fetchErr) {
+                      if (fetchErr.name === 'AbortError') {
+                        console.error("Restaurant data refresh timed out after 8 seconds");
+                      } else {
+                        console.error("Error fetching restaurant data:", fetchErr);
+                      }
+                    }
+                    
+                    setLoading(false); // Hide loading when done
+                  } catch (err) {
+                    console.error('Error in restaurant refresh flow:', err);
+                    setLoading(false);
+                  }
+                };
+                
+                fetchRestaurantData();
+              }} 
+            />
+
+            {/* Add a Retry button that appears if restaurant rating is 0 but there should be reviews */}
+            {restaurant?.reviewCount > 0 && restaurant?.rating === 0 && (
+              <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                <p className="text-yellow-700">
+                  Restaurant rating appears to be out of sync with reviews. 
+                </p>
+                <button
+                  onClick={() => {
+                    // Force refresh restaurant data
+                    const fetchRestaurantData = async () => {
+                      try {
+                        setLoading(true);
+                        const resRest = await fetch(`http://localhost:5000/api/restaurants/${id}`, {
+                          cache: 'no-store' // Force fresh data
+                        });
+                        const restData = await resRest.json();
+                        if (restData.data) {
+                          setRestaurant(restData.data);
+                          toast.success("Restaurant data refreshed");
+                        }
+                      } catch (err) {
+                        console.error('Error refreshing data:', err);
+                        toast.error("Couldn't refresh restaurant data");
+                      } finally {
+                        setLoading(false);
+                      }
+                    };
+                    fetchRestaurantData();
+                  }}
+                  className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                >
+                  Refresh Rating
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

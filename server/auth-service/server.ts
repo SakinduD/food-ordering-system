@@ -7,6 +7,7 @@ import passport from 'passport';
 import connectDB from './src/config/db';
 import authRoutes from './src/routes/authRoutes';
 import userRoutes from './src/routes/userRoutes';
+import reviewRoutes from './src/routes/reviewRoutes';
 import errorHandler from './src/middlewares/errorHandler';
 
 // Load environment variables
@@ -51,6 +52,7 @@ app.use(passport.session());
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Error Handling Middleware (must be last middleware)
 app.use(errorHandler);

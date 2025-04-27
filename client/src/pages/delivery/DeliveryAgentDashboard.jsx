@@ -558,7 +558,10 @@ const DeliveryAgentDashboard = () => {
                 </button>
                 
                 <button 
-                  onClick={logout}
+                  onClick={async () => { 
+                    await logout(); 
+                    navigate('/login');
+                  }}
                   className="flex items-center px-4 py-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
@@ -827,11 +830,11 @@ const DeliveryAgentDashboard = () => {
                         <span className="text-xs text-gray-700">Restaurant</span>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg">
-                        <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
+                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
                         <span className="text-xs text-gray-700">Your Location</span>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg">
-                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
+                        <div className="h-3 w-3 bg-orange-300 rounded-full"></div>
                         <span className="text-xs text-gray-700">Customer</span>
                       </div>
                     </div>

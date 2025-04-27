@@ -303,7 +303,7 @@ const DetailedOrderPage = () => {
                                 <div className="border-t border-orange-100 pt-6 mt-6">
                                     <div className="flex flex-wrap items-center justify-between mb-4">
                                         <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                            <TruckIcon className="h-5 w-5 text-orange-500" />
+                                            <TruckIcon className="h-5 w-5 text-orange-300" />
                                             Delivery Status
                                         </h4>
                                         <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
@@ -354,11 +354,11 @@ const DetailedOrderPage = () => {
                                                         <span className="text-xs text-gray-700">Restaurant</span>
                                                     </div>
                                                     <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg shadow-sm">
-                                                        <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
+                                                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
                                                         <span className="text-xs text-gray-700">Delivery Agent</span>
                                                     </div>
                                                     <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg shadow-sm">
-                                                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
+                                                        <div className="h-3 w-3 bg-orange-500 rounded-full"></div>
                                                         <span className="text-xs text-gray-700">Your Location</span>
                                                     </div>
                                                 </div>

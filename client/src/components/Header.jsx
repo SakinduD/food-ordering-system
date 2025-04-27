@@ -29,6 +29,10 @@ function Header() {
   const navigate = useNavigate()
   const { user, setUser } = useContext(UserContext)
 
+  if (user && user.role === "deliveryAgent") {
+    return null;
+  }
+
   // Helper function to get home page based on user role
   const getHomePage = () => {
     if (!user) return "/";

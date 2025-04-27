@@ -207,10 +207,7 @@ const GoogleDeliveryMap = ({
               // Convert seconds to minutes
               const etaMinutes = Math.round(totalDuration / 60);
               
-              // Show ETA in toast notification
-              if (etaMinutes > 0) {
-                toast.success(`Estimated arrival: ${etaMinutes} minutes`);
-              }
+              
             } else {
               console.error('Directions request failed due to ' + status);
               directionsRenderer.setDirections({ routes: [] });

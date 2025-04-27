@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Restaurant, { IRestaurant } from '../models/Restaurant';
-import { getOrdersByRestaurantId, updateOrderStatus, deleteOrder } from '../services/orderService';
+
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -339,7 +339,7 @@ export const setVerificationStatus = async (req: Request, res: Response): Promis
  */
 export const findNearbyRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { longitude, latitude, distance = 5000 } = req.query; // distance in meters, default 5km
+    const { longitude, latitude, distance = 5000 } = req.query; 
     
     if (!longitude || !latitude) {
       res.status(400).json({ message: 'Longitude and latitude are required' });
@@ -364,7 +364,7 @@ export const findNearbyRestaurants = async (req: Request, res: Response): Promis
           $maxDistance: parseInt(distance as string) || 5000
         }
       },
-      available: true // Only show available restaurants
+      available: true 
     });
 
     res.json({
@@ -374,73 +374,6 @@ export const findNearbyRestaurants = async (req: Request, res: Response): Promis
     });
   } catch (err: any) {
     console.error('Error finding nearby restaurants:', err);
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Keep the order-related controller methods as they are
-export const fetchRestaurantOrders = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const restaurantId = req.params.id;
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      res.status(401).json({ message: 'No token provided' });
-      return;
-    }
-
-    const orders = await getOrdersByRestaurantId(restaurantId, token);
-    if (!orders) {
-      res.status(404).json({ message: 'Orders not found' });
-      return;
-    }
-
-    res.json({ message: 'Orders fetched successfully', data: orders });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const handleUpdateOrderStatus = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const orderId = req.params.id;
-    const { orderStatus } = req.body;
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!orderStatus || !token) {
-      res.status(400).json({ message: 'Missing orderStatus or token' });
-      return;
-    }
-
-    const success = await updateOrderStatus(orderId, orderStatus, token);
-
-    if (!success) {
-      res.status(500).json({ message: 'Failed to update order status' });
-      return;
-    }
-
-    res.json({ message: 'Order status updated successfully' });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const handleDeleteOrder = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const orderId = req.params.id;
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      res.status(401).json({ message: 'No token provided' });
-      return;
-    }
-
-    const success = await deleteOrder(orderId, token);
-    if (!success) {
-      res.status(400).json({ message: 'Failed to delete order' });
-      return;
-    }
-
-    res.json({ message: 'Order deleted successfully' });
-  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };

@@ -6,14 +6,16 @@ import EditMenuItem from "../pages/restaurant-service/EditMenuItem";
 import RegisterRestaurant from "../pages/restaurant-service/RegisterRestaurant";
 import AdminMenuList from "../pages/restaurant-service/AdminMenuList";
 import CustomerMenuList from "../pages/restaurant-service/CustomerMenuList";
-import UserOrderList from "../pages/orders/userOrderList";
+
 import RestaurantProfile from "../pages/restaurant-service/RestaurantProfile";
 import EditRestaurant from "../pages/restaurant-service/EditRestaurant";
 import AllRestaurants from "../pages/restaurant-service/AllRestaurants";
 import DeliveryDriverAssignment from "../components/Delivery/DeliveryDriverAssignment";
 import CreateDelivery from "../components/Delivery/CreateDelivery";
-import Cart from "../components/Orders/cart";
 
+//Ishan imports
+import UserOrderList from "../pages/orders/userOrderList";
+import Cart from "../components/Orders/cart";
 import DetailedOrderPage from "../pages/orders/DetailedOrderPage";
 
 // New import for Delivery Tracking
@@ -124,9 +126,10 @@ function AppRoutes() {
         }
       />
 
-      <Route path="/orders" element={<UserOrderList />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/detailed-order/:orderId" element={<DetailedOrderPage />} />
+      {/* Protected Routes - ishan */}
+      <Route path="/orders" element={<ProtectedRoute> <UserOrderList /> </ProtectedRoute>} />
+      <Route path="/cart" element={<ProtectedRoute> <Cart /> </ProtectedRoute>} />
+      <Route path="/detailed-order/:orderId" element={<ProtectedRoute> <DetailedOrderPage /> </ProtectedRoute>} />
 
       {/* Protected Routes */}
       <Route

@@ -18,6 +18,7 @@ export interface Restaurant {
   phone?: string;
   available: boolean;
   userId: string;
+  category?: string;
   location?: {
     type: string;
     coordinates: [number, number];

@@ -30,6 +30,7 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       name: req.body.name,
       address: req.body.address || '',
       phone: req.body.phone || '',
+      category: req.body.category || '',
       available: req.body.available !== undefined ? req.body.available === 'true' || req.body.available === true : true,
       isVerified: req.body.isVerified !== undefined ? req.body.isVerified === 'true' || req.body.isVerified === true : false,
       userId: userId
@@ -174,6 +175,7 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
     if (req.body.name !== undefined) updateData.name = req.body.name;
     if (req.body.address !== undefined) updateData.address = req.body.address;
     if (req.body.phone !== undefined) updateData.phone = req.body.phone;
+    if (req.body.category !== undefined) updateData.category = req.body.category;
     if (req.body.available !== undefined) {
       updateData.available = req.body.available === 'true' || req.body.available === true;
     }

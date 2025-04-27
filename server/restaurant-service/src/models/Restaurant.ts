@@ -7,6 +7,7 @@ export interface IRestaurant extends Document {
   available: boolean;
   isVerified: boolean;
   userId: string;
+  category?: string;
   location?: {
     type: string;
     coordinates: [number, number]; // [longitude, latitude]
@@ -22,7 +23,7 @@ const restaurantSchema = new Schema<IRestaurant>(
     available: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },
     userId: { type: String, required: true, unique: true },
-
+    category: { type: String, default: '' },
     location: {
       type: {
         type: String,

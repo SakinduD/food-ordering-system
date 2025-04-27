@@ -186,6 +186,10 @@ const RestaurantProfile = () => {
                       <h4 className="text-sm font-semibold text-gray-500">Phone</h4>
                       <p className="text-gray-800">{restaurant.phone}</p>
                     </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-500">Category</h4>
+                      <p className="text-gray-800">{restaurant.category || '-'}</p>
+                    </div>
                   </div>
 
                   <div className="mt-6">
@@ -265,6 +269,10 @@ const RestaurantProfile = () => {
                   <h4 className="text-sm font-semibold text-gray-500">Phone</h4>
                   <p className="text-gray-800">{restaurant.phone}</p>
                 </div>
+                <div>
+                      <h4 className="text-sm font-semibold text-gray-500">Category</h4>
+                      <p className="text-gray-800">{restaurant.category || '-'}</p>
+                    </div>
               </div>
               <div className="mt-6 flex gap-4">
                 <span className={`px-4 py-1 rounded-full text-sm font-medium ${restaurant.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>

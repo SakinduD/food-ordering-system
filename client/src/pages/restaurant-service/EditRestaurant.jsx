@@ -116,6 +116,7 @@ const EditRestaurant = () => {
       formData.append('name', form.name);
       formData.append('address', form.address || '');
       formData.append('phone', form.phone || '');
+      formData.append('category', form.category || '');
       formData.append('available', String(form.available !== false));  // Default to true if undefined
       
       // Fix coordinates format to ensure it's sent correctly
@@ -295,6 +296,30 @@ const EditRestaurant = () => {
               />
             </div>
 
+            {/* Categories */}
+            <div className="space-y-2">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  Restaurant Category *
+                </label>
+                <select
+                  id="category"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Fine Dining">Fine Dining</option>
+                  <option value="Casual Dining">Casual Dining</option>
+                  <option value="Fast Food">Fast Food</option>
+                  <option value="Cafe">Cafe</option>
+                  <option value="Buffet">Buffet</option>
+                  <option value="Food Truck">Food Truck</option>
+                  <option value="Bakery">Bakery</option>
+                  <option value="Bar / Pub">Bar / Pub</option>
+                </select>
+              </div>
+              
             {/* Location Picker */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

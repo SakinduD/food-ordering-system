@@ -1,4 +1,4 @@
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, MapPin } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,8 +7,17 @@ function RestaurantsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef(null);
 
-  const cuisineTypes = ["All", "Sri Lankan Traditional", "Seafood", "Street Food", "Contemporary"];
-  const [selectedCuisine, setSelectedCuisine] = useState("All");
+  const restaurantCategories = [
+    "All",
+    "Fine Dining",
+    "Casual Dining",
+    "Fast Food",
+    "Cafe",
+    "Buffet",
+    "Bakery",
+    "Food Truck",
+  ];
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   // ✅ Fetch restaurants from backend
   useEffect(() => {
@@ -25,15 +34,15 @@ function RestaurantsSection() {
     fetchRestaurants();
   }, []);
 
-  // ✅ Filter logic (must be BEFORE carousel effect)
+  // ✅ Filter logic
   const filteredRestaurants =
-    selectedCuisine === "All"
+    selectedCategory === "All"
       ? restaurants
       : restaurants.filter((r) =>
-          r.cuisine?.toLowerCase().includes(selectedCuisine.toLowerCase())
+          r.category?.toLowerCase().includes(selectedCategory.toLowerCase())
         );
 
-  // ✅ Auto carousel (runs AFTER filteredRestaurants is defined)
+  // ✅ Auto carousel
   useEffect(() => {
     if (filteredRestaurants.length === 0) return;
     const interval = setInterval(() => {
@@ -48,6 +57,7 @@ function RestaurantsSection() {
       className="py-16 md:py-24 bg-gradient-to-b from-white to-orange-50/30 overflow-hidden"
     >
       <div className="container mx-auto px-4 max-w-7xl">
+        {/* Title and View All */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
             Popular Sri Lankan Restaurants
@@ -61,34 +71,36 @@ function RestaurantsSection() {
           </Link>
         </div>
 
-        {/* Cuisine filter tabs */}
+        {/* Category Filter Tabs */}
         <div className="flex flex-wrap gap-2 mb-8 justify-center sm:justify-start">
-          {cuisineTypes.map((cuisine) => (
+          {restaurantCategories.map((category) => (
             <button
-              key={cuisine}
-              onClick={() => setSelectedCuisine(cuisine)}
+              key={category}
+              onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                selectedCuisine === cuisine
+                selectedCategory === category
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
                   : "bg-white text-gray-500 hover:bg-orange-50 hover:text-orange-600 border border-gray-100"
               }`}
             >
-              {cuisine}
+              {category}
             </button>
           ))}
         </div>
 
+        {/* Grid Section */}
         <div className="relative">
-          {/* Animated gradient background for restaurants */}
+          {/* Animated Background */}
           <div className="absolute inset-0 animate-gradient bg-gradient-to-r from-orange-50/50 to-orange-100/50 -z-10"></div>
 
-          {/* Restaurants grid */}
           <div
             ref={containerRef}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 overflow-hidden"
           >
             {filteredRestaurants.length === 0 ? (
-              <p className="text-center col-span-full text-gray-500">No restaurants found.</p>
+              <p className="text-center col-span-full text-gray-500">
+                No restaurants found.
+              </p>
             ) : (
               filteredRestaurants.map((restaurant, index) => (
                 <Link key={restaurant._id} to={`/restaurant/${restaurant._id}`}>
@@ -101,7 +113,7 @@ function RestaurantsSection() {
             )}
           </div>
 
-          {/* Pagination dots */}
+          {/* Pagination Dots */}
           {filteredRestaurants.length > 1 && (
             <div className="flex justify-center gap-2 mt-8">
               {filteredRestaurants
@@ -146,48 +158,45 @@ function RestaurantCard({ restaurant, isActive }) {
           className="h-full w-auto object-contain"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        {restaurant.specialty && (
-          <div className="absolute bottom-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-            {restaurant.specialty}
-          </div>
-        )}
       </div>
       <div className="p-5">
-      <div className="flex justify-between items-center mb-3">
-      <div className="flex items-center gap-2">
-        <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
-          {restaurant.name}
-        </h3>
-      </div>
-
-      {restaurant.rating && (
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50">
-          <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
-          <span className="font-semibold text-orange-600">
-            {restaurant.rating}
-          </span>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
+            {restaurant.name}
+          </h3>
+          {restaurant.rating && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50">
+              <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
+              <span className="font-semibold text-orange-600">
+                {restaurant.rating}
+              </span>
+            </div>
+          )}
         </div>
-      )}
-    </div>
 
-        <p className="text-sm text-gray-600 mb-4">{restaurant.cuisine}</p>
-        <p className="text-sm text-gray-500 mb-4">{restaurant.address || "No address provided"}</p>
+        {/* <p className="text-sm text-gray-600 mb-2">
+          {restaurant.category || "Uncategorized"}
+        </p> */}
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+          <MapPin className="h-4 w-4 text-orange-400" />
+          <span>{restaurant.address || "No address provided"}</span>
+        </div>
+
 
         <div className="flex items-center justify-between gap-4">
-        <span className="text-xs font-medium bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full">
-          {restaurant.deliveryTime || "30-40 min"}
-        </span>
-        {restaurant.available ? (
-          <span className="text-xs font-medium bg-green-100 text-green-800 px-3 py-1.5 rounded-full">
-            Open
+          <span className="text-xs font-medium bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full">
+            {restaurant.deliveryTime || "30-40 min"}
           </span>
-        ) : (
-          <span className="text-xs font-medium bg-red-100 text-red-800 px-3 py-1.5 rounded-full">
-            Closed
-          </span>
-        )}
-      </div>
-
+          {restaurant.available ? (
+            <span className="text-xs font-medium bg-green-100 text-green-800 px-3 py-1.5 rounded-full">
+              Open
+            </span>
+          ) : (
+            <span className="text-xs font-medium bg-red-100 text-red-800 px-3 py-1.5 rounded-full">
+              Closed
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

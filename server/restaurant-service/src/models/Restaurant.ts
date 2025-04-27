@@ -13,6 +13,8 @@ export interface IRestaurant extends Document {
     coordinates: [number, number]; // [longitude, latitude]
   };
   imageUrl?: string;
+  rating: number;     // Make sure this is defined
+  reviewCount: number; // Make sure this is defined
 }
 
 const restaurantSchema = new Schema<IRestaurant>(
@@ -36,6 +38,8 @@ const restaurantSchema = new Schema<IRestaurant>(
       }
     },
     imageUrl: { type: String },
+    rating: { type: Number, default: 0 },        // Make sure this is defined
+    reviewCount: { type: Number, default: 0 }    // Make sure this is defined
   },
   { timestamps: true }
 );

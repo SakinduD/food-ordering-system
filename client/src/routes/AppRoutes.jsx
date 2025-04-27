@@ -69,7 +69,7 @@ const AdminRoute = ({ children }) => {
 const DeliveryAgentRoute = ({ children }) => {
   const { user } = useContext(UserContext);
 
-  if (!user || user.role !== "deliveryAgent") {
+  if (!user || user.role !== 'deliveryAgent') {
     return <Navigate to="/login" replace />;
   }
 
@@ -119,22 +119,6 @@ function AppRoutes() {
       <Route path="/orders" element={<ProtectedRoute> <UserOrderList /> </ProtectedRoute>} />
       <Route path="/cart" element={<ProtectedRoute> <Cart /> </ProtectedRoute>} />
       <Route path="/detailed-order/:orderId" element={<ProtectedRoute> <DetailedOrderPage /> </ProtectedRoute>} />
-      <Route
-        path="/delivery-driver-assignment/:deliveryId"
-        element={
-          <ProtectedRoute>
-            <DeliveryDriverAssignmentPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/delivery-tracking/:deliveryId"
-        element={<DeliveryTrackingPage />}
-      />
-
-      <Route path="/orders" element={<UserOrderList />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/detailed-order/:orderId" element={<DetailedOrderPage />} />
 
       {/* Protected Routes */}
       <Route
@@ -192,6 +176,7 @@ function AppRoutes() {
         }
       />
       <Route path="/reviews" element={<ViewReview />} />
+
     </Routes>
     );
 }

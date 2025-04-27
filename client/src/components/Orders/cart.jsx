@@ -130,7 +130,7 @@ const Cart = () => {
 
             if (createOrder.status == 201) {
                 const orderId = data.orderId;
-                const deletedOrder = await axios.delete('http://localhost:5001/api/order/deleteOrder/'+ orderId, {
+                const deletedOrder = await axios.delete(`http://localhost:5001/api/order/deleteOrder/${orderId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

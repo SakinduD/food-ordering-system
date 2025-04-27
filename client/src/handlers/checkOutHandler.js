@@ -115,7 +115,7 @@ const handleCheckout = async (formData, location, cart, dispatch, userId, user) 
                                 });
                                 
                                 setTimeout(() => {
-                                    window.location.href = 'http://localhost:3000/detailed-order/' + data.orderId;
+                                    window.location.href = `http://localhost:3000/detailed-order/${data.orderId}`;
                                 }, 500);
                     
                             } else {

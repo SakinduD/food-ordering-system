@@ -5,6 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { User, Mail, Shield, Edit2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa';
 
 // API base URL - makes it easier to change in development/production
 const API_BASE_URL = 'http://localhost:5010/api';
@@ -371,6 +372,20 @@ function UserProfile() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Add this component to your profile page: */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Your Reviews</h2>
+        <p className="text-gray-600 mb-4">
+          View and manage all your restaurant reviews in one place.
+        </p>
+        <Link
+          to="/profile/reviews"
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 flex items-center justify-center w-full sm:w-auto"
+        >
+          <FaStar className="mr-2" /> View Your Reviews
+        </Link>
       </div>
     </div>
   );

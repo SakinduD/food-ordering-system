@@ -152,6 +152,25 @@ const DetailedOrderPage = () => {
         }
     };
 
+    const getStatusStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'pending':
+                return 'bg-yellow-50 text-yellow-700';
+            case 'accepted':
+                return 'bg-blue-50 text-blue-700';
+            case 'out_for_delivery':
+                return 'bg-indigo-50 text-indigo-700';
+            case 'delivered':
+                return 'bg-green-50 text-green-700';
+            case 'completed':
+                return 'bg-teal-50 text-teal-700';
+            case 'cancelled':
+                return 'bg-red-50 text-red-700';
+            default:
+                return 'bg-gray-50 text-gray-700';
+        }
+    };
+
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleString('en-US', {
             year: 'numeric',
@@ -185,9 +204,9 @@ const DetailedOrderPage = () => {
                                     <p className="text-sm text-gray-500 mb-1">Order ID</p>
                                     <h3 className="text-lg font-semibold text-gray-900">{orderDetails.invoiceId}</h3>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl">
+                                <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${getStatusStyle(orderDetails.orderStatus)}`}>
                                     {getStatusIcon(orderDetails.orderStatus)}
-                                    <span className="text-sm font-medium text-gray-700">
+                                    <span className="text-sm font-medium">
                                         {orderDetails.orderStatus}
                                     </span>
                                 </div>

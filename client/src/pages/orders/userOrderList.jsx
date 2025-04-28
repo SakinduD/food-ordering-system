@@ -95,6 +95,25 @@ const UserOrderList = () => {
         }
     };
 
+    const getStatusStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'accepted':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'out_for_delivery':
+                return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+            case 'delivered':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'completed':
+                return 'bg-teal-100 text-teal-800 border-teal-200';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800 border-red-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
     if (loading || itemLoading) return <Spinner />;
 
     return (
@@ -150,7 +169,7 @@ const UserOrderList = () => {
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                                            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium ${getStatusStyle(order.orderStatus)} border`}>
                                                                 {getStatusIcon(order.orderStatus)}
                                                                 <span>{order.orderStatus}</span>
                                                             </div>

@@ -385,16 +385,7 @@ const DetailedOrderPage = () => {
                             {/* Live Tracking Button - Shows even when map isn't visible yet */}
                             {deliveryInfo && ['pending', 'accepted', 'driver_assigned', 'out_for_delivery', 'on_the_way'].includes(deliveryInfo.status?.toLowerCase().replace(/ /g, '_')) && (
                                 <div className="mt-6">
-                                    <button 
-                                        onClick={() => {
-                                            fetchDriverLocation(deliveryInfo._id);
-                                            setShowMap(true);
-                                        }}
-                                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-lg font-medium rounded-xl shadow-md hover:shadow-lg hover:shadow-orange-200 transition-all duration-300"
-                                    >
-                                        <Navigation className="h-6 w-6" />
-                                        {showMap ? 'Refresh Delivery Tracking' : 'Track Order Live'}
-                                    </button>
+                                    
                                     <p className="text-center text-sm text-gray-500 mt-2">
                                         {['out_for_delivery', 'on_the_way'].includes(deliveryInfo.status?.toLowerCase().replace(/ /g, '_')) 
                                             ? "Your order is on the way! Track the delivery agent's location in real-time."

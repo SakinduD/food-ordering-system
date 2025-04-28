@@ -16,26 +16,27 @@ import { authenticate, authorize } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-// Route ordering is important - more specific routes come first
-router.post('/', createDelivery);
-router.get('/', getAllDeliveries);
-
-// Specific routes with fixed paths
-router.get('/active-drivers', getActiveDriversLocations);
-router.get('/driver/:driverId', getDeliveriesByDriverId); 
-router.get('/by-order/:orderId', getDeliveryByOrderId); 
 
 
+// Protected routes - requires authentication
 
-// Dynamic parameter routes come after specific routes
-router.post('/:deliveryId/assign', assignDriver);
-router.post('/:deliveryId/update-location', updateDeliveryLocation);
-router.post('/:deliveryId/update-status', updateDeliveryStatus);
+router.post('/', authenticate, authorize(['admin', 'restaurant']), createDelivery);
+router.get('/', authenticate, authorize(['admin', 'restaurant', 'deliveryAgent']), getAllDeliveries);
 
-router.get('/:deliveryId/location', getDeliveryLocation);
-router.get('/:deliveryId/nearby-drivers', getNearbyDrivers);
 
-// This most generic route must come last
-router.get('/:deliveryId', getDeliveryById);
+router.get('/active-drivers', authenticate, authorize(['admin', 'restaurant', 'deliveryAgent']), getActiveDriversLocations);
+router.get('/driver/:driverId', authenticate, authorize(['admin', 'deliveryAgent']), getDeliveriesByDriverId); 
+router.get('/by-order/:orderId', authenticate, authorize(['admin', 'restaurant', 'customer', 'deliveryAgent']), getDeliveryByOrderId); 
+
+
+router.post('/:deliveryId/assign', authenticate, authorize(['admin', 'restaurant']), assignDriver);
+router.post('/:deliveryId/update-location', authenticate, authorize(['admin', 'deliveryAgent']), updateDeliveryLocation);
+router.post('/:deliveryId/update-status', authenticate, authorize(['admin', 'deliveryAgent']), updateDeliveryStatus);
+
+router.get('/:deliveryId/location', authenticate, authorize(['admin', 'restaurant', 'customer', 'deliveryAgent']), getDeliveryLocation);
+router.get('/:deliveryId/nearby-drivers', authenticate, authorize(['admin', 'restaurant']), getNearbyDrivers);
+
+
+router.get('/:deliveryId', authenticate, authorize(['admin', 'restaurant', 'customer', 'deliveryAgent']), getDeliveryById);
 
 export default router;

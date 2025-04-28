@@ -42,13 +42,13 @@ const DeliveryAgentDashboard = () => {
   const [manualRefreshRequired, setManualRefreshRequired] = useState(false);
   
   useEffect(() => {
-    // First, check if we actually have a user
+    
     if (!user) {
       console.log('User not loaded yet, waiting...');
-      return; // Wait until user is properly loaded
+      return; 
     }
     
-    // Check role once we have user data
+    
     if (user.role !== 'deliveryAgent') {
       toast.error('Unauthorized: Only delivery agents can access this page');
       navigate('/');

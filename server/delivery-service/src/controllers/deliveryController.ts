@@ -254,7 +254,7 @@ export const getNearbyDrivers = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Helper function to calculate distance between two points
+
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -264,7 +264,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c; // Distance in km
+  return R * c; 
 }
 
 export const getDeliveryById = async (req: Request, res: Response): Promise<void> => {
@@ -440,12 +440,9 @@ export const updateDeliveryLocation = async (req: Request, res: Response): Promi
       return;
     }
 
-    // Skip the user validation for now since it's causing errors
-    
-    // Format location data for MongoDB (GeoJSON format)
     const geoJsonLocation: { type: "Point"; coordinates: [number, number] } = {
       type: "Point",
-      coordinates: [location.longitude, location.latitude] // GeoJSON format is [longitude, latitude]
+      coordinates: [location.longitude, location.latitude] 
     };
     
     // Update delivery current location

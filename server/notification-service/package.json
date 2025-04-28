@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/twilio": "^3.19.2",
     "axios": "^1.9.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
@@ -19,7 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.0",
     "nodemailer": "^6.10.1",
-    "nodeman": "^1.1.2"
+    "nodeman": "^1.1.2",
+    "twilio": "^5.5.2"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",

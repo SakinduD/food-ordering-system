@@ -16,8 +16,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
-import emailRoutes from './routes/emailRoutes';
-app.use('/api/email', emailRoutes);
+import notificationRoutes from './routes/notificationRoutes';
+app.use('/api/notification', notificationRoutes);
 
 
 const PORT = process.env.PORT || 5020;

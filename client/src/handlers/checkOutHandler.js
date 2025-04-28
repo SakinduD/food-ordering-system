@@ -85,7 +85,7 @@ const handleCheckout = async (formData, location, cart, dispatch, userId, user) 
                     
                             if (response.ok) {
                                 try {
-                                    await axios.post('http://localhost:5020/api/email/orderConfirmationEmail', 
+                                    await axios.post('http://localhost:5020/api/notification/orderConfirmationEmail', 
                                         {
                                             orderId: data.orderId,
                                             user: user
@@ -96,9 +96,20 @@ const handleCheckout = async (formData, location, cart, dispatch, userId, user) 
                                             }
                                         }
                                     );
-                                    console.log("Email sent successfully");
+                                    await axios.post('http://localhost:5020/api/notification/sendSMS',
+                                        {
+                                            orderId: data.orderId,
+                                            user: user,
+                                        },
+                                        {
+                                            headers: {
+                                                Authorization: `Bearer ${token}`
+                                            }
+                                        }
+                                    );
+                                    console.log("Email and SMS sent successfully");
                                 } catch (error) {
-                                    console.error("Error sending email:", error);
+                                    console.error("Error sending email or sms:", error);
                                 }
 
                                 Swal.fire({

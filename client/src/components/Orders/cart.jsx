@@ -315,9 +315,10 @@ const Cart = () => {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Phone Number</label>
                                         <input
-                                            type="number"
+                                            type="tel"
                                             name="phone"
-                                            min={0}
+                                            placeholder='+94 7x xxx xxxx'
+                                            pattern="^\+94[7][0-9]{8}$"
                                             value={formData.phone}
                                             onChange={handleChange}
                                             required

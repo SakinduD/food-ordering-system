@@ -149,8 +149,8 @@ const sendOrderConfirmationEmail = async (req: Request, res: Response): Promise<
                         </center>
 
                         <div class="footer">
-                            <p>If you have any questions about your order, please <a href="mailto:support@foodfast.com" style="color: #f97316;">contact our customer support</a>.</p>
-                            <p>Thank you for choosing FoodFast!</p>
+                            <p>If you have any questions about your order, please <a href="mailto:support@homeplate.com" style="color: #f97316;">contact our customer support</a>.</p>
+                            <p>Thank you for choosing HomePlate!</p>
                             <small style="color: #666666;">This is an automated email, please do not reply.</small>
                         </div>
                     </div>

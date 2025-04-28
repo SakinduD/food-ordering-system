@@ -207,27 +207,61 @@ function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation - Updated Home link to use getHomePage */}
+        {/* Desktop Navigation - Updated with Restaurants, About Us and Contact Us links */}
         <nav className="hidden md:flex gap-8">
-          {["Home", "Features", "How It Works", "Restaurants", "Testimonials"].map((item) => (
-            item === "Home" ? (
-              <Link
-                key={item}
-                to={getHomePage()}
-                className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
-              >
-                {item}
-              </Link>
-            ) : (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
-              >
-                {item}
-              </a>
-            )
-          ))}
+          {["Home", "Features", "How It Works", "Restaurants", "About Us", "Contact Us"].map((item) => {
+            if (item === "Home") {
+              return (
+                <Link
+                  key={item}
+                  to={getHomePage()}
+                  className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  {item}
+                </Link>
+              );
+            } else if (item === "About Us") {
+              return (
+                <Link
+                  key={item}
+                  to="/about-us"
+                  className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  {item}
+                </Link>
+              );
+            } else if (item === "Contact Us") {
+              return (
+                <Link
+                  key={item}
+                  to="/contact-us"
+                  className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  {item}
+                </Link>
+              );
+            } else if (item === "Restaurants") {
+              return (
+                <Link
+                  key={item}
+                  to="/restaurants"
+                  className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  {item}
+                </Link>
+              );
+            } else {
+              return (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  {item}
+                </a>
+              );
+            }
+          })}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -251,27 +285,64 @@ function Header() {
             <div className="container mx-auto px-4 py-4 space-y-4">
               {/* Mobile Navigation */}
               <nav className="flex flex-col gap-4">
-                {["Home", "Features", "How It Works", "Restaurants", "Testimonials"].map((item) => (
-                  item === "Home" ? (
-                    <Link
-                      key={item}
-                      to={getHomePage()}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
-                    >
-                      {item}
-                    </Link>
-                  ) : (
-                    <a
-                      key={item}
-                      href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
-                    >
-                      {item}
-                    </a>
-                  )
-                ))}
+                {["Home", "Features", "How It Works", "Restaurants", "About Us", "Contact Us"].map((item) => {
+                  if (item === "Home") {
+                    return (
+                      <Link
+                        key={item}
+                        to={getHomePage()}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+                      >
+                        {item}
+                      </Link>
+                    );
+                  } else if (item === "About Us") {
+                    return (
+                      <Link
+                        key={item}
+                        to="/about-us"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+                      >
+                        {item}
+                      </Link>
+                    );
+                  } else if (item === "Contact Us") {
+                    return (
+                      <Link
+                        key={item}
+                        to="/contact-us"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+                      >
+                        {item}
+                      </Link>
+                    );
+                  } else if (item === "Restaurants") {
+                    return (
+                      <Link
+                        key={item}
+                        to="/restaurants"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+                      >
+                        {item}
+                      </Link>
+                    );
+                  } else {
+                    return (
+                      <a
+                        key={item}
+                        href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-sm font-medium text-gray-600 hover:text-orange-500 transition-colors p-2 hover:bg-orange-50 rounded-lg"
+                      >
+                        {item}
+                      </a>
+                    );
+                  }
+                })}
               </nav>
               <div className="flex flex-col gap-4 pt-4 border-t border-orange-100">
                 {user ? (

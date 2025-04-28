@@ -33,6 +33,11 @@ const AllRestaurants = () => {
   }, []);
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
+    // First check if restaurant is verified
+    if (restaurant.isVerified !== true) {
+      return false;
+    }
+    
     const matchesSearch =
       restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       restaurant.address?.toLowerCase().includes(searchTerm.toLowerCase());

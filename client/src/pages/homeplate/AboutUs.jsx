@@ -24,7 +24,7 @@ const AboutUs = () => {
               alt="HomePlate Story" 
               className="rounded-2xl shadow-xl w-full h-auto"
               onError={(e) => {
-                e.target.src = "https://i.imgur.com/Ur80mcW.png";
+                e.target.src = "https://i.imgur.com/WJYDoYa.png";
               }}
             />
           </div>

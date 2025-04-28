@@ -35,6 +35,15 @@ app.use('/api/users', createProxyMiddleware({
     },
 }));
 
+// Auth Service Proxy (Port 5010)
+app.use('/api/reviews', createProxyMiddleware({
+    target: process.env.AUTH_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+        '^/api/reviews': '/api/reviews'
+    },
+}));
+
 // Restaurant Service Proxy (Port 5000)
 app.use('/api/restaurants', createProxyMiddleware({
     target: process.env.RESTAURANT_SERVICE_URL,

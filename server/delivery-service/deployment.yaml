@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service
+  labels:
+    app: delivery-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery-service
+  template:
+    metadata:
+      labels:
+        app: delivery-service
+    spec:
+      containers:
+      - name: delivery-service
+        image: delivery-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5005
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.2"
+            memory: "256Mi"
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "5005"
+        - name: MONGO_URI
+          value: "mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/DeliveryService?retryWrites=true&w=majority"
+        - name: JWT_SECRET
+          value: "secret"
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:5010/api"
+        - name: ORDER_SERVICE_URL
+          value: "http://order-service:5001/api/order"
+        - name: RESTAURANT_SERVICE_URL
+          value: "http://restaurant-service:5000/api/restaurants"

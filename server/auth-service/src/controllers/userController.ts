@@ -219,12 +219,19 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response): Pro
 // Update User
 export const updateUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   try {
-    const { role, ...updateData } = req.body;
+    const { password, role, ...updateData } = req.body;
 
     // Validate role if provided
     if (role && !['customer', 'restaurant', 'deliveryAgent'].includes(role)) {
       res.status(400).json({ error: 'Invalid role' });
       return;
+    }
+
+    // Handle password updates
+    if (password) {
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
     }
 
     const updatedUser: IUser | null = await User.findByIdAndUpdate(

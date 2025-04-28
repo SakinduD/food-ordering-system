@@ -37,9 +37,11 @@ function RestaurantsSection() {
   // ✅ Filter logic
   const filteredRestaurants =
     selectedCategory === "All"
-      ? restaurants
-      : restaurants.filter((r) =>
-          r.category?.toLowerCase().includes(selectedCategory.toLowerCase())
+      ? restaurants.filter(r => r.isVerified === true)
+      : restaurants.filter(
+          (r) =>
+            r.isVerified === true &&
+            r.category?.toLowerCase().includes(selectedCategory.toLowerCase())
         );
 
   // ✅ Auto carousel

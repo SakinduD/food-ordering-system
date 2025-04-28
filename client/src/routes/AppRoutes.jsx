@@ -37,6 +37,8 @@ import CreateReview from "../pages/reviews/CreateReview";
 import EditReview from "../pages/reviews/EditReview";
 import UserReviews from "../pages/reviews/UserReviews";
 import ViewReview from "../pages/reviews/ViewReview";
+import AboutUs from '../pages/homeplate/AboutUs';
+import ContactUs from '../pages/homeplate/ContactUs';
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -176,6 +178,9 @@ function AppRoutes() {
         }
       />
       <Route path="/reviews" element={<ViewReview />} />
+
+      <Route path="/about-us" element={<AboutUs />} />
+      <Route path="/contact-us" element={<ContactUs />} />
 
     </Routes>
     );

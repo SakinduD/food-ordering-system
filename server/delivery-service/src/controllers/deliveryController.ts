@@ -136,10 +136,6 @@ export const updateDeliveryStatus = async (req: Request, res: Response): Promise
       return;
     }
 
-    const orderId = delivery.orderId.toString();
-    const { order } = await orderService.getOrderById(orderId);
-    order.orderStatus = status;
-
     delivery.status = status;
     await delivery.save();
 

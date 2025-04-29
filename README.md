@@ -96,16 +96,13 @@ You can use the provided PowerShell script for deployment:
 ```
 
 ## Development & Deployment
-- Each service can be developed and run independently (see each service's README for details)
+- Each service can be developed and run independently
 - For production, use the provided Kubernetes manifests in each service folder
 - Static frontend is served via Nginx
 
 ## API Endpoints
 - All API requests should go through the API Gateway (`/api/...`)
 - See each service's `README.md` or `src/routes` for detailed endpoints
-
-## License
-This project is licensed under the MIT License.
 
 ---
 

@@ -246,26 +246,27 @@ const AddMenuItem = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
-                  <div className="space-y-2">
-                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                      Price
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <DollarSign className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        id="price"
-                        name="price"
-                        value={form.price}
-                        onChange={handleInputChange}
-                        className={`w-full pl-10 p-3 bg-white border ${errors.price ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${errors.price ? 'focus:ring-red-300' : 'focus:ring-orange-300'}`}
-                        type="number"
-                        placeholder="Enter price"
-                      />
+                <div className="space-y-2">
+                  <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                    Price
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-400 font-bold text-base">LKR</span> {/* ✅ Correct LKR label */}
                     </div>
-                    {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
+                    <input
+                      id="price"
+                      name="price"
+                      value={form.price}
+                      onChange={handleInputChange}
+                      className={`w-full pl-14 p-3 bg-white border ${errors.price ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${errors.price ? 'focus:ring-red-300' : 'focus:ring-orange-300'}`}
+                      type="number"
+                      placeholder="Enter price"
+                    />
                   </div>
+                  {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
+                </div>
+
                   
                   
                   <div className="space-y-2">

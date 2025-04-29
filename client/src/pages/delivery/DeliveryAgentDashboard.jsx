@@ -230,7 +230,7 @@ const DeliveryAgentDashboard = () => {
     
     console.log('Starting location tracking with accuracy level:', locationAccuracy);
     
-    // Clear any existing watchers
+    
     stopLocationTracking();
     
     // Reset manual refresh flag
@@ -253,18 +253,17 @@ const DeliveryAgentDashboard = () => {
           
           console.log('Location updated:', newLocation);
           
-          // Save this as the last known location
+          
           setLastKnownLocation(newLocation);
           
-          // Update current location state
+          
           setDriverLocation(newLocation);
           setLocationWatching(true);
           
-          // Reset retry counter on successful location
+          
           setLocationRetries(0);
           
-          // If we previously downgraded accuracy but now have a successful fix,
-          // try upgrading back to higher accuracy after a while
+          
           if (locationAccuracy !== 'high' && locationRetries === 0) {
             setTimeout(() => {
               console.log('Attempting to increase accuracy level');
@@ -272,7 +271,7 @@ const DeliveryAgentDashboard = () => {
                                locationAccuracy === 'low' ? 'medium' : 'high';
               setLocationAccuracy(nextLevel);
               startLocationTracking();
-            }, 60000); // Try to upgrade after a minute of successful tracking
+            }, 60000); 
           }
           
   

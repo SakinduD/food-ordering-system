@@ -1,19 +1,17 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
-
-# Install TypeScript globally
-RUN npm install -g typescript
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-# Compile TypeScript directly
-RUN tsc || echo "TypeScript compilation completed with warnings"
+# Build TypeScript files
+RUN npm run build || (echo "Build failed. Creating the build script..." && \
+    npm pkg set scripts.build="tsc" && \
+    npm run build)
 
-EXPOSE 5010
+EXPOSE 5007
 
-# Use node to run the compiled JavaScript file
 CMD ["node", "dist/server.js"]

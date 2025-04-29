@@ -87,10 +87,9 @@ export class OrderServiceAdapter {
     this.baseUrl = process.env.ORDER_SERVICE_URL || 'http://localhost:5001/api/order';
   }
 
-  async getOrderById(orderId: string, token?: string): Promise<IOrderResponse> {
+  async getOrderById(orderId: string): Promise<IOrderResponse> {
     try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const response = await axios.get(`${this.baseUrl}/getOrderById/${orderId}`, config);
+      const response = await axios.get(`${this.baseUrl}/getOrderById/${orderId}`);
       
       if (!response.data || !response.data.order) {
         throw new ServiceError('OrderService', 'Invalid order response', 404);
@@ -118,10 +117,9 @@ export class RestaurantServiceAdapter {
     this.baseUrl = process.env.RESTAURANT_SERVICE_URL || 'http://localhost:5000/api/restaurants';
   }
 
-  async getRestaurantById(restaurantId: string, token?: string): Promise<IRestaurantResponse> {
+  async getRestaurantById(restaurantId: string): Promise<IRestaurantResponse> {
     try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const response = await axios.get(`${this.baseUrl}/${restaurantId}`, config);
+      const response = await axios.get(`${this.baseUrl}/${restaurantId}`);
       
       if (!response.data || !response.data.data) {
         throw new ServiceError('RestaurantService', 'Invalid restaurant response', 404);

@@ -290,7 +290,7 @@ const AddMenuItem = () => {
                         <option value="Street Food">Street Food</option>
                         <option value="Desserts & Sweets">Desserts & Sweets</option>
                         <option value="Beverages">Beverages</option>
-                        <option value="Contemporary Fusion">Contemporary Fusion</option>
+                        <option value="Burgers">Burgers</option>
                         <option value="Vegetarian & Vegan">Vegetarian & Vegan</option>
                         <option value="Snacks & Short Eats">Snacks & Short Eats</option>
                       </select>

@@ -327,7 +327,7 @@ const CustomerMenuList = () => {
                           <div key={item._id} className="flex items-center p-2 bg-orange-50 rounded-lg">
                             {item.imageUrl && (
                               <img 
-                                src={item.imageUrl.startsWith('/') ? `http://localhost:5000${item.imageUrl}` : item.imageUrl}
+                                src={item.imageUrl.startsWith('/') ? `http://localhost:5025${item.imageUrl}` : item.imageUrl}
                                 alt={item.name} 
                                 className="w-12 h-12 object-cover rounded-md mr-3" 
                                 onError={(e) => {
@@ -367,10 +367,6 @@ const CustomerMenuList = () => {
                     </h3>
                     <p className="text-gray-600 mb-2">{restaurant.address || 'Address not provided'}</p>
                     
-                    {/* Map placeholder - would usually integrate with Google Maps */}
-                    <div className="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center">
-                      <span className="text-gray-500">Map view unavailable</span>
-                    </div>
                   </div>
                   
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -379,7 +375,6 @@ const CustomerMenuList = () => {
                       Contact
                     </h3>
                     <p className="text-gray-600 mb-1">Phone: {restaurant.phone || 'Not provided'}</p>
-                    <p className="text-gray-600">Email: {restaurant.email || 'Not provided'}</p>
                   </div>
                 </div>
               </div>

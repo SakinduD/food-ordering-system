@@ -367,10 +367,6 @@ const CustomerMenuList = () => {
                     </h3>
                     <p className="text-gray-600 mb-2">{restaurant.address || 'Address not provided'}</p>
                     
-                    {/* Map placeholder - would usually integrate with Google Maps */}
-                    <div className="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center">
-                      <span className="text-gray-500">Map view unavailable</span>
-                    </div>
                   </div>
                   
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -379,7 +375,6 @@ const CustomerMenuList = () => {
                       Contact
                     </h3>
                     <p className="text-gray-600 mb-1">Phone: {restaurant.phone || 'Not provided'}</p>
-                    <p className="text-gray-600">Email: {restaurant.email || 'Not provided'}</p>
                   </div>
                 </div>
               </div>

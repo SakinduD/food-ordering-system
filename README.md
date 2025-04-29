@@ -102,7 +102,7 @@ You can use the provided PowerShell script for deployment:
 
 ## API Endpoints
 - All API requests should go through the API Gateway (`/api/...`)
-- See each service's `README.md` or `src/routes` for detailed endpoints
+- See each service's `src/routes` for detailed endpoints
 
 ---
 

@@ -216,7 +216,7 @@ export const getNearbyDrivers = async (req: Request, res: Response): Promise<voi
     // Get active drivers through user service
     const activeDrivers = await userService.getActiveDrivers(token);
     
-    // Calculate distance and sort drivers by proximity to restaurant
+    
     const availableDrivers = activeDrivers.map(({ user }) => {
       if (!user.currentLocation?.coordinates) return null;
       
@@ -232,7 +232,7 @@ export const getNearbyDrivers = async (req: Request, res: Response): Promise<voi
       return {
         driverId: user._id,
         name: user.name,
-        distance: Math.round(distance * 10) / 10, // Round to 1 decimal place
+        distance: Math.round(distance * 10) / 10, 
         location: user.currentLocation
       };
     })
@@ -277,7 +277,7 @@ export const getDeliveryById = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    // Return full delivery details including locations
+    
     res.json({
       deliveryId: delivery._id,
       status: delivery.status,
@@ -292,7 +292,7 @@ export const getDeliveryById = async (req: Request, res: Response): Promise<void
 };
 
 
-// Get deliveries by driver ID (alternative to getDriverDeliveries)
+// Get deliveries by driver ID 
 export const getDeliveriesByDriverId = async (req: Request, res: Response): Promise<void> => {
   try {
     const { driverId } = req.params;
@@ -303,7 +303,7 @@ export const getDeliveriesByDriverId = async (req: Request, res: Response): Prom
       return;
     }
     
-    // Find all deliveries assigned to this driver
+    
     const deliveries = await Delivery.find({ driverId: driverId });
     
     if (!deliveries.length) {
@@ -316,7 +316,7 @@ export const getDeliveriesByDriverId = async (req: Request, res: Response): Prom
     
     // Enrich delivery data with customer and restaurant information
     const enrichedDeliveries = await Promise.all(deliveries.map(async (delivery) => {
-      // Basic delivery object that will always be returned
+      
       const basicDelivery = {
         _id: delivery._id,
         orderId: delivery.orderId,
@@ -329,7 +329,7 @@ export const getDeliveriesByDriverId = async (req: Request, res: Response): Prom
       };
       
       try {
-        // Try to get order details for customer info
+        
         let customerInfo = {
           customerName: 'Customer information unavailable',
           customerPhone: 'N/A',
@@ -375,10 +375,10 @@ export const getDeliveriesByDriverId = async (req: Request, res: Response): Prom
           };
         } catch (error) {
           console.error(`Error fetching restaurant for delivery ${delivery._id}:`, error);
-          // Continue with default restaurant info
+          
         }
         
-        // Calculate distance if not already set from order
+        
         if (!distance && delivery.restaurantLocation?.coordinates && delivery.customerLocation?.coordinates) {
           distance = calculateDistance(
             delivery.restaurantLocation.coordinates[1],
@@ -388,16 +388,16 @@ export const getDeliveriesByDriverId = async (req: Request, res: Response): Prom
           );
         }
 
-        // Return enriched delivery with all available info
+        
         return {
           ...basicDelivery,
           ...customerInfo,
           ...restaurantInfo,
-          distance: Number(distance.toFixed(1)) // Round to 1 decimal place
+          distance: Number(distance.toFixed(1)) 
         };
       } catch (error) {
         console.error(`Error enriching delivery ${delivery._id}:`, error);
-        // Return basic delivery info if any part of enrichment fails
+        
         return basicDelivery;
       }
     }));
@@ -450,7 +450,7 @@ export const updateDeliveryLocation = async (req: Request, res: Response): Promi
     
     await delivery.save();
 
-    // Emit location update to clients tracking this delivery
+    
     getIo().to(deliveryId.toString()).emit('deliveryLocationUpdate', {
       deliveryId,
       location: {
@@ -484,7 +484,7 @@ export const getDeliveryByOrderId = async (req: Request, res: Response): Promise
       return;
     }
     
-    // Find delivery associated with the order
+    
     const delivery = await Delivery.findOne({ orderId: new mongoose.Types.ObjectId(orderId) });
     
     if (!delivery) {
@@ -492,7 +492,7 @@ export const getDeliveryByOrderId = async (req: Request, res: Response): Promise
       return;
     }
     
-    // Return the delivery details needed for tracking
+    
     res.json(delivery);
   } catch (error) {
     console.error('Error fetching delivery by order ID:', error);

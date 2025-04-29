@@ -11,7 +11,7 @@ const MenuItemCard = ({ item, onEdit, onDelete }) => {
   
         <h3 className="text-lg font-bold">{item.name}</h3>
         <p>{item.description}</p>
-        <p className="text-green-600 font-semibold">Rs. {item.price}</p>
+        <p className="text-green-600 font-semibold">LKR {item.price}</p>
         <p className="text-sm text-orange-500">{item.category}</p>
         <p className="text-sm text-gray-500">{item.available ? 'Available' : 'Not Available'}</p>
   

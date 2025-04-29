@@ -296,7 +296,7 @@ const RegisterRestaurant = () => {
                     value={form.phone}
                     onChange={handleInputChange}
                     className={`w-full pl-10 p-3 bg-white border ${errors.phone ? 'border-red-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 ${errors.phone ? 'focus:ring-red-300' : 'focus:ring-orange-300'}`}
-                    placeholder="Enter 10-digit phone number"
+                    placeholder="Enter phone number"
                     maxLength={10}
                   />
                 </div>

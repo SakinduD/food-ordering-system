@@ -658,7 +658,7 @@ const RestaurantProfile = () => {
                     )}
                   </td>
                   <td className="p-4">{new Date(order.orderDate || order.createdAt).toLocaleString()}</td>
-                  <td className="p-4 font-medium">Rs. {order.totalAmount?.toFixed(2)}</td>
+                  <td className="p-4 font-medium">LKR {order.totalAmount?.toFixed(2)}</td>
                   <td className="p-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus}

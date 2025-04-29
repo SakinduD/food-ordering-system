@@ -1,7 +1,7 @@
 // External service interfaces
 export interface ILocation {
   type: string;
-  coordinates: [number, number]; // [longitude, latitude]
+  coordinates: [number, number]; 
 }
 
 export interface IOrderResponse {
@@ -9,7 +9,7 @@ export interface IOrderResponse {
   order: {
     _id: string;
     restaurantId: string;
-    orderLocation: [number, number]; // [longitude, latitude]
+    orderLocation: [number, number]; 
     orderStatus: string;
     userName: string;
     userPhone: string;

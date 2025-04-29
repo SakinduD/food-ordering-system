@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # Client Service (Frontend)
+  client:
+    image: food-ordering-system-client
+    ports:
+      - "3000:80"
+    # Add extra_hosts to map localhost to the host.docker.internal
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      - auth-service
+      - restaurant-service
+      - menu-service
+      - order-service
+      - delivery-service
+      - payment-service
+      - notification-service
+    networks:
+      - app-network
+
+  # API Gateway
+  api-gateway:
+    image: food-ordering-system-api-gateway
+    ports:
+      - "5007:5007"
+    environment:
+      - PORT=5007
+      - NODE_ENV=development
+      - CLIENT_URL=http://client:80
+      - AUTH_SERVICE_URL=http://auth-service:5010
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
+      - ORDER_SERVICE_URL=http://order-service:5001
+      - DELIVERY_SERVICE_URL=http://delivery-service:5005
+      - PAYMENT_SERVICE_URL=http://payment-service:5008
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5020
+      - MENU_SERVICE_URL=http://menu-service:5025
+    networks:
+      - app-network
+
+  # Auth Service
+  auth-service:
+    image: food-ordering-system-auth-service
+    ports:
+      - "5010:5010"
+    environment:
+      - PORT=5010
+      - NODE_ENV=development
+      - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/Authentication?retryWrites=true&w=majority&appName=FoodOrderingSystem
+      - JWT_SECRET=secret
+      - CORS_ORIGIN=http://localhost:3000
+    networks:
+      - app-network
+
+  # Restaurant Service
+  restaurant-service:
+    image: food-ordering-system-restaurant-service
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/RestaurantService?retryWrites=true&w=majority&appName=FoodOrderingSystem
+    volumes:
+      - restaurant-uploads:/app/uploads
+    networks:
+      - app-network
+
+  # Menu Service
+  menu-service:
+    image: food-ordering-system-menu-service
+    ports:
+      - "5025:5025"
+    environment:
+      - PORT=5025
+      - NODE_ENV=development
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
+      - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/MenuService?retryWrites=true&w=majority&appName=FoodOrderingSystem
+    volumes:
+      - menu-uploads:/app/uploads
+    networks:
+      - app-network
+
+  # Order Service
+  order-service:
+    image: food-ordering-system-order-service
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=development
+      - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/OrderService?retryWrites=true&w=majority&appName=FoodOrderingSystem
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
+    networks:
+      - app-network
+
+  # Notification Service
+  notification-service:
+    image: food-ordering-system-notification-service
+    ports:
+      - "5020:5020"
+    environment:
+      - PORT=5020
+      - NODE_ENV=development
+      - ORDER_SERVICE_URL=http://order-service:5001
+      - CLIENT_URL=http://client:80
+      - EMAIL_USER=${EMAIL_USER:-notification@example.com}
+      - EMAIL_PASS=${EMAIL_PASS:-password123}
+    networks:
+      - app-network
+
+  # Delivery Service
+  delivery-service:
+    image: food-ordering-system-delivery-service
+    ports:
+      - "5005:5005"
+    environment:
+      - PORT=5005
+      - NODE_ENV=development
+      - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/DeliveryService?retryWrites=true&w=majority
+      - JWT_SECRET=secret
+      - AUTH_SERVICE_URL=http://auth-service:5010/api
+      - ORDER_SERVICE_URL=http://order-service:5001/api/order
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:5000/api/restaurants
+    networks:
+      - app-network
+
+  # Payment Service
+  payment-service:
+    image: food-ordering-system-payment-service
+    ports:
+      - "5008:5008"
+    environment:
+      - PORT=5008
+      - NODE_ENV=development
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  restaurant-uploads:
+  menu-uploads:

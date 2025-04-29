@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+/* Custom animations for the landing page */
+@layer utilities {
+  /* Fade-in animation */
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.7s ease-out forwards;
+  }
+
+  /* Floating animation variants */
+  @keyframes floating {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .animate-floating {
+    animation: floating 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 7s ease-in-out infinite;
+  }
+
+  .animate-float-delay {
+    animation: float 5s ease-in-out 1s infinite;
+  }
+
+  /* Blob animation */
+  @keyframes blob {
+    0% {
+      transform: scale(1);
+      opacity: 0.2;
+    }
+    33% {
+      transform: scale(1.1);
+      opacity: 0.3;
+    }
+    66% {
+      transform: scale(0.9);
+      opacity: 0.1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.2;
+    }
+  }
+
+  .animate-blob {
+    animation: blob 10s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Subtle pulse animation */
+  @keyframes pulse-subtle {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+  }
+
+  /* Gradient animation */
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+  }
+
+  /* Scale in animation for text underlines */
+  @keyframes scale-in {
+    0% {
+      transform: scaleX(0);
+    }
+    100% {
+      transform: scaleX(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 1s ease-out forwards 0.5s;
+  }
+
+  /* Particle animation */
+  @keyframes particle-fade {
+    0% {
+      transform: translateY(0) scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-20px) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-particle-fade {
+    animation: particle-fade 1s ease-out forwards;
+  }
+}

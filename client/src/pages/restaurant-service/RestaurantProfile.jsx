@@ -636,12 +636,12 @@ const RestaurantProfile = () => {
                 <th className="p-4 text-sm font-semibold text-gray-600">Customer</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Items Ordered</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Date</th>
-                <th className="p-4 text-sm font-semibold text-gray-600">Amount</th>
+                <th className="p-4 text-sm font-semibold text-gray-600">Amount(LKR)</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Status</th>
                 <th className="p-4 text-sm font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 whitespace-nowrap">
               {filteredOrders.map(order => (
                 <tr key={order._id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">{order.invoiceId}</td>
@@ -658,7 +658,7 @@ const RestaurantProfile = () => {
                     )}
                   </td>
                   <td className="p-4">{new Date(order.orderDate || order.createdAt).toLocaleString()}</td>
-                  <td className="p-4 font-medium">LKR {order.totalAmount?.toFixed(2)}</td>
+                  <td className="p-4 font">{order.totalAmount?.toFixed(2)}</td>
                   <td className="p-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus}

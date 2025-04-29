@@ -123,6 +123,7 @@ app.listen(PORT, () => {
     console.log('Connected Services:');
     console.log('- Auth Service:', process.env.AUTH_SERVICE_URL);
     console.log('- Restaurant Service:', process.env.RESTAURANT_SERVICE_URL);
+    console.log('- Menu Service:', process.env.MENU_SERVICE_URL);
     console.log('- Order Service:', process.env.ORDER_SERVICE_URL);
     console.log('- Delivery Service:', process.env.DELIVERY_SERVICE_URL);
     console.log('- Payment Service:', process.env.PAYMENT_SERVICE_URL);

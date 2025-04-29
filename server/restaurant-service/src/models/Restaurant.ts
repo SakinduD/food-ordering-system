@@ -10,11 +10,11 @@ export interface IRestaurant extends Document {
   category?: string;
   location?: {
     type: string;
-    coordinates: [number, number]; // [longitude, latitude]
+    coordinates: [number, number]; 
   };
   imageUrl?: string;
-  rating: number;     // Make sure this is defined
-  reviewCount: number; // Make sure this is defined
+  rating: number;     
+  reviewCount: number; 
 }
 
 const restaurantSchema = new Schema<IRestaurant>(
@@ -38,13 +38,12 @@ const restaurantSchema = new Schema<IRestaurant>(
       }
     },
     imageUrl: { type: String },
-    rating: { type: Number, default: 0 },        // Make sure this is defined
-    reviewCount: { type: Number, default: 0 }    // Make sure this is defined
+    rating: { type: Number, default: 0 },        
+    reviewCount: { type: Number, default: 0 }    
   },
   { timestamps: true }
 );
 
-// Add geospatial index
 restaurantSchema.index({ location: '2dsphere' });
 
 export default model<IRestaurant>('Restaurant', restaurantSchema);

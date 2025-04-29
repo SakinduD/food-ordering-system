@@ -8,7 +8,7 @@ interface MulterRequest extends Request {
 
 const restaurantService = new RestaurantServiceImpl();
 
-// ✅ Create a new menu item
+// Create a new menu item
 export const addMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const { name, description, price, category, available } = req.body;
@@ -19,7 +19,6 @@ export const addMenuItem = async (req: MulterRequest, res: Response): Promise<vo
       return;
     }
 
-    // 🔍 Match restaurant by userId, not restaurantId from form
     const restaurant = await restaurantService.getRestaurantByUserId(userId);
     if (!restaurant) {
       res.status(404).json({ message: 'Restaurant not found for this user' });
@@ -47,7 +46,7 @@ export const addMenuItem = async (req: MulterRequest, res: Response): Promise<vo
   }
 };
 
-// ✅ Get all menu items (optionally by restaurantId)
+// Get all menu items
 export const getMenuItems = async (req: Request, res: Response): Promise<void> => {
   try {
     const { restaurantId } = req.query;
@@ -70,7 +69,7 @@ export const getMenuItems = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// ✅ Get menu items by restaurant ID
+// Get menu items by restaurant ID
 export const getMenuItemsByRestaurantId = async (req: Request, res: Response) => {
   try {
     const { restaurantId } = req.params;
@@ -81,7 +80,7 @@ export const getMenuItemsByRestaurantId = async (req: Request, res: Response) =>
   }
 };
 
-// ✅ Update menu item by ID
+// Update menu item by ID
 export const updateMenuItem = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const { name, description, price, category, available, restaurantId } = req.body;
@@ -111,7 +110,7 @@ export const updateMenuItem = async (req: MulterRequest, res: Response): Promise
   }
 };
 
-// ✅ Delete menu item by ID
+// Delete menu item by ID
 export const deleteMenuItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MenuItem.findByIdAndDelete(req.params.id);

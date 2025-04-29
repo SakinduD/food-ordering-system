@@ -1,6 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-// Define the interface for a menu item
 export interface IMenuItem extends Document {
   name: string;
   description?: string;
@@ -11,7 +10,6 @@ export interface IMenuItem extends Document {
   restaurantId: Types.ObjectId;
 }
 
-// Create the schema
 const menuItemSchema = new Schema<IMenuItem>(
   {
     name: { type: String, required: true },
@@ -31,6 +29,5 @@ const menuItemSchema = new Schema<IMenuItem>(
   }
 );
 
-// Export the model
 const MenuItem = model<IMenuItem>('MenuItem', menuItemSchema);
 export default MenuItem;

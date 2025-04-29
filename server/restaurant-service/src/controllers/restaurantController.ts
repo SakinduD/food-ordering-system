@@ -6,10 +6,7 @@ interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
 
-/**
- * Create a new restaurant for the logged-in user
- * Ensures all model fields are properly handled
- */
+//Create a new restaurant
 export const createRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user._id;
@@ -25,7 +22,6 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       return;
     }
 
-    // Prepare restaurant data with all possible fields from the model
     const restaurantData: Partial<IRestaurant> = {
       name: req.body.name,
       address: req.body.address || '',
@@ -36,15 +32,12 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       userId: userId
     };
 
-    // Handle image if uploaded
     if (req.file) {
       restaurantData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    // Handle location data
     if (req.body.location) {
       try {
-        // Try parsing location as JSON first (from direct JSON inputs)
         const locationData = typeof req.body.location === 'string' 
           ? JSON.parse(req.body.location) 
           : req.body.location;
@@ -62,10 +55,8 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
         console.error('Error parsing location JSON:', e);
       }
     }
-    
-    // If location wasn't set from the location object, try individual coordinates
+       
     if (!restaurantData.location || !restaurantData.location.coordinates) {
-      // Check for coordinates in form data format (from FormData submissions)
       if (req.body['location[coordinates][]']) {
         const coords = Array.isArray(req.body['location[coordinates][]']) 
           ? req.body['location[coordinates][]'] 
@@ -78,7 +69,7 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
           };
         }
       } 
-      // Also check for separate latitude/longitude fields
+      
       else if (req.body.longitude !== undefined && req.body.latitude !== undefined) {
         restaurantData.location = {
           type: 'Point',
@@ -87,7 +78,6 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
       }
     }
 
-    // Create restaurant with properly structured data
     const restaurant = await Restaurant.create(restaurantData);
 
     res.status(201).json({ 
@@ -100,15 +90,11 @@ export const createRestaurant = async (req: MulterRequest, res: Response): Promi
   }
 };
 
-/**
- * Get all restaurants
- * Can filter by availability and verification status
- */
+//Get all restaurants
 export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
     const filter: any = {};
     
-    // Add filters if provided as query params
     if (req.query.available !== undefined) {
       filter.available = req.query.available === 'true';
     }
@@ -129,9 +115,7 @@ export const getRestaurants = async (req: Request, res: Response): Promise<void>
   }
 };
 
-/**
- * Get a single restaurant by ID
- */
+//Get a single restaurant by ID
 export const getRestaurantById = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -146,9 +130,7 @@ export const getRestaurantById = async (req: Request, res: Response): Promise<vo
   }
 };
 
-/**
- * Get a restaurant by user ID
- */
+//Get a restaurant by user ID
 export const getRestaurantByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
     const restaurant = await Restaurant.findOne({ userId: req.params.userId });
@@ -163,15 +145,11 @@ export const getRestaurantByUserId = async (req: Request, res: Response): Promis
   }
 };
 
-/**
- * Update a restaurant by ID
- * Properly handles all model fields
- */
+//Update a restaurant by ID
 export const updateRestaurant = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     const updateData: Partial<IRestaurant> = {};
 
-    // Only update fields that are provided
     if (req.body.name !== undefined) updateData.name = req.body.name;
     if (req.body.address !== undefined) updateData.address = req.body.address;
     if (req.body.phone !== undefined) updateData.phone = req.body.phone;
@@ -183,15 +161,12 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
       updateData.isVerified = req.body.isVerified === 'true' || req.body.isVerified === true;
     }
 
-    // Handle image upload if provided
     if (req.file) {
       updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    // Handle location data - try different ways the client might send coordinates
     if (req.body.location) {
-      try {
-        // Try parsing location as JSON first
+      try {      
         const locationData = typeof req.body.location === 'string' 
           ? JSON.parse(req.body.location) 
           : req.body.location;
@@ -209,10 +184,9 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
         console.error('Error parsing location JSON:', e);
       }
     }
-    
-    // If location wasn't set from the location object, try individual coordinates
+       
     if (!updateData.location) {
-      // Check for coordinates in form data format
+      
       if (req.body['location[coordinates][]']) {
         const coords = Array.isArray(req.body['location[coordinates][]']) 
           ? req.body['location[coordinates][]'] 
@@ -225,7 +199,7 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
           };
         }
       }
-      // Also check for separate latitude/longitude fields
+      
       else if (req.body.longitude !== undefined && req.body.latitude !== undefined) {
         updateData.location = {
           type: 'Point',
@@ -255,9 +229,7 @@ export const updateRestaurant = async (req: MulterRequest, res: Response): Promi
   }
 };
 
-/**
- * Delete a restaurant
- */
+//Delete a restaurant
 export const deleteRestaurant = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await Restaurant.findByIdAndDelete(req.params.id);
@@ -272,9 +244,7 @@ export const deleteRestaurant = async (req: Request, res: Response): Promise<voi
   }
 };
 
-/**
- * Set restaurant availability
- */
+//Set restaurant availability
 export const setAvailability = async (req: Request, res: Response): Promise<void> => {
   try {
     if (req.body.available === undefined) {
@@ -303,9 +273,7 @@ export const setAvailability = async (req: Request, res: Response): Promise<void
   }
 };
 
-/**
- * Set restaurant verification status
- */
+//Set restaurant verification status
 export const setVerificationStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     if (req.body.isVerified === undefined) {
@@ -334,9 +302,7 @@ export const setVerificationStatus = async (req: Request, res: Response): Promis
   }
 };
 
-/**
- * Find nearby restaurants based on coordinates
- */
+//Find nearby restaurants based on coordinates
 export const findNearbyRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
     const { longitude, latitude, distance = 5000 } = req.query; 
@@ -378,16 +344,11 @@ export const findNearbyRestaurants = async (req: Request, res: Response): Promis
   }
 };
 
-
-
-/**
- * Update rating controller to handle add, update, delete operations
- */
+//Update rating controller to handle add, update, delete operations
 export const updateRatingController = async (req: Request, res: Response): Promise<void> => {
   const { restaurantId, reviewId, rating, oldRating, operation } = req.body;
 
   try {
-    // Validate input
     if (!restaurantId || !operation) {
       res.status(400).json({
         success: false,
@@ -396,7 +357,6 @@ export const updateRatingController = async (req: Request, res: Response): Promi
       return;
     }
 
-    // Find the restaurant
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
       res.status(404).json({
@@ -406,21 +366,17 @@ export const updateRatingController = async (req: Request, res: Response): Promi
       return;
     }
 
-    // Update the restaurant's rating based on operation
     let updatedRating = restaurant.rating || 0;
     let reviewCount = restaurant.reviewCount || 0;
     
     if (operation === 'add') {
-      // Add a new review's rating
       const newTotal = (updatedRating * reviewCount) + Number(rating);
       reviewCount++;
       updatedRating = parseFloat((newTotal / reviewCount).toFixed(1));
     } else if (operation === 'update' && oldRating) {
-      // Update an existing review's rating
       const newTotal = (updatedRating * reviewCount) - Number(oldRating) + Number(rating);
       updatedRating = parseFloat((newTotal / reviewCount).toFixed(1));
     } else if (operation === 'delete') {
-      // Remove a review's rating
       if (reviewCount <= 1) {
         updatedRating = 0;
         reviewCount = 0;
@@ -431,7 +387,6 @@ export const updateRatingController = async (req: Request, res: Response): Promi
       }
     }
 
-    // Save the updated restaurant
     restaurant.rating = updatedRating;
     restaurant.reviewCount = reviewCount;
     await restaurant.save();

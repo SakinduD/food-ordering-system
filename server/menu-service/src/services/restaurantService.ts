@@ -3,14 +3,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// ✅ Ensure environment variable exists
 const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL;
 
 if (!RESTAURANT_SERVICE_URL) {
   throw new Error('RESTAURANT_SERVICE_URL is not defined in .env');
 }
 
-// ✅ Define restaurant type
 export interface Restaurant {
   _id: string;
   name: string;

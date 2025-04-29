@@ -12,5 +12,4 @@ router.get('/restaurant/:restaurantId', getMenuItemsByRestaurantId);
 router.put('/:id', authMiddleware, restaurantMiddleware, upload.single('image'), updateMenuItem);
 router.delete('/:id', authMiddleware, restaurantMiddleware, deleteMenuItem);
 
-
 export default router;

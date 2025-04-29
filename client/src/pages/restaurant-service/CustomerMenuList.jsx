@@ -307,9 +307,9 @@ const CustomerMenuList = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="col-span-2">
-                  <div className="prose max-w-none">
+                  {/* <div className="prose max-w-none">
                     <p className="text-gray-600">{restaurant.description || 'This restaurant has not provided a description yet.'}</p>
-                  </div>
+                  </div> */}
                   
                   {restaurant.specialties && (
                     <div className="mt-6">

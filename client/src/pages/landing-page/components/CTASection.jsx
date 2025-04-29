@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function CTASection() {
   const [isVisible, setIsVisible] = useState(false);
   const [hoverButton, setHoverButton] = useState(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -57,6 +59,7 @@ function CTASection() {
                   ${hoverButton === 'order' ? 'scale-105' : ''}`}
                 onMouseEnter={() => setHoverButton('order')}
                 onMouseLeave={() => setHoverButton(null)}
+                onClick={() => navigate('/restaurants')}
               >
                 {/* Animated gradient background */}
                 <span className="absolute inset-0 overflow-hidden rounded-xl">
@@ -90,6 +93,7 @@ function CTASection() {
                 )}
               </button>
               
+
               <button 
                 className={`w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-xl 
                   border-2 border-orange-200 bg-white px-8 text-base font-semibold text-orange-600 

@@ -90,7 +90,7 @@ function HowItWorksSection() {
               <div className="aspect-video rounded-xl overflow-hidden border-8 border-white shadow-2xl transform transition-all duration-500 hover:scale-105 hover:rotate-1">
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-orange-600/10"></div>
                 <img 
-                  src="https://i.imgur.com/JfcSHWL.jpg" 
+                  src="https://i.imgur.com/oW0sQU1.png" 
                   alt="Sri Lankan food ordering app" 
                   className="w-full h-full object-cover"
                 />

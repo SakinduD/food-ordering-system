@@ -99,7 +99,7 @@ function TestimonialsSection() {
       role: "Software Engineer",
       location: "Colombo",
       rating: 5,
-      image: "https://i.imgur.com/8Km9tLL.jpg"
+      image: "https://i.imgur.com/onxInez.png"
     },
     {
       name: "Amali Fernando",
@@ -107,7 +107,7 @@ function TestimonialsSection() {
       role: "University Lecturer",
       location: "Kandy",
       rating: 5,
-      image: "https://i.imgur.com/wUbtrR1.jpg"
+      image: "https://i.imgur.com/onxInez.png"
     },
     {
       name: "Malik Jayasuriya",
@@ -115,7 +115,7 @@ function TestimonialsSection() {
       role: "Bank Manager",
       location: "Galle",
       rating: 4,
-      image: "https://i.imgur.com/7oM3RYk.jpg"
+      image: "https://i.imgur.com/onxInez.png"
     },
     {
       name: "Tharushi Silva",
@@ -123,7 +123,7 @@ function TestimonialsSection() {
       role: "Marketing Director",
       location: "Negombo",
       rating: 5,
-      image: "https://i.imgur.com/3jLPBGK.jpg"
+      image: "https://i.imgur.com/onxInez.png"
     },
     {
       name: "Ranjan Bandara",
@@ -131,7 +131,7 @@ function TestimonialsSection() {
       role: "Tourism Consultant",
       location: "Colombo",
       rating: 5,
-      image: "https://i.imgur.com/PpGYUaT.jpg"
+      image: "https://i.imgur.com/onxInez.png"
     },
   ];
 
@@ -257,24 +257,7 @@ function TestimonialsSection() {
           </div>
         )}
 
-        {/* Social proof */}
-        <div className="mt-20">
-          <p className="text-center text-gray-500 mb-6">Trusted by food lovers across Sri Lanka</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
-            <div className="h-8 md:h-10">
-              <img src="https://i.imgur.com/8KxDSOU.png" alt="Daily Mirror" className="h-full" />
-            </div>
-            <div className="h-8 md:h-10">
-              <img src="https://i.imgur.com/TeC4Zs2.png" alt="Sunday Times" className="h-full" />
-            </div>
-            <div className="h-8 md:h-10">
-              <img src="https://i.imgur.com/7vLuA8x.png" alt="Ceylon Today" className="h-full" />
-            </div>
-            <div className="h-8 md:h-10">
-              <img src="https://i.imgur.com/PPpgVjW.png" alt="Daily News" className="h-full" />
-            </div>
-          </div>
-        </div>
+      
       </div>
     </section>
   )

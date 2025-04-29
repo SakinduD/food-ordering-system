@@ -9,7 +9,7 @@ const categories = [
   { label: 'Street Food', value: 'Street Food', icon: '🌯' },
   { label: 'Desserts & Sweets', value: 'Desserts & Sweets', icon: '🍮' },
   { label: 'Beverages', value: 'Beverages', icon: '🥤' },
-  { label: 'Contemporary Fusion', value: 'Contemporary Fusion', icon: '🍴' },
+  { label: 'Burgers', value: 'Burgers', icon: '🍔' },
   { label: 'Vegetarian & Vegan', value: 'Vegetarian & Vegan', icon: '🥗' },
   { label: 'Snacks & Short Eats', value: 'Snacks & Short Eats', icon: '🍥' },
 ];

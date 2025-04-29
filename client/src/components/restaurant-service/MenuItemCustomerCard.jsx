@@ -21,7 +21,7 @@ const MenuItemCustomerCard = ({ item }) => {
       )}
 
       <h3 className="text-lg font-semibold">{item.name}</h3>
-      <p>{item.description}</p>
+      <p className="line-clamp-2 text-gray-700">{item.description}</p>
       <p className="text-green-600 font-medium">LKR {item.price}</p>
       <p className="text-sm text-gray-500">
         {item.available ? 'Available' : 'Not Available'}

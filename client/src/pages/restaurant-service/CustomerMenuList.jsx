@@ -327,7 +327,7 @@ const CustomerMenuList = () => {
                           <div key={item._id} className="flex items-center p-2 bg-orange-50 rounded-lg">
                             {item.imageUrl && (
                               <img 
-                                src={item.imageUrl.startsWith('/') ? `http://localhost:5000${item.imageUrl}` : item.imageUrl}
+                                src={item.imageUrl.startsWith('/') ? `http://localhost:5025${item.imageUrl}` : item.imageUrl}
                                 alt={item.name} 
                                 className="w-12 h-12 object-cover rounded-md mr-3" 
                                 onError={(e) => {

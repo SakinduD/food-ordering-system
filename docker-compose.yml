@@ -92,6 +92,7 @@ services:
       - NODE_ENV=development
       - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/OrderService?retryWrites=true&w=majority&appName=FoodOrderingSystem
       - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5020
     networks:
       - app-network
 

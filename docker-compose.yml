@@ -50,6 +50,10 @@ services:
       - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/Authentication?retryWrites=true&w=majority&appName=FoodOrderingSystem
       - JWT_SECRET=secret
       - CORS_ORIGIN=http://localhost:3000
+      - EMAIL_USER=aurafitness00@gmail.com
+      - EMAIL_PASS=yjplffkuxrknlrjv
+      - GOOGLE_CLIENT_ID=725020767584-q6p90get0cteascfft7gk3fndhdmg85e.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
     networks:
       - app-network
 
@@ -62,6 +66,9 @@ services:
       - PORT=5000
       - NODE_ENV=development
       - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/RestaurantService?retryWrites=true&w=majority&appName=FoodOrderingSystem
+      - JWT_SECRET=secret
+      - RESTAURANT_SERVICE_URL=http://localhost:5000
+      - ORDER_SERVICE_URL=http://localhost:5001
     volumes:
       - restaurant-uploads:/app/uploads
     networks:
@@ -93,6 +100,7 @@ services:
       - MONGO_URI=mongodb+srv://SEGROUP:segroup123@foodorderingsystem.zqiiqvx.mongodb.net/OrderService?retryWrites=true&w=majority&appName=FoodOrderingSystem
       - RESTAURANT_SERVICE_URL=http://restaurant-service:5000
       - NOTIFICATION_SERVICE_URL=http://notification-service:5020
+      - GOOGLE_MAPS_API_KEY=AIzaSyA-e1QNF2Q4yjhTieqegIgQWr51yUpIxms
     networks:
       - app-network
 
@@ -106,8 +114,12 @@ services:
       - NODE_ENV=development
       - ORDER_SERVICE_URL=http://order-service:5001
       - CLIENT_URL=http://client:80
-      - EMAIL_USER=${EMAIL_USER:-notification@example.com}
-      - EMAIL_PASS=${EMAIL_PASS:-password123}
+      - EMAIL_USER=legazy56@gmail.com
+      - EMAIL_PASS=ctop zumv fkjz thbl
+      - JWT_SECRET=secret
+      - TWILIO_ACCOUNT_SID=ACcd88963ff77be026f9efb81c33aa76f5
+      - TWILIO_AUTH_TOKEN=9cb99d2b047816668dab929e8050e7cd
+      - TWILIO_PHONE_NUMBER=+19787362320
     networks:
       - app-network
 
@@ -135,6 +147,9 @@ services:
     environment:
       - PORT=5008
       - NODE_ENV=development
+      - JWT_SECRET = secret
+      - MERCHANT_ID = 1229431
+      - MERCHANT_SECRET = NTYxNzgyODYzMzI2NzI4MzQ2MjIwNTg5NTA5MzU5NjkyODIxMg==
     networks:
       - app-network
 

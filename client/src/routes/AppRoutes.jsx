@@ -39,6 +39,7 @@ import UserReviews from "../pages/reviews/UserReviews";
 import ViewReview from "../pages/reviews/ViewReview";
 import AboutUs from '../pages/homeplate/AboutUs';
 import ContactUs from '../pages/homeplate/ContactUs';
+import NotFound from '../pages/NotFound';
 
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
@@ -181,7 +182,9 @@ function AppRoutes() {
 
       <Route path="/about-us" element={<AboutUs />} />
       <Route path="/contact-us" element={<ContactUs />} />
-
+      
+      {/* 404 Route - This should be the last route */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
     );
 }
